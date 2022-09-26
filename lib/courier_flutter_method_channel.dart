@@ -8,6 +8,7 @@ class MethodChannelCourierFlutter extends CourierFlutterPlatform {
 
   @visibleForTesting
   final methodChannel = const MethodChannel('courier_flutter');
+  final eventsChannel = const MethodChannel('courier_flutter_events');
 
   @override
   Future<String?> userId() async {
@@ -25,6 +26,11 @@ class MethodChannelCourierFlutter extends CourierFlutterPlatform {
   @override
   Future signOut() async {
     return await methodChannel.invokeMethod('signOut');
+  }
+
+  @override
+  Future getClickedNotification() async {
+    return await eventsChannel.invokeMethod('getClickedNotification');
   }
 
 }

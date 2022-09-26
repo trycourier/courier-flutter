@@ -49,7 +49,7 @@ android {
 
 dependencies {
 
-    implementation 'com.github.trycourier:courier-android:1.0.14'
+    implementation 'com.github.trycourier:courier-android:1.0.15'
 
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:30.3.1')

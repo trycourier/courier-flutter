@@ -28,24 +28,48 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+
+  String _message = 'Unknown';
 
   @override
   void initState() {
     super.initState();
+
+    if (!mounted) {
+      return;
+    }
+
     _initCourier();
+
   }
 
   Future<void> _initCourier() async {
 
     try {
 
+      // Listen to push notification events
+      Courier.shared.onPushNotificationDelivered = (message) {
+        print(message);
+        setState(() {
+          _message = 'Delivered \n ${message.toString()}';
+        });
+      };
+
+      Courier.shared.onPushNotificationClicked = (message) {
+        print(message);
+        setState(() {
+          _message = 'Clicked \n ${message.toString()}';
+        });
+      };
+
+      Courier.shared.getClickedNotification();
+
       final test1 = await Courier.shared.userId;
       print(test1);
 
       await Courier.shared.signIn(
-          accessToken: 'asdasd',
-          userId: 'mike_user'
+          accessToken: '',
+          userId: ''
       );
 
       final test2 = await Courier.shared.userId;
@@ -64,10 +88,10 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Courier example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Text(_message, textAlign: TextAlign.center),
         ),
       ),
     );

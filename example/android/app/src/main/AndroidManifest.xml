@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.courier.courier_flutter_example">
+
+    <!-- Needed to handle notification permission requests -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
    <application
         android:label="courier_flutter_example"
         android:name="${applicationName}"
@@ -25,6 +29,15 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".ExampleService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

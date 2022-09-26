@@ -35,4 +35,8 @@ abstract class CourierFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
+  Future getClickedNotification() {
+    throw UnimplementedError('getClickedNotification() has not been implemented.');
+  }
+
 }

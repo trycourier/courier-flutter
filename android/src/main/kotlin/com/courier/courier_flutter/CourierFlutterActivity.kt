@@ -4,9 +4,37 @@ import android.content.Intent
 import android.os.Bundle
 import com.courier.android.Courier
 import com.courier.android.trackPushNotificationClick
+import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
 open class CourierFlutterActivity : FlutterActivity() {
+
+    private var eventChannel: MethodChannel? = null
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        eventChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "courier_flutter_events")
+        eventChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+
+                "getClickedNotification" -> {
+                    checkIntentForPushNotificationClick(intent)
+                }
+
+                else -> {
+                    result.notImplemented()
+                }
+
+            }
+        }
+    }
+
+    override fun detachFromFlutterEngine() {
+        super.detachFromFlutterEngine()
+        eventChannel?.setMethodCallHandler(null)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,8 +46,7 @@ open class CourierFlutterActivity : FlutterActivity() {
 
         // Handle delivered messages on the main thread
         Courier.getLastDeliveredMessage { message ->
-            print("YAY")
-//            pushNotificationCallbacks?.onPushNotificationDelivered(message)
+            postPushNotificationDelivered(message)
         }
 
     }
@@ -31,9 +58,16 @@ open class CourierFlutterActivity : FlutterActivity() {
 
     private fun checkIntentForPushNotificationClick(intent: Intent?) {
         intent?.trackPushNotificationClick { message ->
-            print("YAY")
-//            pushNotificationCallbacks?.onPushNotificationClicked(message)
+            postPushNotificationClicked(message)
         }
+    }
+
+    private fun postPushNotificationDelivered(message: RemoteMessage) {
+        eventChannel?.invokeMethod("pushNotificationDelivered", message.data)
+    }
+
+    private fun postPushNotificationClicked(message: RemoteMessage) {
+        eventChannel?.invokeMethod("pushNotificationClicked", message.data)
     }
 
 }
