@@ -24,10 +24,13 @@ class Courier {
   }
 
   Function(dynamic message)? onPushNotificationDelivered;
-  Function(dynamic message)? onPushNotificationClicked;
 
-  getClickedNotification() {
-    return CourierFlutterPlatform.instance.getClickedNotification();
+  // When registering the push notification click listener
+  // The Flutter SDK will check to see if the native platform has a notification waiting for it
+  Function(dynamic message)? _onPushNotificationClicked;
+  set onPushNotificationClicked(Function(dynamic message)? listener) {
+    _onPushNotificationClicked = listener;
+    CourierFlutterPlatform.instance.getClickedNotification();
   }
 
   _registerPushNotificationListeners() {
@@ -41,7 +44,7 @@ class Courier {
           break;
         }
         case 'pushNotificationClicked': {
-          onPushNotificationClicked?.call(call.arguments);
+          _onPushNotificationClicked?.call(call.arguments);
           break;
         }
       }

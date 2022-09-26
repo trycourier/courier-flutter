@@ -62,8 +62,6 @@ class _MyAppState extends State<MyApp> {
         });
       };
 
-      Courier.shared.getClickedNotification();
-
       final test1 = await Courier.shared.userId;
       print(test1);
 

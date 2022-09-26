@@ -21,6 +21,7 @@ open class CourierFlutterActivity : FlutterActivity() {
 
                 "getClickedNotification" -> {
                     checkIntentForPushNotificationClick(intent)
+                    result.success(null)
                 }
 
                 else -> {
