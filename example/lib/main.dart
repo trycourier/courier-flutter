@@ -1,3 +1,5 @@
+import 'package:courier_flutter/courier_flutter_method_channel.dart';
+import 'package:courier_flutter/courier_flutter_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -47,6 +49,7 @@ class _MyAppState extends State<MyApp> {
 
     try {
 
+
       // Listen to push notification events
       Courier.shared.onPushNotificationDelivered = (message) {
         print(message);
@@ -62,16 +65,22 @@ class _MyAppState extends State<MyApp> {
         });
       };
 
-      final test1 = await Courier.shared.userId;
-      print(test1);
-
       await Courier.shared.signIn(
-          accessToken: '',
-          userId: ''
+          accessToken: myApiKey,
+          userId: myUserId
       );
 
-      final test2 = await Courier.shared.userId;
-      print(test2);
+      final fcmToken = await Courier.shared.fcmToken;
+      final userId = await Courier.shared.userId;
+      print('$fcmToken :: $userId');
+
+      final requestId = await Courier.shared.sendPush(
+          authKey: myApiKey,
+          userId: userId ?? '',
+          title: 'Sent from flutter',
+          body: 'To you! <3'
+      );
+      print("https://app.courier.com/logs/messages?message=$requestId");
 
     } catch (e) {
 

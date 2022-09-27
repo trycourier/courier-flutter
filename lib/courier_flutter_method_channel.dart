@@ -7,17 +7,29 @@ import 'courier_flutter_platform_interface.dart';
 class MethodChannelCourierFlutter extends CourierFlutterPlatform {
 
   @visibleForTesting
-  final methodChannel = const MethodChannel('courier_flutter');
+  final coreChannel = const MethodChannel('courier_flutter_core');
   final eventsChannel = const MethodChannel('courier_flutter_events');
 
   @override
   Future<String?> userId() async {
-    return await methodChannel.invokeMethod('userId');
+    return await coreChannel.invokeMethod('userId');
+  }
+
+  @override
+  Future<String?> fcmToken() async {
+    return await coreChannel.invokeMethod('fcmToken');
+  }
+
+  @override
+  Future setFcmToken(String token) async {
+    return await coreChannel.invokeMethod('setFcmToken', {
+      'token': token,
+    });
   }
 
   @override
   Future signIn(String accessToken, String userId) async {
-    return await methodChannel.invokeMethod('signIn', {
+    return await coreChannel.invokeMethod('signIn', {
       'accessToken': accessToken,
       'userId': userId,
     });
@@ -25,7 +37,17 @@ class MethodChannelCourierFlutter extends CourierFlutterPlatform {
 
   @override
   Future signOut() async {
-    return await methodChannel.invokeMethod('signOut');
+    return await coreChannel.invokeMethod('signOut');
+  }
+
+  @override
+  Future<String> sendPush(String authKey, String userId, String title, String body) async {
+    return await coreChannel.invokeMethod('sendPush', {
+      'authKey': authKey,
+      'userId': userId,
+      'title': title,
+      'body': body,
+    });
   }
 
   @override

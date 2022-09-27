@@ -15,21 +15,16 @@ open class CourierFlutterActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        eventChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "courier_flutter_events")
-        eventChannel?.setMethodCallHandler { call, result ->
-            when (call.method) {
 
-                "getClickedNotification" -> {
+        eventChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CourierFlutterPlugin.EVENTS_CHANNEL).apply {
+            setMethodCallHandler { call, result ->
+                if (call.method == "getClickedNotification") {
                     checkIntentForPushNotificationClick(intent)
                     result.success(null)
                 }
-
-                else -> {
-                    result.notImplemented()
-                }
-
             }
         }
+
     }
 
     override fun detachFromFlutterEngine() {

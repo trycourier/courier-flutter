@@ -27,12 +27,24 @@ abstract class CourierFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('userId() has not been implemented.');
   }
 
+  Future<String?> fcmToken() {
+    throw UnimplementedError('fcmToken() has not been implemented.');
+  }
+
+  Future setFcmToken(String token) {
+    throw UnimplementedError('setFcmToken() has not been implemented.');
+  }
+
   Future signIn(String accessToken, String userId) {
     throw UnimplementedError('signIn() has not been implemented.');
   }
 
   Future signOut() {
     throw UnimplementedError('signOut() has not been implemented.');
+  }
+
+  Future<String> sendPush(String authKey, String userId, String title, String body) {
+    throw UnimplementedError('sendPush() has not been implemented.');
   }
 
   Future getClickedNotification() {

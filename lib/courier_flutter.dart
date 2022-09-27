@@ -2,6 +2,7 @@
 
 import 'package:flutter/services.dart';
 
+import 'courier_flutter_method_channel.dart';
 import 'courier_flutter_platform_interface.dart';
 
 class Courier {
@@ -15,12 +16,24 @@ class Courier {
 
   Future<String?> get userId => CourierFlutterPlatform.instance.userId();
 
+  // TODO: Debugging
+
+  Future<String?> get fcmToken => CourierFlutterPlatform.instance.fcmToken();
+
+  Future setFcmToken({ required String token }) {
+    return CourierFlutterPlatform.instance.setFcmToken(token);
+  }
+
   Future signIn({ required String accessToken, required String userId }) {
     return CourierFlutterPlatform.instance.signIn(accessToken, userId);
   }
 
   Future signOut() {
     return CourierFlutterPlatform.instance.signOut();
+  }
+
+  Future<String> sendPush({ required String authKey, required String userId, required String title, required String body }) {
+    return CourierFlutterPlatform.instance.sendPush(authKey, userId, title, body);
   }
 
   Function(dynamic message)? onPushNotificationDelivered;
