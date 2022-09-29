@@ -1,71 +1,67 @@
-
-
-import 'package:flutter/services.dart';
-
-import 'courier_flutter_method_channel.dart';
-import 'courier_flutter_platform_interface.dart';
+import 'package:flutter/foundation.dart';
+import 'courier_flutter_core_platform_interface.dart';
+import 'courier_flutter_events_platform_interface.dart';
 
 class Courier {
 
-  Courier._() {
-    _registerPushNotificationListeners();
+  Function(dynamic message)? _onPushNotificationDelivered;
+  set onPushNotificationDelivered(Function(dynamic message)? listener) {
+    _onPushNotificationDelivered = listener;
   }
-
-  static Courier? _instance;
-  static Courier get shared => _instance ??= Courier._();
-
-  Future<String?> get userId => CourierFlutterPlatform.instance.userId();
-
-  // TODO: Debugging
-
-  Future<String?> get fcmToken => CourierFlutterPlatform.instance.fcmToken();
-
-  Future setFcmToken({ required String token }) {
-    return CourierFlutterPlatform.instance.setFcmToken(token);
-  }
-
-  Future signIn({ required String accessToken, required String userId }) {
-    return CourierFlutterPlatform.instance.signIn(accessToken, userId);
-  }
-
-  Future signOut() {
-    return CourierFlutterPlatform.instance.signOut();
-  }
-
-  Future<String> sendPush({ required String authKey, required String userId, required String title, required String body }) {
-    return CourierFlutterPlatform.instance.sendPush(authKey, userId, title, body);
-  }
-
-  Function(dynamic message)? onPushNotificationDelivered;
 
   // When registering the push notification click listener
   // The Flutter SDK will check to see if the native platform has a notification waiting for it
   Function(dynamic message)? _onPushNotificationClicked;
   set onPushNotificationClicked(Function(dynamic message)? listener) {
     _onPushNotificationClicked = listener;
-    CourierFlutterPlatform.instance.getClickedNotification();
+    CourierFlutterEventsPlatform.instance.getClickedNotification();
   }
 
-  _registerPushNotificationListeners() {
+  Courier._() {
 
-    const eventsChannel = MethodChannel('courier_flutter_events');
-    eventsChannel.setMethodCallHandler((call) {
+    // Set debugging mode to default if app is debugging
+    setIsDebugging(kDebugMode);
 
-      switch (call.method) {
-        case 'pushNotificationDelivered': {
-          onPushNotificationDelivered?.call(call.arguments);
-          break;
-        }
-        case 'pushNotificationClicked': {
-          _onPushNotificationClicked?.call(call.arguments);
-          break;
-        }
-      }
+    // Register listeners for when the native system receives messages
+    CourierFlutterEventsPlatform.instance.registerMessagingListeners(
+        onPushNotificationDelivered: (message) => _onPushNotificationDelivered?.call(message),
+        onPushNotificationClicked: (message) => _onPushNotificationClicked?.call(message),
+        onLogPosted: (log) => { /* Empty for now. Does support receiving logs */ },
+    );
 
-      return Future.value();
+  }
 
-    });
+  static Courier? _instance;
+  static Courier get shared => _instance ??= Courier._();
 
+  bool _isDebugging = false;
+  bool get isDebugging => _isDebugging;
+  Future setIsDebugging(bool isDebugging) async {
+    _isDebugging = await CourierFlutterCorePlatform.instance.isDebugging(isDebugging);
+  }
+
+  Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();
+
+  Future<String?> get fcmToken => CourierFlutterCorePlatform.instance.fcmToken();
+
+  Future setFcmToken({ required String token }) {
+    return CourierFlutterCorePlatform.instance.setFcmToken(token);
+  }
+
+  Future signIn({ required String accessToken, required String userId }) {
+    return CourierFlutterCorePlatform.instance.signIn(accessToken, userId);
+  }
+
+  Future signOut() {
+    return CourierFlutterCorePlatform.instance.signOut();
+  }
+
+  Future<String> requestNotificationPermission() {
+    return CourierFlutterEventsPlatform.instance.requestNotificationPermission();
+  }
+
+  Future<String> sendPush({ required String authKey, required String userId, required String title, required String body }) {
+    return CourierFlutterCorePlatform.instance.sendPush(authKey, userId, title, body);
   }
 
 }

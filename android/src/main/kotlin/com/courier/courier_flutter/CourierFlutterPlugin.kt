@@ -1,6 +1,6 @@
 package com.courier.courier_flutter
 
-import androidx.annotation.NonNull
+import com.courier.android.BuildConfig
 import com.courier.android.Courier
 import com.courier.android.models.CourierAgent
 import com.courier.android.models.CourierProvider
@@ -27,15 +27,24 @@ class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
   private var channel: MethodChannel? = null
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+  override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, CORE_CHANNEL).apply {
       setMethodCallHandler(this@CourierFlutterPlugin)
     }
   }
 
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+  override fun onMethodCall(call: MethodCall, result: Result) {
 
     when (call.method) {
+
+      "isDebugging" -> {
+
+        val params = call.arguments as HashMap<*, *>
+        val isDebugging = params["isDebugging"] as? Boolean
+        Courier.shared.isDebugging = isDebugging ?: BuildConfig.DEBUG
+        result.success(isDebugging)
+
+      }
 
       "userId" -> {
 
@@ -131,7 +140,7 @@ class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
   }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     channel?.setMethodCallHandler(null)
   }
 

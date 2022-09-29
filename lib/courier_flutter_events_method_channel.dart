@@ -1,58 +1,42 @@
+import 'package:courier_flutter/courier_flutter_events_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'courier_flutter_core_platform_interface.dart';
-
-/// An implementation of [CourierFlutterPlatform] that uses method channels.
-class MethodChannelCourierFlutter extends CourierFlutterPlatform {
+/// An implementation of [EventsChannelCourierFlutter] that uses method channels.
+class EventsChannelCourierFlutter extends CourierFlutterEventsPlatform {
 
   @visibleForTesting
-  final coreChannel = const MethodChannel('courier_flutter_core');
-  final eventsChannel = const MethodChannel('courier_flutter_events');
+  final channel = const MethodChannel('courier_flutter_events');
 
   @override
-  Future<String?> userId() async {
-    return await coreChannel.invokeMethod('userId');
-  }
-
-  @override
-  Future<String?> fcmToken() async {
-    return await coreChannel.invokeMethod('fcmToken');
-  }
-
-  @override
-  Future setFcmToken(String token) async {
-    return await coreChannel.invokeMethod('setFcmToken', {
-      'token': token,
-    });
-  }
-
-  @override
-  Future signIn(String accessToken, String userId) async {
-    return await coreChannel.invokeMethod('signIn', {
-      'accessToken': accessToken,
-      'userId': userId,
-    });
-  }
-
-  @override
-  Future signOut() async {
-    return await coreChannel.invokeMethod('signOut');
-  }
-
-  @override
-  Future<String> sendPush(String authKey, String userId, String title, String body) async {
-    return await coreChannel.invokeMethod('sendPush', {
-      'authKey': authKey,
-      'userId': userId,
-      'title': title,
-      'body': body,
-    });
+  Future<String> requestNotificationPermission() async {
+    return await channel.invokeMethod('requestNotificationPermission');
   }
 
   @override
   Future getClickedNotification() async {
-    return await eventsChannel.invokeMethod('getClickedNotification');
+    return await channel.invokeMethod('getClickedNotification');
+  }
+
+  @override
+  registerMessagingListeners({ required Function(dynamic message) onPushNotificationDelivered, required Function(dynamic message) onPushNotificationClicked, required Function(dynamic log) onLogPosted }) {
+    channel.setMethodCallHandler((call) {
+      switch (call.method) {
+        case 'log': {
+          onLogPosted.call(call.arguments);
+          break;
+        }
+        case 'pushNotificationDelivered': {
+          onPushNotificationDelivered.call(call.arguments);
+          break;
+        }
+        case 'pushNotificationClicked': {
+          onPushNotificationClicked.call(call.arguments);
+          break;
+        }
+      }
+      return Future.value();
+    });
   }
 
 }

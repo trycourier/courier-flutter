@@ -1,5 +1,5 @@
-import 'package:courier_flutter/courier_flutter_method_channel.dart';
-import 'package:courier_flutter/courier_flutter_platform_interface.dart';
+import 'package:courier_flutter/courier_flutter_core_method_channel.dart';
+import 'package:courier_flutter/courier_flutter_core_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -49,6 +49,10 @@ class _MyAppState extends State<MyApp> {
 
     try {
 
+      final test = await Courier.shared.requestNotificationPermission();
+      print(test);
+
+      Courier.shared.setIsDebugging(false);
 
       // Listen to push notification events
       Courier.shared.onPushNotificationDelivered = (message) {
@@ -80,7 +84,7 @@ class _MyAppState extends State<MyApp> {
           title: 'Sent from flutter',
           body: 'To you! <3'
       );
-      print("https://app.courier.com/logs/messages?message=$requestId");
+      print(requestId);
 
     } catch (e) {
 
