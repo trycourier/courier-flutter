@@ -1,3 +1,4 @@
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'courier_flutter_core_platform_interface.dart';
 import 'courier_flutter_events_platform_interface.dart';
@@ -48,6 +49,9 @@ class Courier {
     return CourierFlutterCorePlatform.instance.setFcmToken(token);
   }
 
+  // Will save a persistent reference to the accessToken and userId you provide
+  // This will be available between app sessions
+  // You must call signOut to remove these references
   Future signIn({ required String accessToken, required String userId }) {
     return CourierFlutterCorePlatform.instance.signIn(accessToken, userId);
   }
@@ -60,8 +64,12 @@ class Courier {
     return CourierFlutterEventsPlatform.instance.requestNotificationPermission();
   }
 
-  Future<String> sendPush({ required String authKey, required String userId, required String title, required String body }) {
-    return CourierFlutterCorePlatform.instance.sendPush(authKey, userId, title, body);
+  Future<String> getNotificationPermissionStatus() {
+    return CourierFlutterEventsPlatform.instance.getNotificationPermissionStatus();
+  }
+
+  Future<String> sendPush({ required String authKey, required String userId, required String title, required String body, required bool isProduction, required List<CourierProvider> providers }) {
+    return CourierFlutterCorePlatform.instance.sendPush(authKey, userId, title, body, isProduction, providers);
   }
 
 }

@@ -1,3 +1,4 @@
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'courier_flutter_core_platform_interface.dart';
@@ -46,12 +47,14 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
-  Future<String> sendPush(String authKey, String userId, String title, String body) async {
+  Future<String> sendPush(String authKey, String userId, String title, String body, bool isProduction, List<CourierProvider> providers) async {
     return await channel.invokeMethod('sendPush', {
       'authKey': authKey,
       'userId': userId,
       'title': title,
       'body': body,
+      'isProduction': isProduction,
+      'providers': providers.map((provider) => provider.value).toList(),
     });
   }
 

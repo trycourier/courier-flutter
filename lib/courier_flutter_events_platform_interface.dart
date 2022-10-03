@@ -21,6 +21,10 @@ abstract class CourierFlutterEventsPlatform extends PlatformInterface {
     throw UnimplementedError('requestNotificationPermission() has not been implemented.');
   }
 
+  Future<String> getNotificationPermissionStatus() async {
+    throw UnimplementedError('getNotificationPermissionStatus() has not been implemented.');
+  }
+
   Future getClickedNotification() async {
     throw UnimplementedError('getClickedNotification() has not been implemented.');
   }

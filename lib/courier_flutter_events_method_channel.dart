@@ -14,6 +14,11 @@ class EventsChannelCourierFlutter extends CourierFlutterEventsPlatform {
   }
 
   @override
+  Future<String> getNotificationPermissionStatus() async {
+    return await channel.invokeMethod('getNotificationPermissionStatus');
+  }
+
+  @override
   Future getClickedNotification() async {
     return await channel.invokeMethod('getClickedNotification');
   }

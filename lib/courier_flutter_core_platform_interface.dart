@@ -1,3 +1,4 @@
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'courier_flutter_core_method_channel.dart';
 
@@ -44,7 +45,7 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
-  Future<String> sendPush(String authKey, String userId, String title, String body) {
+  Future<String> sendPush(String authKey, String userId, String title, String body, bool isProduction, List<CourierProvider> providers) {
     throw UnimplementedError('sendPush() has not been implemented.');
   }
 

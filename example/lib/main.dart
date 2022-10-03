@@ -1,12 +1,10 @@
-import 'package:courier_flutter/courier_flutter_core_method_channel.dart';
-import 'package:courier_flutter/courier_flutter_core_platform_interface.dart';
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-import 'package:flutter/services.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 
 Future<void> main() async {
@@ -49,10 +47,17 @@ class _MyAppState extends State<MyApp> {
 
     try {
 
+      final id = await Courier.shared.userId;
+      print(id);
+
+      await Courier.shared.setIsDebugging(false);
+      print(Courier.shared.isDebugging);
+
+      final status = await Courier.shared.getNotificationPermissionStatus();
+      print(status);
+
       final test = await Courier.shared.requestNotificationPermission();
       print(test);
-
-      Courier.shared.setIsDebugging(false);
 
       // Listen to push notification events
       Courier.shared.onPushNotificationDelivered = (message) {
@@ -82,9 +87,14 @@ class _MyAppState extends State<MyApp> {
           authKey: myApiKey,
           userId: userId ?? '',
           title: 'Sent from flutter',
-          body: 'To you! <3'
+          body: 'To you! <3',
+          isProduction: false,
+          // providers: [CourierProvider.apns, CourierProvider.fcm],
+          providers: [CourierProvider.apns],
       );
       print(requestId);
+
+      // await Courier.shared.signOut();
 
     } catch (e) {
 
