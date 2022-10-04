@@ -9,6 +9,7 @@ import UIKit
 import Flutter
 import Courier_iOS
 
+@available(iOSApplicationExtension, unavailable)
 open class CourierFlutterDelegate: FlutterAppDelegate {
     
     // MARK: Getters

@@ -79,13 +79,17 @@ class _MyAppState extends State<MyApp> {
           userId: myUserId
       );
 
-      final fcmToken = await Courier.shared.fcmToken;
-      final userId = await Courier.shared.userId;
-      print('$fcmToken :: $userId');
+      final res = await Future.wait([
+        Courier.shared.apnsToken,
+        Courier.shared.fcmToken,
+        Courier.shared.userId,
+      ]);
+
+      print(res.join(', '));
 
       final requestId = await Courier.shared.sendPush(
           authKey: myApiKey,
-          userId: userId ?? '',
+          userId: myUserId,
           title: 'Sent from flutter',
           body: 'To you! <3',
           isProduction: false,

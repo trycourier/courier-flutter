@@ -43,6 +43,8 @@ class Courier {
 
   Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();
 
+  Future<String?> get apnsToken => CourierFlutterCorePlatform.instance.apnsToken();
+
   Future<String?> get fcmToken => CourierFlutterCorePlatform.instance.fcmToken();
 
   Future setFcmToken({ required String token }) {

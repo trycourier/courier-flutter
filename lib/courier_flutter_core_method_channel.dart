@@ -22,6 +22,11 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
+  Future<String?> apnsToken() async {
+    return await channel.invokeMethod('apnsToken');
+  }
+
+  @override
   Future<String?> fcmToken() async {
     return await channel.invokeMethod('fcmToken');
   }

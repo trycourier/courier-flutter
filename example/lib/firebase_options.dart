@@ -51,5 +51,4 @@ class DefaultFirebaseOptions {
 
   // TODO: Git ignore these
 
-
 }

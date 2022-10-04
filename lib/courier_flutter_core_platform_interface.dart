@@ -29,6 +29,10 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('isDebugging() has not been implemented.');
   }
 
+  Future<String?> apnsToken() {
+    throw UnimplementedError('apnsToken() has not been implemented.');
+  }
+
   Future<String?> fcmToken() {
     throw UnimplementedError('fcmToken() has not been implemented.');
   }
