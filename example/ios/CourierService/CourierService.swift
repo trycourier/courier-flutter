@@ -5,10 +5,12 @@
 //  Created by Michael Miller on 10/3/22.
 //
 
+import UserNotifications
+import UIKit
 import Courier_iOS
 
-class NotificationService: CourierNotificationServiceExtension {
-
+class CourierService: CourierNotificationServiceExtension {
+    
     //
     //         ^      ╔══════════════════════════════╗
     //       >' )     ║ You can override this class, ║
