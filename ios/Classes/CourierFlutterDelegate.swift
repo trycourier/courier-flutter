@@ -96,7 +96,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
                                 case "badge": self?.foregroundPresentationOptions.insert(.badge)
                                 case "list": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.list) } else { self?.foregroundPresentationOptions.insert(.alert) }
                                 case "banner": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.banner) } else { self?.foregroundPresentationOptions.insert(.alert) }
-                                default: print("Presentation Option supported")
+                                default: break
                                 }
                             }
                             
