@@ -1,7 +1,8 @@
-import 'package:courier_flutter/courier_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'courier_flutter_core_platform_interface.dart';
 import 'courier_flutter_events_platform_interface.dart';
+import 'courier_provider.dart';
+import 'ios_foreground_notification_presentation_options.dart';
 
 class Courier {
 
@@ -21,7 +22,10 @@ class Courier {
   Courier._() {
 
     // Set debugging mode to default if app is debugging
-    setIsDebugging(kDebugMode);
+    isDebugging = kDebugMode;
+
+    // Set the default iOS presentation options
+    iOSForegroundNotificationPresentationOptions = _iOSForegroundNotificationPresentationOptions;
 
     // Register listeners for when the native system receives messages
     CourierFlutterEventsPlatform.instance.registerMessagingListeners(
@@ -35,10 +39,20 @@ class Courier {
   static Courier? _instance;
   static Courier get shared => _instance ??= Courier._();
 
-  bool _isDebugging = false;
+  bool _isDebugging = kDebugMode;
   bool get isDebugging => _isDebugging;
-  Future setIsDebugging(bool isDebugging) async {
-    _isDebugging = await CourierFlutterCorePlatform.instance.isDebugging(isDebugging);
+  set isDebugging(bool isDebugging) {
+    CourierFlutterCorePlatform.instance.isDebugging(isDebugging);
+    _isDebugging = isDebugging;
+  }
+
+  // Default presentation will use all available values
+  // Pass [] if you do not want this to be used
+  List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions = iOSNotificationPresentationOption.values;
+  List<iOSNotificationPresentationOption> get iOSForegroundNotificationPresentationOptions => _iOSForegroundNotificationPresentationOptions;
+  set iOSForegroundNotificationPresentationOptions(List<iOSNotificationPresentationOption> options) {
+    CourierFlutterEventsPlatform.instance.iOSForegroundPresentationOptions(options);
+    _iOSForegroundNotificationPresentationOptions = options;
   }
 
   Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();

@@ -1,3 +1,4 @@
+import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'courier_flutter_events_method_channel.dart';
 
@@ -27,6 +28,10 @@ abstract class CourierFlutterEventsPlatform extends PlatformInterface {
 
   Future getClickedNotification() async {
     throw UnimplementedError('getClickedNotification() has not been implemented.');
+  }
+
+  Future iOSForegroundPresentationOptions(List<iOSNotificationPresentationOption> options) {
+    throw UnimplementedError('iOSForegroundPresentationOptions() has not been implemented.');
   }
 
   registerMessagingListeners({ required Function(dynamic message) onPushNotificationDelivered, required Function(dynamic message) onPushNotificationClicked, required Function(dynamic log) onLogPosted }) {

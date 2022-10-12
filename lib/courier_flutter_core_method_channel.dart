@@ -10,15 +10,15 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   final channel = const MethodChannel('courier_flutter_core');
 
   @override
-  Future<String?> userId() async {
-    return await channel.invokeMethod('userId');
-  }
-
-  @override
   Future<bool> isDebugging(bool isDebugging) async {
     return await channel.invokeMethod('isDebugging', {
       'isDebugging': isDebugging,
     });
+  }
+
+  @override
+  Future<String?> userId() async {
+    return await channel.invokeMethod('userId');
   }
 
   @override

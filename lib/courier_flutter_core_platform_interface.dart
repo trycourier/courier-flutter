@@ -21,12 +21,12 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> userId() {
-    throw UnimplementedError('userId() has not been implemented.');
-  }
-
   Future<bool> isDebugging(bool isDebugging) {
     throw UnimplementedError('isDebugging() has not been implemented.');
+  }
+
+  Future<String?> userId() {
+    throw UnimplementedError('userId() has not been implemented.');
   }
 
   Future<String?> apnsToken() {

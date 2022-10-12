@@ -30,6 +30,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     
     private var methodChannel: FlutterMethodChannel? = nil
     private var lastClickedMessage: [AnyHashable : Any]? = nil
+    private var foregroundPresentationOptions: UNNotificationPresentationOptions = []
     
     // MARK: Init
     
@@ -81,6 +82,27 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
                         }
                     
                         result(nil)
+                    
+                    case "iOSForegroundPresentationOptions":
+                        
+                        if let params = call.arguments as? Dictionary<String, Any>,
+                            let options = params["options"] as? [String] {
+                            
+                            // Clear out and add presentation optionset
+                            self?.foregroundPresentationOptions = []
+                            options.forEach { option in
+                                switch option {
+                                case "sound": self?.foregroundPresentationOptions.insert(.sound)
+                                case "badge": self?.foregroundPresentationOptions.insert(.badge)
+                                case "list": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.list) } else { self?.foregroundPresentationOptions.insert(.alert) }
+                                case "banner": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.banner) } else { self?.foregroundPresentationOptions.insert(.alert) }
+                                default: print("Options supported")
+                                }
+                            }
+                            
+                        }
+                        
+                        result(nil)
 
                     default:
 
@@ -114,12 +136,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
         methodChannel?.invokeMethod("pushNotificationDelivered", arguments: message)
         
-        // TODO:
-        if #available(iOS 14.0, *) {
-            completionHandler([.sound, .list, .banner, .badge])
-        } else {
-            completionHandler([.sound, .badge])
-        }
+        completionHandler(foregroundPresentationOptions)
         
     }
     
@@ -150,9 +167,5 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
             }
         }
     }
-    
-    // MARK: Functions
-    
-//    open func deviceTokenDidChange(rawApnsToken: Data, isDebugging: Bool) {}
     
 }
