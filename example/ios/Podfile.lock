@@ -1,7 +1,7 @@
 PODS:
-  - Courier-iOS (1.0.12)
+  - Courier-iOS (1.0.14)
   - courier_flutter (0.0.1):
-    - Courier-iOS (= 1.0.12)
+    - Courier-iOS (= 1.0.14)
     - Flutter
   - Firebase/CoreOnly (9.5.0):
     - FirebaseCore (= 9.5.0)
@@ -102,8 +102,8 @@ EXTERNAL SOURCES:
     :path: Flutter
 
 SPEC CHECKSUMS:
-  Courier-iOS: 5acf30f05ea9a4f3af315c9a4fbcaf88f6b58383
-  courier_flutter: 65239e41e4cff9950f130a64ec29faa4e67fcbe5
+  Courier-iOS: 4272d63f4310e7765de8d4833b72dd650d9306ff
+  courier_flutter: ccbfb40d5385fffb4fc49970e39e954a3c339525
   Firebase: 800f16f07af493d98d017446a315c27af0552f41
   firebase_core: c266297725f66cacd7eac30745cd1a629d3b048b
   firebase_messaging: c3e6b5f8ef9ea31b67365ec017802e32d165447c
