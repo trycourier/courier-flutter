@@ -47,6 +47,9 @@ class _MyAppState extends State<MyApp> {
 
     try {
 
+      const myUserId = 'mike_user';
+      const myApiKey = 'pk_prod_F0NMXKMWQ6M1CCQ5KG587KZ7J478';
+
       final id = await Courier.shared.userId;
       print(id);
 

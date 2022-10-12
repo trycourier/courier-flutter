@@ -112,10 +112,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
             
         }
         
-        // Post flutter event
         methodChannel?.invokeMethod("pushNotificationDelivered", arguments: message)
-        
-//        let presentationOptions = pushNotificationDeliveredInForeground(message: message)
         
         // TODO:
         if #available(iOS 14.0, *) {
@@ -131,11 +128,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         let message = response.notification.request.content.userInfo
         
         Courier.shared.trackNotification(message: message, event: .clicked)
-        
-//        pushNotificationClicked(message: message)
-        
         lastClickedMessage = message
-        
         methodChannel?.invokeMethod("pushNotificationClicked", arguments: message)
         
         completionHandler()

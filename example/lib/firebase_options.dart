@@ -51,4 +51,21 @@ class DefaultFirebaseOptions {
 
   // TODO: Git ignore these
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDBhCFMeKzpL-enS9KNYXPbDTibHI4G1mM',
+    appId: '1:98931983397:android:28e9749164ff6068a4abcc',
+    messagingSenderId: '98931983397',
+    projectId: 'courier-testing-61c0b',
+    storageBucket: 'courier-testing-61c0b.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAWnYV_4reQ_nSvr_q1P5WwBoJajVj8bFk',
+    appId: '1:98931983397:ios:bddf76ba344327bda4abcc',
+    messagingSenderId: '98931983397',
+    projectId: 'courier-testing-61c0b',
+    storageBucket: 'courier-testing-61c0b.appspot.com',
+    iosClientId: '98931983397-oc2rntk0nad0gvhghr924f2hbgd3nd5h.apps.googleusercontent.com',
+    iosBundleId: 'com.courier.courierFlutterExample',
+  );
 }

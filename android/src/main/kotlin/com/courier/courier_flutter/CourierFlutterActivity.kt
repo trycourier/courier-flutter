@@ -33,6 +33,8 @@ open class CourierFlutterActivity : FlutterActivity() {
 
                     "requestNotificationPermission" -> {
 
+                        // TODO: Return this with error or something
+
 //                        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_CONTACTS}, 0);
 
 //                        ActivityCompat.requestPermissions(this@CourierFlutterActivity, new String[] {Manifest.permission.READ_CONTACTS}, 0)
