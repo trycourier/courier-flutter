@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     try {
 
       const myUserId = 'mike_user';
-      const myApiKey = 'pk_test_JA9NNAAJB2MTP3KQJ9ZHMWGA14YJ';
+      const myApiKey = 'pk_prod_F0NMXKMWQ6M1CCQ5KG587KZ7J478';
 
       Courier.shared.isDebugging = false;
       print(Courier.shared.isDebugging);
@@ -65,11 +67,11 @@ class _MyAppState extends State<MyApp> {
       final id = await Courier.shared.userId;
       print(id);
 
-      final status = await Courier.shared.getNotificationPermissionStatus();
-      print(status);
+      final fetchStatus = await Courier.shared.getNotificationPermissionStatus();
+      print(fetchStatus);
 
-      final test = await Courier.shared.requestNotificationPermission();
-      print(test);
+      final requestStatus = await Courier.shared.requestNotificationPermission();
+      print(requestStatus);
 
       // Listen to push notification events
       Courier.shared.onPushNotificationDelivered = (message) {
@@ -106,7 +108,7 @@ class _MyAppState extends State<MyApp> {
           body: 'To you! <3',
           isProduction: false,
           // providers: [CourierProvider.apns, CourierProvider.fcm],
-          providers: [CourierProvider.apns],
+          providers: [CourierProvider.fcm],
       );
       print(requestId);
 

@@ -1,3 +1,4 @@
+import 'package:courier_flutter/notification_permission_status.dart';
 import 'package:flutter/foundation.dart';
 import 'courier_flutter_core_platform_interface.dart';
 import 'courier_flutter_events_platform_interface.dart';
@@ -76,12 +77,14 @@ class Courier {
     return CourierFlutterCorePlatform.instance.signOut();
   }
 
-  Future<String> requestNotificationPermission() {
-    return CourierFlutterEventsPlatform.instance.requestNotificationPermission();
+  Future<NotificationPermissionStatus> requestNotificationPermission() async {
+    final status = await CourierFlutterEventsPlatform.instance.requestNotificationPermission();
+    return status.permissionStatus;
   }
 
-  Future<String> getNotificationPermissionStatus() {
-    return CourierFlutterEventsPlatform.instance.getNotificationPermissionStatus();
+  Future<NotificationPermissionStatus> getNotificationPermissionStatus() async {
+    final status = await CourierFlutterEventsPlatform.instance.getNotificationPermissionStatus();
+    return status.permissionStatus;
   }
 
   Future<String> sendPush({ required String authKey, required String userId, required String title, required String body, required bool isProduction, required List<CourierProvider> providers }) {

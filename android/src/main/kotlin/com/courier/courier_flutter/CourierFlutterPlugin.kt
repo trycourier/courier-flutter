@@ -115,13 +115,23 @@ class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
         val userId = params["userId"] as? String
         val title = params["title"] as? String
         val body = params["body"] as? String
+        val isProduction = params["isProduction"] as? Boolean
+        val providers = params["providers"] as? List<*>
+
+        // Map the providers to the proper enums
+        val courierProviders = providers?.mapNotNull { value ->
+          return@mapNotNull CourierProvider.values().firstOrNull { provider ->
+            provider.value == value.toString()
+          }
+        }.orEmpty()
 
         Courier.shared.sendPush(
           authKey = authKey ?: "",
           userId = userId ?: "",
           title = title ?: "",
           body = body ?: "",
-          providers = listOf(CourierProvider.FCM),
+          isProduction = isProduction ?: false,
+          providers = courierProviders,
           onSuccess = { requestId ->
             result.success(requestId)
           },

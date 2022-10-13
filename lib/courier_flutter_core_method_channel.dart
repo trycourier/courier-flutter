@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -23,7 +25,12 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
 
   @override
   Future<String?> apnsToken() async {
+
+    // Skip other platforms. Do not show error
+    if (!Platform.isIOS) return null;
+
     return await channel.invokeMethod('apnsToken');
+
   }
 
   @override

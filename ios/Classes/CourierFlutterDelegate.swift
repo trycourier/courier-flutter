@@ -29,7 +29,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     // MARK: Props
     
     private var methodChannel: FlutterMethodChannel? = nil
-    private var lastClickedMessage: [AnyHashable : Any]? = nil
+    private var lastClickedPushNotification: [AnyHashable : Any?]? = nil
     private var foregroundPresentationOptions: UNNotificationPresentationOptions = []
     
     // MARK: Init
@@ -76,9 +76,9 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
 
                     
                         // Fetch the last push notification that was clicked
-                        if let self = self, let lastMessage = self.lastClickedMessage {
-                            self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastMessage)
-                            self.lastClickedMessage = nil
+                        if let self = self, let lastPush = self.lastClickedPushNotification {
+                            self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
+                            self.lastClickedPushNotification = nil
                         }
                     
                         result(nil)
@@ -122,32 +122,39 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     
     public override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        let message = notification.request.content.userInfo
+        let content = notification.request.content
+        let message = content.userInfo
+        let pushNotification = content.pushNotification
         
         Task {
-            
             do {
                 try await Courier.shared.trackNotification(message: message, event: .delivered)
             } catch {
                 Courier.log(String(describing: error))
             }
-            
         }
-        
-        methodChannel?.invokeMethod("pushNotificationDelivered", arguments: message)
-        
+
+        methodChannel?.invokeMethod("pushNotificationDelivered", arguments: pushNotification)
         completionHandler(foregroundPresentationOptions)
         
     }
     
     public override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        let message = response.notification.request.content.userInfo
+        let content = response.notification.request.content
+        let message = content.userInfo
+        let pushNotification = content.pushNotification
         
-        Courier.shared.trackNotification(message: message, event: .clicked)
-        lastClickedMessage = message
-        methodChannel?.invokeMethod("pushNotificationClicked", arguments: message)
+        Task {
+            do {
+                try await Courier.shared.trackNotification(message: message, event: .clicked)
+            } catch {
+                Courier.log(String(describing: error))
+            }
+        }
         
+        lastClickedPushNotification = pushNotification
+        methodChannel?.invokeMethod("pushNotificationClicked", arguments: pushNotification)
         completionHandler()
         
     }
