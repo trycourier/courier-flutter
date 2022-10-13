@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     try {
 
       const myUserId = 'mike_user';
-      const myApiKey = 'pk_prod_F0NMXKMWQ6M1CCQ5KG587KZ7J478';
+      const myApiKey = 'pk_test_JA9NNAAJB2MTP3KQJ9ZHMWGA14YJ';
 
       Courier.shared.isDebugging = false;
       print(Courier.shared.isDebugging);
@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
           body: 'To you! <3',
           isProduction: false,
           // providers: [CourierProvider.apns, CourierProvider.fcm],
-          providers: [CourierProvider.fcm],
+          providers: [CourierProvider.apns],
       );
       print(requestId);
 

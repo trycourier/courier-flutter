@@ -105,7 +105,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 let providers = params["providers"] as? [String] {
                 
                 let courierProviders = providers.map { provider in
-                    return CourierProvider(rawValue: provider)!
+                    return CourierProvider(rawValue: provider) ?? .unknown
                 }
                 
                 Courier.shared.sendPush(
