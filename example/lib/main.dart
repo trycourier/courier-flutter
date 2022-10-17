@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -42,18 +43,18 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    _initCourier();
+    _start();
 
   }
 
-  Future<void> _initCourier() async {
+  Future _start() async {
 
     try {
 
       const myUserId = 'mike_user';
-      const myApiKey = 'pk_test_JA9NNAAJB2MTP3KQJ9ZHMWGA14YJ';
+      const myApiKey = 'pk_prod_F0NMXKMWQ6M1CCQ5KG587KZ7J478';
 
-      Courier.shared.isDebugging = false;
+      Courier.shared.isDebugging = true;
       print(Courier.shared.isDebugging);
 
       Courier.shared.iOSForegroundNotificationPresentationOptions = [
@@ -93,6 +94,19 @@ class _MyAppState extends State<MyApp> {
           userId: myUserId
       );
 
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      print(fcmToken);
+
+      if (fcmToken != null) {
+        await Courier.shared.setFcmToken(token: fcmToken);
+      }
+
+      FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+        Courier.shared.setFcmToken(token: fcmToken);
+      }).onError((err) {
+        throw err;
+      });
+
       final res = await Future.wait([
         Courier.shared.apnsToken,
         Courier.shared.fcmToken,
@@ -108,7 +122,8 @@ class _MyAppState extends State<MyApp> {
           body: 'To you! <3',
           isProduction: false,
           // providers: [CourierProvider.apns, CourierProvider.fcm],
-          providers: [CourierProvider.apns],
+          // providers: [CourierProvider.apns],
+          providers: [CourierProvider.fcm],
       );
       print(requestId);
 
