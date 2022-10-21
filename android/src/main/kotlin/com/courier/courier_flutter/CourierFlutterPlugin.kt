@@ -36,8 +36,6 @@ class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
   override fun onMethodCall(call: MethodCall, result: Result) {
 
-    Log.d("EHHHHHHH", "onMethodCall")
-
     when (call.method) {
 
       "isDebugging" -> {
@@ -85,8 +83,6 @@ class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
         val accessToken = params["accessToken"] as? String
         val userId = params["userId"] as? String
 
-        Log.d("EHHHHHHH", "SIGN IN CALLED")
-
         Courier.shared.signIn(
           accessToken = accessToken ?: "",
           userId = userId ?: "",
@@ -94,7 +90,6 @@ class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
             result.success(null)
           },
           onFailure = { error ->
-            Log.d("EHHHHHHH", error.toString())
             result.error(COURIER_ERROR_TAG, error.message, error)
           }
         )
