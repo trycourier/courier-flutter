@@ -49,8 +49,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  // TODO: Git ignore these
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDBhCFMeKzpL-enS9KNYXPbDTibHI4G1mM',
     appId: '1:98931983397:android:28e9749164ff6068a4abcc',
@@ -68,4 +66,5 @@ class DefaultFirebaseOptions {
     iosClientId: '98931983397-oc2rntk0nad0gvhghr924f2hbgd3nd5h.apps.googleusercontent.com',
     iosBundleId: 'com.courier.courierFlutterExample',
   );
+
 }

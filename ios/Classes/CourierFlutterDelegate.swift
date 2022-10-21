@@ -77,7 +77,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
                     
                         // Fetch the last push notification that was clicked
                         if let self = self, let lastPush = self.lastClickedPushNotification {
-                            self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
+//                            self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
                             self.lastClickedPushNotification = nil
                         }
                     
@@ -124,7 +124,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
         let content = notification.request.content
         let message = content.userInfo
-        let pushNotification = content.pushNotification
+        let pushNotification = Courier.formatPushNotification(content: content)
         
         Task {
             do {
@@ -143,7 +143,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
         let content = response.notification.request.content
         let message = content.userInfo
-        let pushNotification = content.pushNotification
+        let pushNotification = Courier.formatPushNotification(content: content)
         
         Task {
             do {

@@ -3,6 +3,7 @@ package com.courier.courier_flutter
 import android.content.Intent
 import android.os.Bundle
 import com.courier.android.Courier
+import com.courier.android.pushNotification
 import com.courier.android.trackPushNotificationClick
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.android.FlutterActivity
