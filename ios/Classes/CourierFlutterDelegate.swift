@@ -76,9 +76,13 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
 
                     
                         // Fetch the last push notification that was clicked
-                        if let self = self, let lastPush = self.lastClickedPushNotification {
-//                            self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
+                        if let self = self, let _ = self.lastClickedPushNotification {
+                            
+                            // Seems to be working well on iOS
+                            // Commented out for now
+                            // self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
                             self.lastClickedPushNotification = nil
+                            
                         }
                     
                         result(nil)
@@ -124,17 +128,12 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
         let content = notification.request.content
         let message = content.userInfo
-        let pushNotification = Courier.formatPushNotification(content: content)
         
-        Task {
-            do {
-                try await Courier.shared.trackNotification(message: message, event: .delivered)
-            } catch {
-                Courier.log(String(describing: error))
-            }
-        }
+        Courier.shared.trackNotification(message: message, event: .delivered)
 
+        let pushNotification = Courier.formatPushNotification(content: content)
         methodChannel?.invokeMethod("pushNotificationDelivered", arguments: pushNotification)
+        
         completionHandler(foregroundPresentationOptions)
         
     }
@@ -143,18 +142,13 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
         let content = response.notification.request.content
         let message = content.userInfo
+        
+        Courier.shared.trackNotification(message: message, event: .clicked)
+        
         let pushNotification = Courier.formatPushNotification(content: content)
-        
-        Task {
-            do {
-                try await Courier.shared.trackNotification(message: message, event: .clicked)
-            } catch {
-                Courier.log(String(describing: error))
-            }
-        }
-        
         lastClickedPushNotification = pushNotification
         methodChannel?.invokeMethod("pushNotificationClicked", arguments: pushNotification)
+        
         completionHandler()
         
     }
