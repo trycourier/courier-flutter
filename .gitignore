@@ -31,3 +31,5 @@ build/
 
 # Env
 example/lib/env.dart
+example/android/app/google-services.json
+example/ios/Runner/GoogleService-Info.plist
