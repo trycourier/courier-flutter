@@ -1,12 +1,10 @@
 package com.courier.courier_flutter
 
-import android.util.Log
 import com.courier.android.BuildConfig
 import com.courier.android.Courier
 import com.courier.android.models.CourierAgent
 import com.courier.android.models.CourierProvider
 import com.courier.android.sendPush
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -14,7 +12,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 /** CourierFlutterPlugin */
-class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
+internal class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
   companion object {
     private const val COURIER_ERROR_TAG = "Courier Android SDK Error"

@@ -31,7 +31,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
 
     compileOptions {
@@ -50,11 +50,6 @@ android {
 }
 
 dependencies {
-
-    implementation 'com.github.trycourier:courier-android:1.0.21'
-
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:30.3.1')
-    implementation 'com.google.firebase:firebase-messaging-ktx'
-
+    api 'com.github.trycourier:courier-android:1.0.21'
+    api 'com.google.firebase:firebase-messaging-ktx:23.1.0'
 }
