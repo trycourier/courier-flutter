@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
+import 'package:courier_flutter_example/env.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -56,8 +57,6 @@ StreamController<dynamic> pushDelivered = StreamController<dynamic>();
 StreamController<dynamic> pushClicked = StreamController<dynamic>();
 
 class _MyAppState extends State<MyApp> {
-  static const _userId = 'mike_user_1';
-  static const _apiKey = 'pk_prod_F0NMXKMWQ6M1CCQ5KG587KZ7J478';
 
   bool _isLoading = true;
   String? _currentUserId;
@@ -145,8 +144,8 @@ class _MyAppState extends State<MyApp> {
       });
 
       await Courier.shared.signIn(
-        accessToken: _apiKey,
-        userId: _userId,
+        accessToken: Env.accessToken,
+        userId: Env.userId,
       );
 
       final userId = await Courier.shared.userId;
@@ -217,10 +216,11 @@ class _MyAppState extends State<MyApp> {
       });
 
       final providers = [CourierProvider.apns, CourierProvider.fcm];
+      final userId = await Courier.shared.userId ?? '';
 
       final requestId = await Courier.shared.sendPush(
-        authKey: _apiKey,
-        userId: _userId,
+        authKey: Env.authKey,
+        userId: userId,
         title: 'Push sent from: ${providers.map((e) => e.name).join(' & ')}',
         body: 'To your Flutter app 🐣',
         isProduction: false,
