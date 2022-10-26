@@ -65,7 +65,7 @@ final messageId = await Courier.shared.sendPush(
 
 1. [`Install the package`](#1-install-the-package)
 2. [`iOS Setup`](#2-ios-setup)
-3. Setup Android to receive push notifications from FCM
+3. [`Android Setup`](#3-android-setup)
 4. Linking APNS or FCM to your Courier workspace
 4. Managing user state
 5. Handling notification permissions
@@ -90,7 +90,7 @@ flutter pub add courier_flutter
 ⚠️ If you do not intend to receive push notifications on iOS, you can skip this step.
 
 1. From your projects root directory, run: `cd ios && pod update`
-2. Open your iOS project and increase the min SDK target
+2. Open your iOS project and increase the min SDK target to iOS 13.0+
 3. Change your `AppDelegate` to extend the `CourierFlutterDelegate`
     - This automatically syncs APNS tokens to Courier
     - Allows the Flutter SDK to handle when push notifications are delivered and clicked
@@ -98,34 +98,83 @@ flutter pub add courier_flutter
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
-### **3. Manage User Credentials**
+// Recommended Service
 
-User Credentials must be set in Courier before they can receive push notifications. This should be handled where you normally manage your user's state.
+### **3. Android Setup**
 
-⚠️ User Credentials should be [signed out](#6-signing-users-out) when you no longer want that user to receive push notifications.
+⚠️ If you do not intend to receive push notifications on Android, you can skip this step.
 
-⚠️ Courier does not maintain user state between app sessions, or in other words, if you force close the app, you will need to set user credentials again. We will be looking into maintaining user credential state between app sessions in future versions of this SDK.
+1. Open Android project
+2. Add support for Jitpack to `android/build.gradle`
+    - This is needed because the Courier Android SDK is hosted using Jitpack
+    - Maven support will be coming later
 
-```swift
-import Courier
-
-func signInWithCourier() {
-    
-    Task.init {
-
-        let userId = "example_user"
-        
-        // Courier needs you to generate an access token on your backend
-        // Docs for setting this up: https://www.courier.com/docs/reference/auth/issue-token/
-        let accessToken = try await YourBackend.generateCourierAccessToken(userId: userId)
-
-        // Set Courier user credentials
-        try await Courier.shared.setCredentials(accessToken: accessToken, userId: userId)
-
+```
+..
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' } // Add this line
     }
-    
 }
 ```
+
+3. Update your `app/build.gradle` to support the min and compile SDKs
+    - `minSdkVersion 21`
+    - `compileSdkVersion 33`
+4. Run Gradle sync
+5. Change your `MainActivity` to extend the `CourierFlutterActivity`
+    - This allows Courier to handle when push notifications are delivered and clicked
+6. Setup a new Notification Service by create a new file and pasting the code below in it
+    - This allows you to present a notification to your user when a new notification arrives
+
+```
+import android.annotation.SuppressLint
+import com.courier.android.notifications.presentNotification
+import com.courier.android.service.CourierService
+import com.google.firebase.messaging.RemoteMessage
+
+// Warning is suppressed
+// You do not need to worry about this warning
+// The CourierService will handle the function automatically
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
+class YourExampleService: CourierService() {
+
+    override fun showNotification(message: RemoteMessage) {
+        super.showNotification(message)
+
+        // TODO: This is where you will customize the notification that is shown to your users
+        // The function below is used to get started quickly.
+        // You likely do not want to use `message.presentNotification(...)`
+        // Make sure you point the handling class back to MainActivity
+        // For details on how to customize an Android notification, check here:
+        // https://developer.android.com/develop/ui/views/notifications/build-notification
+
+        message.presentNotification(
+            context = this,
+            handlingClass = MainActivity::class.java,
+            icon = android.R.drawable.ic_dialog_info
+        )
+
+    }
+
+}
+```
+
+7. Add the Notification Service entry in your `AndroidManifest.xml` file
+
+```
+<service
+    android:name=".YourNotificationService"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
+```
+
+
 
 &emsp;
 
