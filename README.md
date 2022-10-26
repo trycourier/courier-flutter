@@ -104,7 +104,7 @@ https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9
 
 ⚠️ If you don't need push notification support on Android, you can skip this step.
 
-https://user-images.githubusercontent.com/6370613/198107975-dbfc618c-85de-4938-8073-a670abb99486.mov
+https://user-images.githubusercontent.com/6370613/198111372-09a29aba-6507-4cf7-a59d-87e8df2ba492.mov
 
 1. Open Android project
 2. Add support for Jitpack to `android/build.gradle`
