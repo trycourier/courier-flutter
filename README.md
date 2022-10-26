@@ -102,6 +102,8 @@ https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9
 
 To ensure Courier can track when a notification is delivered to the device, you need to add a Notification Service Extension. Here is how to add one.
 
+https://user-images.githubusercontent.com/6370613/198119360-4b153756-b6b3-4afe-8c74-4088890674a0.mov
+
 1. Download and Unzip the Courier Notification Service Extension: [`CourierNotificationService-Cocoapods.zip`](https://github.com/trycourier/courier-ios/blob/master/push-notification-entitlement.gif)
 2. Open the folder and run `sh make_template.sh`
     - This will create the Notification Service Extension on your mac to save you time
