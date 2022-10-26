@@ -111,11 +111,10 @@ To ensure Courier can track when a notification is delivered to the device, you 
 6. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
 7. Click "Cancel" on the next pop
     - You do not need to click activate here. Your Notification Service Extension will still work just fine
-8. Open your `Podfile` and add the following snippet to your Podfile
+8. Open your `Podfile` and add the following snippet to the end of your Podfile
     - This will sync the `Courier-iOS` pod to your new Notification Service Extension
 
 ```
-..
 target 'CourierService' do
   use_frameworks!
   pod 'Courier-iOS'
