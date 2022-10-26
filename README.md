@@ -58,8 +58,9 @@ final messageId = await Courier.shared.sendPush(
 | `APNS (Apple Push Notification Service)` | `iOS`                   |
 | `FCM (Firebase Cloud Messaging)`         | `iOS`, `Android`        |
 
-- Most of this SDK depends on a Courier account: [`Create a Courier account here`](https://app.courier.com/signup)
-- Testing push notifications requires a physical device. Simulators will not work.
+> Most of this SDK depends on a Courier account: [`Create a Courier account here`](https://app.courier.com/signup)
+
+> Testing push notifications requires a physical device. Simulators will not work.
 
 # **Installation**
 
@@ -86,7 +87,7 @@ flutter pub add courier_flutter
 
 ## **2. iOS Setup**
 
-⚠️ If you don't need push notification support on iOS, you can skip this step.
+> If you don't need push notification support on iOS, you can skip this step.
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
@@ -127,7 +128,7 @@ end
 
 ### **3. Android Setup**
 
-⚠️ If you don't need push notification support on Android, you can skip this step.
+> If you don't need push notification support on Android, you can skip this step.
 
 https://user-images.githubusercontent.com/6370613/198111372-09a29aba-6507-4cf7-a59d-87e8df2ba492.mov
 
@@ -217,7 +218,7 @@ class ExampleService: CourierService() {
 
 ## **4. Configure Push Provider**
 
-⚠️ If you don't need push notification support, you can skip this step.
+> If you don't need push notification support, you can skip this step.
 
 To get push notification to appear in your app, add support for the provider you would like to use:
 - [`APNS (Apple Push Notification Service)`](https://www.courier.com/docs/guides/providers/push/apple-push-notification)
@@ -229,11 +230,11 @@ To get push notification to appear in your app, add support for the provider you
 
 Best user experience practice is to synchronize the current user's push notification tokens and the user's state. Courier does most of this for you automatically!
 
-⚠️ You can use a Courier Auth Key [`found here`](https://app.courier.com/settings/api-keys) when developing.
+> You can use a Courier Auth Key [`found here`](https://app.courier.com/settings/api-keys) when developing.
 
-⚠️ When you are ready for production release, you should be using a JWT as the `accessToken`.
-
-Here is more info about [`Going to Production`](#going-to-production)
+> When you are ready for production release, you should be using a JWT as the `accessToken`.
+>
+> Here is more info about [`Going to Production`](#going-to-production)
 
 Place these functions where you normally manage your user's state:
 ```dart
@@ -267,6 +268,8 @@ FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
 &emsp;
 
 ## **6. Testing Push Notifications**
+
+> If you don't need push notification support, you can skip this step.
 
 Courier allows you to send a push notification directly from the SDK to a user id. No tokens juggling or backend needed!
 
