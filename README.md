@@ -109,7 +109,7 @@ https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9
     - This is needed because the Courier Android SDK is hosted using Jitpack
     - Maven support will be coming later
 
-```
+```gradle
 ..
 allprojects {
     repositories {
@@ -129,16 +129,7 @@ allprojects {
 6. Setup a new Notification Service by creating a new file and pasting the code below in it
     - This allows you to present a notification to your user when a new notification arrives
 
-```
-import android.annotation.SuppressLint
-import com.courier.android.notifications.presentNotification
-import com.courier.android.service.CourierService
-import com.google.firebase.messaging.RemoteMessage
-
-// Warning is suppressed
-// You do not need to worry about this warning
-// The CourierService will handle the function automatically
-@SuppressLint("MissingFirebaseInstanceTokenRefresh")
+```kotlin
 class YourExampleService: CourierService() {
 
     override fun showNotification(message: RemoteMessage) {
@@ -162,19 +153,37 @@ class YourExampleService: CourierService() {
 }
 ```
 
+
+
 7. Add the Notification Service entry in your `AndroidManifest.xml` file
 
-```
-<service
-    android:name=".YourNotificationService"
-    android:exported="false">
-    <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT" />
-    </intent-filter>
-</service>
+```xml
+<manifest>
+    ..
+    <application>
+        ..
+
+        <activity>
+            ..
+        </activity>
+
+        // Add this 👇
+        <service
+            android:name=".YourNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        // Add this 👆
+
+        ..
+
+    </application>
+</manifest>
 ```
 
-
+https://user-images.githubusercontent.com/6370613/198107975-dbfc618c-85de-4938-8073-a670abb99486.mov
 
 &emsp;
 
