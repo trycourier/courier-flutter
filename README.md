@@ -71,7 +71,7 @@ final messageId = await Courier.shared.sendPush(
 6. [`Managing User State`](#5-managing-user-state)
 7. [`Testing Push Notifications`](#6-testing-push-notifications)
 
-Here is a link to the [`example app`](https://github.com/trycourier/courier-flutter/tree/master/example)
+> Here is a link to the [`example app`](https://github.com/trycourier/courier-flutter/tree/master/example)
 
 &emsp;
 
@@ -233,7 +233,6 @@ Best user experience practice is to synchronize the current user's push notifica
 > You can use a Courier Auth Key [`found here`](https://app.courier.com/settings/api-keys) when developing.
 
 > When you are ready for production release, you should be using a JWT as the `accessToken`.
->
 > Here is more info about [`Going to Production`](#going-to-production)
 
 Place these functions where you normally manage your user's state:
@@ -336,7 +335,7 @@ curl --request POST \
 Or generate one here:
 [Issue Courier Access Token](https://www.courier.com/docs/reference/auth/issue-token/)
 
-This request to issue a token should likely exist in a separate endpoint served on your backend.
+> This request to issue a token should likely exist in a separate endpoint served on your backend.
 
 &emsp;
 
