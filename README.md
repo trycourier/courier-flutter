@@ -290,12 +290,12 @@ Courier.shared.iOSForegroundNotificationPresentationOptions = [
     iOSNotificationPresentationOption.badge,
 ];
 
-// Will be called if the app is in the foreground and a push notification appears
+// Will be called if the app is in the foreground and a push notification arrives
 Courier.shared.onPushNotificationDelivered = (push) {
     ...
 };
 
-// Will be called when a user clicks your push notification
+// Will be called when a user clicks a push notification
 Courier.shared.onPushNotificationClicked = (push) {
     ...
 };
