@@ -126,7 +126,7 @@ end
 
 &emsp;
 
-### **3. Android Setup**
+## **3. Android Setup**
 
 > If you don't need push notification support on Android, you can skip this step.
 
@@ -313,7 +313,7 @@ final messageId = await Courier.shared.sendPush(
 
 &emsp;
 
-### **Going to Production**
+## **Going to Production**
 
 For security reasons, you should not keep your `authKey` (which looks like: `pk_prod_ABCD...`) in your production app. The `authKey` is safe to test with, but you will want to use an `accessToken` in production.
 
@@ -339,7 +339,7 @@ Or generate one here:
 
 &emsp;
 
-### **Share feedback with Courier**
+## **Share feedback with Courier**
 
 We want to make this the best SDK for managing notifications! Have an idea or feedback about our SDKs? Here are some links to contact us:
 
