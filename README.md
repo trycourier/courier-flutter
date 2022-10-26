@@ -94,7 +94,7 @@ flutter pub add courier_flutter
 3. Change your `AppDelegate` to extend the `CourierFlutterDelegate`
     - This automatically syncs APNS tokens to Courier
     - Allows the Flutter SDK to handle when push notifications are delivered and clicked
-4. Enable the push notification capability
+4. Enable the "Push Notifications" capability
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
