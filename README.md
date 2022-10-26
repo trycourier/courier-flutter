@@ -132,7 +132,13 @@ allprojects {
     - This allows you to present a notification to your user when a new notification arrives
 
 ```kotlin
-class YourExampleService: CourierService() {
+import android.annotation.SuppressLint
+import com.courier.android.notifications.presentNotification
+import com.courier.android.service.CourierService
+import com.google.firebase.messaging.RemoteMessage
+
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
+class ExampleService: CourierService() {
 
     override fun showNotification(message: RemoteMessage) {
         super.showNotification(message)
