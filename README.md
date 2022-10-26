@@ -102,16 +102,15 @@ https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9
 
 To ensure Courier can track when a notification is delivered to the device, you need to add a Notification Service Extension. Here is how to add one.
 
-1. Download the Courier Notification Service Extension: [`CourierNotificationService-Cocoapods.zip`](https://github.com/trycourier/courier-ios/blob/master/push-notification-entitlement.gif)
-2. Unzip the extension
-3. Open the folder and run `sh make_template.sh`
+1. Download and Unzip the Courier Notification Service Extension: [`CourierNotificationService-Cocoapods.zip`](https://github.com/trycourier/courier-ios/blob/master/push-notification-entitlement.gif)
+2. Open the folder and run `sh make_template.sh`
     - This will create the Notification Service Extension on your mac to save you time
-4. Open your iOS app in Xcode and go to File > New > Target
-5. Select "Courier Service" and click "Next"
-6. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
-7. Click "Cancel" on the next pop
+3. Open your iOS app in Xcode and go to File > New > Target
+4. Select "Courier Service" and click "Next"
+5. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
+6. Click "Cancel" on the next pop
     - You do not need to click activate here. Your Notification Service Extension will still work just fine
-8. Open your `Podfile` and add the following snippet to the end of your Podfile
+7. Open your `Podfile` and add the following snippet to the end of your Podfile
     - This will sync the `Courier-iOS` pod to your new Notification Service Extension
 
 ```
@@ -121,7 +120,7 @@ target 'CourierService' do
 end
 ```
 
-10. From the root of your Flutter app, run: `cd ios && pod install`
+8. From the root of your Flutter app, run: `cd ios && pod install`
 
 &emsp;
 
