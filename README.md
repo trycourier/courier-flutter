@@ -326,6 +326,4 @@ We want to make this the best SDK for managing notifications! Have an idea or fe
 - [Courier Feedback](https://feedback.courier.com/)
 - [Courier iOS Issues](https://github.com/trycourier/courier-ios/issues)
 
-https://user-images.githubusercontent.com/6370613/198088530-6789f47b-1656-404e-b860-53fccb265720.mov
-
 
