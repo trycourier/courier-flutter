@@ -87,7 +87,9 @@ flutter pub add courier_flutter
 
 ### **2. iOS Setup**
 
-⚠️ If you do not intend to receive push notifications on iOS, you can skip this step.
+⚠️ If you don't need push notification support on iOS, you can skip this step.
+
+https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
 1. From your projects root directory, run: `cd ios && pod update`
 2. Open your iOS project and increase the min SDK target to iOS 13.0+
@@ -96,13 +98,13 @@ flutter pub add courier_flutter
     - Allows the Flutter SDK to handle when push notifications are delivered and clicked
 4. Enable the "Push Notifications" capability
 
-https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
-
 // Recommended Service
 
 ### **3. Android Setup**
 
-⚠️ If you do not intend to receive push notifications on Android, you can skip this step.
+⚠️ If you don't need push notification support on Android, you can skip this step.
+
+https://user-images.githubusercontent.com/6370613/198107975-dbfc618c-85de-4938-8073-a670abb99486.mov
 
 1. Open Android project
 2. Add support for Jitpack to `android/build.gradle`
@@ -182,8 +184,6 @@ class YourExampleService: CourierService() {
     </application>
 </manifest>
 ```
-
-https://user-images.githubusercontent.com/6370613/198107975-dbfc618c-85de-4938-8073-a670abb99486.mov
 
 &emsp;
 
