@@ -123,6 +123,8 @@ end
 
 10. From the root of your Flutter app, run: `cd ios && pod install`
 
+&emsp;
+
 ### **3. Android Setup**
 
 ⚠️ If you don't need push notification support on Android, you can skip this step.
