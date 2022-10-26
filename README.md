@@ -229,9 +229,11 @@ To get push notification to appear in your app, add support for the provider you
 
 Best user experience practice is to synchronize the current user's push notification tokens and the user's state. Courier does most of this for you automatically!
 
-⚠️ You can use a Courier Auth Key [`found here`](https://app.courier.com/settings/api-keys) when testing locally.
+⚠️ You can use a Courier Auth Key [`found here`](https://app.courier.com/settings/api-keys) when developing.
 
-⚠️ When you are ready for production release, you should be using a JWT as the access token. Here is more info about [`Going to Production`](#going-to-production)
+⚠️ When you are ready for production release, you should be using a JWT as the `accessToken`.
+
+Here is more info about [`Going to Production`](#going-to-production)
 
 Place these functions where you normally manage your user's state:
 ```dart
