@@ -66,10 +66,9 @@ final messageId = await Courier.shared.sendPush(
 1. [`Install the package`](#1-install-the-package)
 2. [`iOS Setup`](#2-ios-setup)
 3. [`Android Setup`](#3-android-setup)
-4. Linking APNS or FCM to your Courier workspace
-4. Managing user state
-5. Handling notification permissions
-6. Sending a test push notification
+5. [`Configure Push Provider`](#4-configure-push-provider)
+6. [`Managing User State`](#5-managing-user-state)
+7. [`Testing Push Notifications`](#6-testing-push-notifications)
 
 Here is a link to the [example app](https://github.com/trycourier/courier-flutter/tree/master/example)
 
@@ -270,7 +269,7 @@ FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
 
 ## **6. Testing Push Notifications**
 
-Courier allows you to send a push directly from the SDK to your device. No backend needed!
+Courier allows you to send a push notification directly from the SDK to a user id. No tokens juggling or backend needed!
 
 ```dart
 final notificationPermission = await Courier.shared.getNotificationPermissionStatus();
@@ -301,12 +300,9 @@ Courier.shared.onPushNotificationClicked = (push) {
 };
 
 // Sends a test push
-final userId = 'example_user';
-final userId = 'example_user';
-
 final messageId = await Courier.shared.sendPush(
     authKey: 'a_courier_auth_key_that_should_only_be_used_for_testing',
-    userId: userId,
+    userId: 'example_user',
     title: 'Chirp Chrip!',
     body: 'Hello from Courier 🐣',
     isProduction: false, // This only affects APNS pushes. false == sandbox / true == production
