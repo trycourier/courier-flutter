@@ -312,11 +312,37 @@ final messageId = await Courier.shared.sendPush(
 
 &emsp;
 
+### **Going to Production**
+
+For security reasons, you should not keep your `authKey` (which looks like: `pk_prod_ABCD...`) in your production app. The `authKey` is safe to test with, but you will want to use an `accessToken` in production.
+
+To create an `accessToken`, call this: 
+
+```curl
+curl --request POST \
+     --url https://api.courier.com/auth/issue-token \
+     --header 'Accept: application/json' \
+     --header 'Authorization: Bearer $YOUR_AUTH_KEY' \
+     --header 'Content-Type: application/json' \
+     --data
+ '{
+    "scope": "user_id:$YOUR_USER_ID write:user-tokens",
+    "expires_in": "$YOUR_NUMBER days"
+  }'
+```
+
+Or generate one here:
+[Issue Courier Access Token](https://www.courier.com/docs/reference/auth/issue-token/)
+
+This request to issue a token should likely exist in a separate endpoint served on your backend.
+
+&emsp;
+
 ### **Share feedback with Courier**
 
 We want to make this the best SDK for managing notifications! Have an idea or feedback about our SDKs? Here are some links to contact us:
 
 - [Courier Feedback](https://feedback.courier.com/)
-- [Courier iOS Issues](https://github.com/trycourier/courier-ios/issues)
+- [Courier Flutter Issues](https://github.com/trycourier/courier-flutter/issues)
 
 
