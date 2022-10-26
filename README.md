@@ -98,7 +98,31 @@ https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9
     - Allows the Flutter SDK to handle when push notifications are delivered and clicked
 4. Enable the "Push Notifications" capability
 
-// Recommended Service
+### **Recommended**
+
+To ensure Courier can track when a notification is delivered to the device, you need to add a Notification Service Extension. Here is how to add one.
+
+1. Download the Courier Notification Service Extension: `[CourierNotificationServiceExtension.zip](https://github.com/trycourier/courier-ios/blob/master/push-notification-entitlement.gif)`
+2. Unzip the extension
+3. Open the folder and run `sh make_template.sh`
+    - This will create the Notification Service Extension on your mac to save you time
+4. Open your iOS app in Xcode and go to File > New > Target
+5. Select "Courier Service" and click "Next"
+6. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
+7. Click "Cancel" on the next pop
+    - You do not need to click activate here. Your Notification Service Extension will still work just fine
+8. Open your `Podfile` and add the following snippet to your Podfile
+    - This will sync the `Courier-iOS` pod to your new Notification Service Extension
+
+```
+..
+target 'CourierService' do
+  use_frameworks!
+  pod 'Courier-iOS'
+end
+```
+
+10. From the root of your Flutter app, run: `cd ios && pod install`
 
 ### **3. Android Setup**
 
