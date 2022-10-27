@@ -64,14 +64,16 @@ final messageId = await Courier.shared.sendPush(
 
 # **Installation**
 
+>
+> Link to [`Example App`](https://github.com/trycourier/courier-flutter/tree/master/example)
+>
+
 1. [`Install the package`](#1-install-the-package)
 2. [`iOS Setup`](#2-ios-setup)
 3. [`Android Setup`](#3-android-setup)
 5. [`Configure Push Provider`](#4-configure-push-provider)
 6. [`Managing User State`](#5-managing-user-state)
 7. [`Testing Push Notifications`](#6-testing-push-notifications)
-
-> Here is a link to the [`example app`](https://github.com/trycourier/courier-flutter/tree/master/example)
 
 &emsp;
 
@@ -91,7 +93,7 @@ flutter pub add courier_flutter
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
-1. From your projects root directory, run: `cd ios && pod update`
+1. From your project's root directory, run: `cd ios && pod update`
 2. Open your iOS project and increase the min SDK target to iOS 13.0+
 3. Change your `AppDelegate` to extend the `CourierFlutterDelegate`
     - This automatically syncs APNS tokens to Courier
