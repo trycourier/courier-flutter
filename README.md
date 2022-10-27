@@ -174,8 +174,8 @@ class YourNotificationService: CourierService() {
         // TODO: This is where you will customize the notification that is shown to your users
         // The function below is used to get started quickly.
         // You likely do not want to use `message.presentNotification(...)`
-        // Make sure you point the handling class back to MainActivity
-        // For details on how to customize an Android notification, check here:
+        // For Flutter, you likely do not want to change the handlingClass
+        // More information on how to customize an Android notification here:
         // https://developer.android.com/develop/ui/views/notifications/build-notification
 
         message.presentNotification(
