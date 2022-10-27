@@ -111,11 +111,11 @@ https://user-images.githubusercontent.com/6370613/198336479-45aeec9e-0c94-4c29-b
     - This will create the Notification Service Extension on your mac to save you time
 3. Open your iOS app in Xcode and go to File > New > Target
 4. Select "Courier Service" and click "Next"
-5. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
+5. Give the Notification Service Extension a name (i.e. "CourierService"), select `Courier_iOS` as the Package, and click "Finish"
 6. Click "Cancel" on the next popup
     - You do NOT need to click "Activate" here. Your Notification Service Extension will still work just fine.
 7. Open your `Podfile` and add the following snippet to the end of your Podfile
-    - This will sync the `Courier-iOS` pod to your new Notification Service Extension
+    - This will link the `Courier-iOS` pod to your Notification Service Extension
 
 ```
 target 'CourierService' do
