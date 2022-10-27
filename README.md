@@ -254,7 +254,13 @@ If you followed the steps above:
 - APNS tokens on iOS will automatically be synced to Courier
 - FCM tokens on Android will automatically be synced to Courier
 
-If you want FCM tokens to sync to Courier on iOS, add the following:
+If you want FCM tokens to sync to Courier on iOS:
+
+1. Add the following Flutter packages to your project
+    - [firebase_core](https://pub.dev/packages/firebase_core)
+    - [firebase_messaging](https://pub.dev/packages/firebase_messaging)
+
+2. Add code to manually sync FCM tokens
 ```dart
 final fcmToken = await FirebaseMessaging.instance.getToken();
 if (fcmToken != null) {
