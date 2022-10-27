@@ -257,8 +257,8 @@ If you followed the steps above:
 If you want FCM tokens to sync to Courier on iOS:
 
 1. Add the following Flutter packages to your project
-    - [firebase_core](https://pub.dev/packages/firebase_core)
-    - [firebase_messaging](https://pub.dev/packages/firebase_messaging)
+    - [`firebase_core`](https://pub.dev/packages/firebase_core)
+    - [`firebase_messaging`](https://pub.dev/packages/firebase_messaging)
 
 2. Add code to manually sync FCM tokens
 ```dart
