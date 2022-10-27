@@ -164,6 +164,7 @@ import com.courier.android.notifications.presentNotification
 import com.courier.android.service.CourierService
 import com.google.firebase.messaging.RemoteMessage
 
+// This is safe. `CourierService` will automatically handle token refreshes.
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class YourNotificationService: CourierService() {
 
