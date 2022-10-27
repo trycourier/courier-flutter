@@ -163,7 +163,7 @@ import com.courier.android.service.CourierService
 import com.google.firebase.messaging.RemoteMessage
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
-class ExampleService: CourierService() {
+class YourNotificationService: CourierService() {
 
     override fun showNotification(message: RemoteMessage) {
         super.showNotification(message)
