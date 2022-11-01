@@ -47,7 +47,6 @@ final messageId = await Courier.shared.sendPush(
 ```
 
 # Requirements & Support
-# Requirements & Support
 
 | Operating System | Minimum SDK | Compile Target SDK |
 | :--------------- | ----------: | -----------------: |
