@@ -63,6 +63,8 @@ final messageId = await Courier.shared.sendPush(
 | :--------------------------------------- | ------------------: |
 | `APNS (Apple Push Notification Service)` |               `iOS` |
 | `FCM (Firebase Cloud Messaging)`         |    `iOS`, `Android` |
+| `Expo`                                   |   Not Supported Yet |
+| `One Signal`                             |   Not Supported Yet |
 
 > Most of this SDK depends on a Courier account: [`Create a Courier account here`](https://app.courier.com/signup)
 
