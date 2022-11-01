@@ -47,16 +47,23 @@ final messageId = await Courier.shared.sendPush(
 ```
 
 # Requirements & Support
+# Requirements & Support
 
-| Operating System   | Minimum SDK      | Compile Target SDK   |
-| :---               |    ----:         |               ---:   |
-| `iOS`              | `13`             | —                    |
-| `Android`          | `21`             | `33`                 |
+| Operating System | Minimum SDK | Compile Target SDK |
+| :--------------- | ----------: | -----------------: |
+| `iOS`            |        `13` |                  — |
+| `Android`        |        `21` |               `33` |
 
-| Push Provider                            | Supported Platforms     |
-| :---                                     |               ----:     |
-| `APNS (Apple Push Notification Service)` | `iOS`                   |
-| `FCM (Firebase Cloud Messaging)`         | `iOS`, `Android`        |
+| Supported Courier Features               | Supported Platforms |
+| :--------------------------------------- | ------------------: |
+| `Push Notifications`                     |    `iOS`, `Android` |
+| `Inbox`                                  |   Not Supported Yet |
+| `Toasts`                                 |   Not Supported Yet |
+
+| Supported Push Notification Providers    | Supported Platforms |
+| :--------------------------------------- | ------------------: |
+| `APNS (Apple Push Notification Service)` |               `iOS` |
+| `FCM (Firebase Cloud Messaging)`         |    `iOS`, `Android` |
 
 > Most of this SDK depends on a Courier account: [`Create a Courier account here`](https://app.courier.com/signup)
 
