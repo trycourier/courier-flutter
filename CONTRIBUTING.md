@@ -1,4 +1,4 @@
-# Welcome to Courier React Native contributing guide
+# Welcome to Courier Flutter contributing guide
 
 ## Getting Started
 
@@ -29,4 +29,3 @@ To debug the Android package:
 
 To debug the iOS package:
 `TODO`
-
