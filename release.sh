@@ -16,5 +16,5 @@ git push --tags
 # gh release create
 gh release create $PACKAGE_VERSION --generate-notes
 
-# Publish to npm
+# Publish to pub.dev
 flutter pub publish
