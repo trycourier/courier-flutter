@@ -1,4 +1,4 @@
-package com.courier.courier_flutter_example
+package com.courier.courier_flutter_sample
 
 import android.annotation.SuppressLint
 import com.courier.android.notifications.presentNotification

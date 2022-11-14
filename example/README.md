@@ -1,4 +1,4 @@
-# courier_flutter_example
+# courier_flutter_sample
 
 Demonstrates how to use the courier_flutter plugin.
 

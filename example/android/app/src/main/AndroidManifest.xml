@@ -1,15 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.courier.courier_flutter_example">
+    package="com.courier.courier_flutter_sample">
 
     <!-- Needed to handle notification permission requests -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
    <application
-        android:label="courier_flutter_example"
+        android:label="courier_flutter_sample"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name=".MainActivity"
+            android:name="com.courier.courier_flutter_sample.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
@@ -31,7 +31,7 @@
         </activity>
 
         <service
-            android:name=".ExampleService"
+            android:name="com.courier.courier_flutter_sample.ExampleService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

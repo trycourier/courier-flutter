@@ -88,9 +88,9 @@ flutter pub add courier_flutter
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
-1. From your project's root directory, run: `cd ios && pod update`
-2. Open your iOS project and increase the min SDK target to iOS 13.0+
-3. Change your `AppDelegate` to extend the `CourierFlutterDelegate`
+1. Open your iOS project and increase the min SDK target to iOS 13.0+
+2. From your Flutter project's root directory, run: `cd ios && pod update`
+3. Change your `AppDelegate` to extend the `CourierFlutterDelegate` and add `import courier_flutter` to the top of your `AppDelegate` file
     - This automatically syncs APNS tokens to Courier
     - Allows the Flutter SDK to handle when push notifications are delivered and clicked
 4. Enable the "Push Notifications" capability
