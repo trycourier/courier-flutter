@@ -9,6 +9,11 @@ brew install python-yq
 PACKAGE_VERSION=$(yq .version pubspec.yaml | tr -d '"')
 echo $PACKAGE_VERSION
 
+# Bump the version
+git add .
+git commit -m "Bump"
+git push
+
 # Add the tag
 git tag $PACKAGE_VERSION
 git push --tags
@@ -16,5 +21,5 @@ git push --tags
 # gh release create
 gh release create $PACKAGE_VERSION --generate-notes
 
-# Publish to npm
+# Publish to pub.dev
 flutter pub publish
