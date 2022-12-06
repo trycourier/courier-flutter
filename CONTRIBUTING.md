@@ -1,11 +1,14 @@
-# Courier Flutter Contribution Guide
+# Welcome to Courier Flutter contributing guide
 
 ## Getting Started
 
-1. Clone the repo and open `courier-flutter` in your IDE
-2. Make sure you have your `example/lib/env.dart` configured with your proper values
-3. Run `pub get` from root to install all dependencies
-4. Run `example/lib/main.dart` to run the example app
+1. From root, run: `flutter pub get`
+2. Navigate to `example/lib`
+3. Create a `env.dart` file and create a class named `Env`
+4. Copy content from `env.sample.dart` and paste in `env.dart`
+5. Drag and drop your google-services.json file into `example/android/android/app` (Needed for Firebase FCM testing)
+6. Navigate to `example/ios`, double click on `Runner.xcworkspace`
+7. Select Runner in xcode click on `add files to "Runner"` and add `GoogleService-Info.plist`
 
 From here, you are all set to start working on the package! 🙌
 
