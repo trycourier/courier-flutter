@@ -4,7 +4,8 @@
 
 1. Clone the repo and open `courier-flutter` in your IDE
 2. Make sure you have your `example/lib/env.dart` configured with your proper values
-3. Run `example/lib/main.dart` to run the example app
+3. Run `pub get` from root to install all dependencies
+4. Run `example/lib/main.dart` to run the example app
 
 From here, you are all set to start working on the package! 🙌
 
