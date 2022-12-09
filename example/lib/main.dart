@@ -153,6 +153,7 @@ class _MyAppState extends State<MyApp> {
             content: TextField(
               autofocus: true,
               autocorrect: false,
+              enableSuggestions: false,
               decoration: InputDecoration(hintText: "Courier User Id"),
               controller: courierUserIdEditingController,
               onSubmitted: (_) => getCourierUserId(),
