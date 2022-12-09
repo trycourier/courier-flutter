@@ -59,10 +59,12 @@ StreamController<dynamic> pushClicked = StreamController<dynamic>();
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   String? _currentUserId;
+  late final TextEditingController courierUserIdEditingController;
 
   @override
   void initState() {
     super.initState();
+    courierUserIdEditingController = TextEditingController();
 
     if (!mounted) {
       return;
@@ -138,11 +140,45 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  void getCourierUserId() {
+    Navigator.of(context).pop(courierUserIdEditingController.text);
+    courierUserIdEditingController.clear();
+  }
+
+  Future<String?> openUserIdDialog() => showDialog<String>(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Text("Enter Courier User Id"),
+            content: TextField(
+              autofocus: true,
+              autocorrect: false,
+              decoration: InputDecoration(hintText: "Courier User Id"),
+              controller: courierUserIdEditingController,
+              onSubmitted: (_) => getCourierUserId(),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Cancel")),
+              TextButton(
+                  onPressed: () {
+                    getCourierUserId();
+                  },
+                  child: Text("SignIn")),
+            ],
+          ));
+
   _signIn() async {
     try {
       setState(() {
         _isLoading = true;
       });
+
+      final courierUserId = await openUserIdDialog();
+      if (courierUserId == null || courierUserId.isEmpty) return;
 
       await Courier.shared.signIn(
         accessToken: Env.accessToken,
@@ -305,6 +341,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     super.dispose();
+    courierUserIdEditingController.clear();
     pushDelivered.close();
     pushClicked.close();
   }
