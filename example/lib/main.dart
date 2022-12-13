@@ -59,7 +59,10 @@ StreamController<dynamic> pushClicked = StreamController<dynamic>();
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   String? _currentUserId;
-  final List<CourierProvider> _providers = [];
+  final List<CourierProvider> _providers = [
+    CourierProvider.apns,
+    CourierProvider.fcm
+  ];
 
   @override
   void initState() {
@@ -105,12 +108,10 @@ class _MyAppState extends State<MyApp> {
       final userId = await Courier.shared.userId;
       print(userId);
 
-      final fetchStatus =
-          await Courier.shared.getNotificationPermissionStatus();
+      final fetchStatus = await Courier.shared.getNotificationPermissionStatus();
       print(fetchStatus);
 
-      final requestStatus =
-          await Courier.shared.requestNotificationPermission();
+      final requestStatus = await Courier.shared.requestNotificationPermission();
       print(requestStatus);
 
       // Set the current FCM token
@@ -223,7 +224,12 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  _sendPush() async {
+  Future _sendPush() async {
+
+    if (_providers.isEmpty) {
+      return;
+    }
+
     try {
       setState(() {
         _isLoading = true;
@@ -268,20 +274,22 @@ class _MyAppState extends State<MyApp> {
           ),
           const Divider(),
           SwitchListTile(
-              value: _providers.contains(CourierProvider.apns),
-              onChanged: (bool value) {
-                _handleProviderSwitch(CourierProvider.apns);
-              },
-              title: Text(CourierProvider.apns.name.toUpperCase())),
+            value: _providers.contains(CourierProvider.apns),
+            onChanged: (bool value) {
+              _handleProviderSwitch(CourierProvider.apns);
+            },
+            title: Text(CourierProvider.apns.name.toUpperCase()),
+          ),
           SwitchListTile(
-              value: _providers.contains(CourierProvider.fcm),
-              onChanged: (bool value) {
-                _handleProviderSwitch(CourierProvider.fcm);
-              },
-              title: Text(CourierProvider.fcm.name.toUpperCase())),
+            value: _providers.contains(CourierProvider.fcm),
+            onChanged: (bool value) {
+              _handleProviderSwitch(CourierProvider.fcm);
+            },
+            title: Text(CourierProvider.fcm.name.toUpperCase()),
+          ),
           TextButton(
+            onPressed: () => _sendPush(),
             child: const Text('Send Push'),
-            onPressed: _providers.length == 0 ? null : () => _sendPush(),
           ),
           const Divider(),
           TextButton(

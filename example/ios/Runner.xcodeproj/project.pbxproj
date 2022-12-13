@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		19F6E51C8775CBD23D8C8FC0 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5C19BD4D23C9BD61BBF01C /* Pods_Runner.framework */; };
-		2794CED02906EED0005BFBE3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2794CECF2906EED0005BFBE3 /* GoogleService-Info.plist */; };
+		277665312948E277009787AF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 277665302948E277009787AF /* GoogleService-Info.plist */; };
 		27E70EC728EB88F000C40E89 /* CourierService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E70EC628EB88F000C40E89 /* CourierService.swift */; };
 		27E70ECB28EB88F000C40E89 /* CourierService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 27E70EC428EB88F000C40E89 /* CourierService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -61,7 +61,7 @@
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		26338B9AB07854A2FD1E6652 /* Pods_CourierService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CourierService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		2794CECF2906EED0005BFBE3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		277665302948E277009787AF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		27E70E8F28EB637E00C40E89 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		27E70EC428EB88F000C40E89 /* CourierService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CourierService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E70EC628EB88F000C40E89 /* CourierService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourierService.swift; sourceTree = "<group>"; };
@@ -159,7 +159,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
-				2794CECF2906EED0005BFBE3 /* GoogleService-Info.plist */,
+				277665302948E277009787AF /* GoogleService-Info.plist */,
 				27E70E8F28EB637E00C40E89 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -292,7 +292,7 @@
 			files = (
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
-				2794CED02906EED0005BFBE3 /* GoogleService-Info.plist in Resources */,
+				277665312948E277009787AF /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 			);
@@ -507,7 +507,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.courier.courierFlutterSample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.courier.flutter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -542,7 +542,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.courier.courierFlutterSample.CourierService;
+				PRODUCT_BUNDLE_IDENTIFIER = com.courier.flutter.CourierService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -579,7 +579,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.courier.courierFlutterSample.CourierService;
+				PRODUCT_BUNDLE_IDENTIFIER = com.courier.flutter.CourierService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -614,7 +614,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.courier.courierFlutterSample.CourierService;
+				PRODUCT_BUNDLE_IDENTIFIER = com.courier.flutter.CourierService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -747,7 +747,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.courier.courierFlutterSample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.courier.flutter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -773,7 +773,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.courier.courierFlutterSample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.courier.flutter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
