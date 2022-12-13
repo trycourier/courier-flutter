@@ -1,12 +1,10 @@
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter_sample/env.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 import 'package:courier_flutter/courier_flutter.dart';
 
@@ -29,11 +27,8 @@ Future<void> main() async {
     pushClicked.add(push);
   };
 
-  // If you are using FCM (Firebase Cloud Messaging)
-  // This must be called before you can use the Courier Flutter SDK
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // This is needed to handle FCM tokens
+  await Firebase.initializeApp();
 
   runApp(
     const MaterialApp(
