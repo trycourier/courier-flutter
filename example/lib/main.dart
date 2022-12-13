@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter_sample/env.dart';
@@ -59,10 +57,7 @@ StreamController<dynamic> pushClicked = StreamController<dynamic>();
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   String? _currentUserId;
-  final List<CourierProvider> _providers = [
-    CourierProvider.apns,
-    CourierProvider.fcm
-  ];
+  final List<CourierProvider> _providers = [CourierProvider.apns, CourierProvider.fcm];
 
   @override
   void initState() {
@@ -140,15 +135,49 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Future<String> _showUserIdAlert() async {
+    final textController = TextEditingController();
+
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Enter User Id"),
+        content: TextField(
+          autofocus: true,
+          autocorrect: false,
+          enableSuggestions: false,
+          decoration: const InputDecoration(hintText: "Courier User Id"),
+          controller: textController,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Sign In"),
+          ),
+        ],
+      ),
+    );
+
+    return Future.value(textController.text);
+  }
+
   _signIn() async {
     try {
       setState(() {
         _isLoading = true;
       });
 
+      final courierUserId = await _showUserIdAlert();
+      if (courierUserId.isEmpty) return;
+
       await Courier.shared.signIn(
         accessToken: Env.accessToken,
-        userId: Env.userId,
+        userId: courierUserId,
       );
 
       final userId = await Courier.shared.userId;
@@ -225,7 +254,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _sendPush() async {
-
     if (_providers.isEmpty) {
       return;
     }
@@ -240,8 +268,8 @@ class _MyAppState extends State<MyApp> {
       final requestId = await Courier.shared.sendPush(
         authKey: Env.authKey,
         userId: userId,
-        title: 'Push sent from: ${_providers.map((e) => e.name).join(' & ')}',
-        body: 'To your Flutter app 🐣',
+        title: 'Hey $userId',
+        body: 'Push sent from: ${_providers.map((e) => e.name).join(' & ')}',
         isProduction: false,
         providers: _providers,
       );
@@ -278,14 +306,18 @@ class _MyAppState extends State<MyApp> {
             onChanged: (bool value) {
               _handleProviderSwitch(CourierProvider.apns);
             },
-            title: Text(CourierProvider.apns.name.toUpperCase()),
+            title: Text(
+              CourierProvider.apns.name.toUpperCase(),
+            ),
           ),
           SwitchListTile(
             value: _providers.contains(CourierProvider.fcm),
             onChanged: (bool value) {
               _handleProviderSwitch(CourierProvider.fcm);
             },
-            title: Text(CourierProvider.fcm.name.toUpperCase()),
+            title: Text(
+              CourierProvider.fcm.name.toUpperCase(),
+            ),
           ),
           TextButton(
             onPressed: () => _sendPush(),
