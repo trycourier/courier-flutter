@@ -3,6 +3,7 @@ import 'package:courier_flutter/ios_foreground_notification_presentation_options
 import 'package:courier_flutter_sample/env.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -265,7 +266,7 @@ class _MyAppState extends State<MyApp> {
         userId: userId,
         title: 'Hey $userId',
         body: 'Push sent from: ${_providers.map((e) => e.name).join(' & ')}',
-        isProduction: false,
+        isProduction: kReleaseMode,
         providers: _providers,
       );
 
