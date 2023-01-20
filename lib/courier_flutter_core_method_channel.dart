@@ -7,7 +7,6 @@ import 'courier_flutter_core_platform_interface.dart';
 
 /// An implementation of [CourierFlutterCorePlatform] that uses method channels.
 class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
-
   @visibleForTesting
   final channel = const MethodChannel('courier_flutter_core');
 
@@ -25,12 +24,10 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
 
   @override
   Future<String?> apnsToken() async {
-
     // Skip other platforms. Do not show error
     if (!Platform.isIOS) return null;
 
     return await channel.invokeMethod('apnsToken');
-
   }
 
   @override
@@ -59,15 +56,14 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
-  Future<String> sendPush(String authKey, String userId, String title, String body, bool isProduction, List<CourierProvider> providers) async {
+  Future<String> sendPush(String authKey, String userId, String title,
+      String body, List<CourierProvider> providers) async {
     return await channel.invokeMethod('sendPush', {
       'authKey': authKey,
       'userId': userId,
       'title': title,
       'body': body,
-      'isProduction': isProduction,
       'providers': providers.map((provider) => provider.value).toList(),
     });
   }
-
 }

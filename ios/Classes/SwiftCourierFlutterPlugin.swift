@@ -101,7 +101,6 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 let userId = params["userId"] as? String,
                 let title = params["title"] as? String,
                 let body = params["body"] as? String,
-                let isProduction = params["isProduction"] as? Bool,
                 let providers = params["providers"] as? [String] {
                 
                 let courierProviders = providers.map { provider in
@@ -113,7 +112,6 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                     userId: userId,
                     title: title,
                     message: body,
-                    isProduction: isProduction,
                     providers: courierProviders,
                     onSuccess: { requestId in
                         result(requestId)

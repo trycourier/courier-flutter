@@ -53,7 +53,10 @@ StreamController<dynamic> pushClicked = StreamController<dynamic>();
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   String? _currentUserId;
-  final List<CourierProvider> _providers = [CourierProvider.apns, CourierProvider.fcm];
+  final List<CourierProvider> _providers = [
+    CourierProvider.apns,
+    CourierProvider.fcm
+  ];
 
   @override
   void initState() {
@@ -99,10 +102,12 @@ class _MyAppState extends State<MyApp> {
       final userId = await Courier.shared.userId;
       print(userId);
 
-      final fetchStatus = await Courier.shared.getNotificationPermissionStatus();
+      final fetchStatus =
+          await Courier.shared.getNotificationPermissionStatus();
       print(fetchStatus);
 
-      final requestStatus = await Courier.shared.requestNotificationPermission();
+      final requestStatus =
+          await Courier.shared.requestNotificationPermission();
       print(requestStatus);
 
       // Set the current FCM token
@@ -266,7 +271,6 @@ class _MyAppState extends State<MyApp> {
         userId: userId,
         title: 'Hey $userId',
         body: 'Push sent from: ${_providers.map((e) => e.name).join(' & ')}',
-        isProduction: kReleaseMode,
         providers: _providers,
       );
 
