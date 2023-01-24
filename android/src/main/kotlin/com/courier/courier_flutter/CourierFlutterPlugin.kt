@@ -114,7 +114,6 @@ internal class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
         val userId = params["userId"] as? String
         val title = params["title"] as? String
         val body = params["body"] as? String
-        val isProduction = params["isProduction"] as? Boolean
         val providers = params["providers"] as? List<*>
 
         // Map the providers to the proper enums
@@ -129,7 +128,6 @@ internal class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
           userId = userId ?: "",
           title = title ?: "",
           body = body ?: "",
-          isProduction = isProduction ?: false,
           providers = courierProviders,
           onSuccess = { requestId ->
             result.success(requestId)
