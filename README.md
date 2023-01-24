@@ -99,7 +99,9 @@ https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9
 
 To make sure Courier can track when a notification is delivered to the device, you need to add a Notification Service Extension. Here is how to add one.
 
-https://user-images.githubusercontent.com/6370613/198336479-45aeec9e-0c94-4c29-b132-ea8c777b9da1.mov
+
+https://user-images.githubusercontent.com/29832989/214159327-01ef662f-094b-455c-9ae8-019c94121ba8.mov
+
 
 1. Download and Unzip the Courier Notification Service Extension: [`CourierNotificationServiceTemplate.zip`](https://github.com/trycourier/courier-notification-service-extension-template/archive/refs/heads/main.zip)
 2. Open the folder in terminal and run `sh make_template.sh`
@@ -109,6 +111,7 @@ https://user-images.githubusercontent.com/6370613/198336479-45aeec9e-0c94-4c29-b
 5. Give the Notification Service Extension a name (i.e. "CourierService"), select `Courier_iOS` as the Package, and click "Finish"
 6. Click "Cancel" on the next popup
     - You do NOT need to click "Activate" here. Your Notification Service Extension will still work just fine.
+7. Select Service Extension (i.e. "CourierService"), select general, change deployment sdk to min SDK target to iOS 13.0+
 7. Open your `Podfile` and add the following snippet to the end of your Podfile
     - This will link the `Courier-iOS` pod to your Notification Service Extension
 
