@@ -8,22 +8,23 @@ import 'courier_provider.dart';
 import 'ios_foreground_notification_presentation_options.dart';
 
 class Courier {
-
   Courier._() {
-
     // Set debugging mode to default if app is debugging
     isDebugging = kDebugMode;
 
     // Set the default iOS presentation options
-    iOSForegroundNotificationPresentationOptions = _iOSForegroundNotificationPresentationOptions;
+    iOSForegroundNotificationPresentationOptions =
+        _iOSForegroundNotificationPresentationOptions;
 
     // Register listeners for when the native system receives messages
     CourierFlutterEventsPlatform.instance.registerMessagingListeners(
-        onPushNotificationDelivered: (message) => _onPushNotificationDelivered?.call(message),
-        onPushNotificationClicked: (message) => _onPushNotificationClicked?.call(message),
-        onLogPosted: (log) => { /* Empty for now. Flutter will automatically print to console */ },
+      onPushNotificationDelivered: (message) =>
+          _onPushNotificationDelivered?.call(message),
+      onPushNotificationClicked: (message) =>
+          _onPushNotificationClicked?.call(message),
+      onLogPosted: (log) =>
+          {/* Empty for now. Flutter will automatically print to console */},
     );
-
   }
 
   // Singleton
@@ -59,10 +60,16 @@ class Courier {
   /// showing a push notification when it is received while the app is in the foreground.
   /// This will not have an affect on any other platform
   /// If you do not not want a system push to appear, pass []
-  List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions = iOSNotificationPresentationOption.values;
-  List<iOSNotificationPresentationOption> get iOSForegroundNotificationPresentationOptions => _iOSForegroundNotificationPresentationOptions;
-  set iOSForegroundNotificationPresentationOptions(List<iOSNotificationPresentationOption> options) {
-    CourierFlutterEventsPlatform.instance.iOSForegroundPresentationOptions(options);
+  List<iOSNotificationPresentationOption>
+      _iOSForegroundNotificationPresentationOptions =
+      iOSNotificationPresentationOption.values;
+  List<iOSNotificationPresentationOption>
+      get iOSForegroundNotificationPresentationOptions =>
+          _iOSForegroundNotificationPresentationOptions;
+  set iOSForegroundNotificationPresentationOptions(
+      List<iOSNotificationPresentationOption> options) {
+    CourierFlutterEventsPlatform.instance
+        .iOSForegroundPresentationOptions(options);
     _iOSForegroundNotificationPresentationOptions = options;
   }
 
@@ -72,16 +79,18 @@ class Courier {
   /// Returns the currently stored apns token in the native SDK
   /// If you sign out, this value may still be set so that you can
   /// pass it to the next signed in userId
-  Future<String?> get apnsToken => CourierFlutterCorePlatform.instance.apnsToken();
+  Future<String?> get apnsToken =>
+      CourierFlutterCorePlatform.instance.apnsToken();
 
   /// Returns the currently stored fcm token in the native SDK
   /// If you sign out, this value may still be set so that you can
   /// pass it to the next signed in userId
-  Future<String?> get fcmToken => CourierFlutterCorePlatform.instance.fcmToken();
+  Future<String?> get fcmToken =>
+      CourierFlutterCorePlatform.instance.fcmToken();
 
   /// Sets the current FCM token in Courier Token Management
   /// Mostly used for handling the iOS Firebase SDK
-  Future setFcmToken({ required String token }) {
+  Future setFcmToken({required String token}) {
     return CourierFlutterCorePlatform.instance.setFcmToken(token);
   }
 
@@ -90,7 +99,7 @@ class Courier {
   /// This will persist across app sessions so that messages
   /// are associated with the correct user.
   /// Be sure to call `signOut()` when you want to remove the user credentials.
-  Future signIn({ required String accessToken, required String userId }) {
+  Future signIn({required String accessToken, required String userId}) {
     return CourierFlutterCorePlatform.instance.signIn(accessToken, userId);
   }
 
@@ -105,22 +114,29 @@ class Courier {
   /// You should call this where it makes the most sense for the user experience you are building
   /// Android does NOT support this feature yet due to Android AppCompatActivity limitations
   Future<NotificationPermissionStatus> requestNotificationPermission() async {
-    final status = await CourierFlutterEventsPlatform.instance.requestNotificationPermission();
+    final status = await CourierFlutterEventsPlatform.instance
+        .requestNotificationPermission();
     return status.permissionStatus;
   }
 
   /// Returns the current push notification permission status
   /// Does not present a popup dialog to your user
   Future<NotificationPermissionStatus> getNotificationPermissionStatus() async {
-    final status = await CourierFlutterEventsPlatform.instance.getNotificationPermissionStatus();
+    final status = await CourierFlutterEventsPlatform.instance
+        .getNotificationPermissionStatus();
     return status.permissionStatus;
   }
 
   /// Sends a push notification to the provider your would like
   /// This is used to test your integration
   /// For more info: https://www.courier.com/docs/reference/send/message/
-  Future<String> sendPush({ required String authKey, required String userId, required String title, required String body, required bool isProduction, required List<CourierProvider> providers }) {
-    return CourierFlutterCorePlatform.instance.sendPush(authKey, userId, title, body, isProduction, providers);
+  Future<String> sendPush(
+      {required String authKey,
+      required String userId,
+      required String title,
+      required String body,
+      required List<CourierProvider> providers}) {
+    return CourierFlutterCorePlatform.instance
+        .sendPush(authKey, userId, title, body, providers);
   }
-
 }

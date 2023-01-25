@@ -9,8 +9,9 @@ import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_flutter_core_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockCourierFlutterCorePlatform with MockPlatformInterfaceMixin implements CourierFlutterCorePlatform {
-
+class MockCourierFlutterCorePlatform
+    with MockPlatformInterfaceMixin
+    implements CourierFlutterCorePlatform {
   String? _userId;
   String? _accessToken;
   String? _apnsToken;
@@ -53,7 +54,6 @@ class MockCourierFlutterCorePlatform with MockPlatformInterfaceMixin implements 
 
   @override
   Future setFcmToken(String token) {
-
     if (_userId == null) {
       print('No user set');
       return Future.value();
@@ -61,37 +61,45 @@ class MockCourierFlutterCorePlatform with MockPlatformInterfaceMixin implements 
 
     _fcmToken = token;
     return Future.value();
-
   }
 
   @override
-  Future<String> sendPush(String authKey, String userId, String title, String body, bool isProduction, List<CourierProvider> providers) {
+  Future<String> sendPush(String authKey, String userId, String title,
+      String body, List<CourierProvider> providers) {
     throw Future.value('asdf');
   }
 }
 
-class MockCourierFlutterEventsPlatform with MockPlatformInterfaceMixin implements CourierFlutterEventsPlatform {
+class MockCourierFlutterEventsPlatform
+    with MockPlatformInterfaceMixin
+    implements CourierFlutterEventsPlatform {
   @override
-  Future iOSForegroundPresentationOptions(List<iOSNotificationPresentationOption> options) {
+  Future iOSForegroundPresentationOptions(
+      List<iOSNotificationPresentationOption> options) {
     return Future.value();
   }
 
   @override
-  registerMessagingListeners({required Function(dynamic message) onPushNotificationDelivered, required Function(dynamic message) onPushNotificationClicked, required Function(dynamic log) onLogPosted}) {
+  registerMessagingListeners(
+      {required Function(dynamic message) onPushNotificationDelivered,
+      required Function(dynamic message) onPushNotificationClicked,
+      required Function(dynamic log) onLogPosted}) {
     return;
   }
 
   @override
   Future<String> getNotificationPermissionStatus() {
     const permissions = NotificationPermissionStatus.values;
-    final randomPermission = permissions.elementAt(Random().nextInt(permissions.length));
+    final randomPermission =
+        permissions.elementAt(Random().nextInt(permissions.length));
     return Future.value(randomPermission.value);
   }
 
   @override
   Future<String> requestNotificationPermission() {
     const permissions = NotificationPermissionStatus.values;
-    final randomPermission = permissions.elementAt(Random().nextInt(permissions.length));
+    final randomPermission =
+        permissions.elementAt(Random().nextInt(permissions.length));
     return Future.value(randomPermission.value);
   }
 
@@ -102,7 +110,6 @@ class MockCourierFlutterEventsPlatform with MockPlatformInterfaceMixin implement
 }
 
 void main() {
-
   const exampleUserId = 'example_user_id';
   const exampleAccessToken = 'example_access_token';
   const exampleFcmToken = 'asdfasdf';
@@ -152,5 +159,4 @@ void main() {
     expect(fcmToken, fcmToken);
     expect(apnsToken, null);
   });
-
 }

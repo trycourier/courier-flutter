@@ -3,7 +3,6 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'courier_flutter_core_method_channel.dart';
 
 abstract class CourierFlutterCorePlatform extends PlatformInterface {
-
   CourierFlutterCorePlatform() : super(token: _token);
   static final Object _token = Object();
   static CourierFlutterCorePlatform _instance = CoreChannelCourierFlutter();
@@ -49,8 +48,8 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
-  Future<String> sendPush(String authKey, String userId, String title, String body, bool isProduction, List<CourierProvider> providers) {
+  Future<String> sendPush(String authKey, String userId, String title,
+      String body, List<CourierProvider> providers) {
     throw UnimplementedError('sendPush() has not been implemented.');
   }
-
 }
