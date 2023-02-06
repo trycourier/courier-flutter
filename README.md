@@ -135,7 +135,7 @@ https://user-images.githubusercontent.com/6370613/198111372-09a29aba-6507-4cf7-a
 1. Open Android project
 2. Add support for Jitpack to `android/build.gradle`
     - This is needed because the Courier Android SDK is hosted using Jitpack
-    - Maven support will be coming later
+    - Maven Central support will be coming later
 
 ```gradle
 allprojects {
