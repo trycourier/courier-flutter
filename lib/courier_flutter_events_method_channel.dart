@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_flutter_events_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -14,17 +15,35 @@ class EventsChannelCourierFlutter extends CourierFlutterEventsPlatform {
 
   @override
   Future<String> requestNotificationPermission() async {
-    return await channel.invokeMethod('requestNotificationPermission');
+
+    try {
+      return await channel.invokeMethod('requestNotificationPermission');
+    } catch (error) {
+      return 'unknown';
+    }
+
   }
 
   @override
   Future<String> getNotificationPermissionStatus() async {
-    return await channel.invokeMethod('getNotificationPermissionStatus');
+
+    try {
+      return await channel.invokeMethod('getNotificationPermissionStatus');
+    } catch (error) {
+      return 'unknown';
+    }
+
   }
 
   @override
   Future getClickedNotification() async {
-    return await channel.invokeMethod('getClickedNotification');
+
+    try {
+      return await channel.invokeMethod('getClickedNotification');
+    } catch (error) {
+      return;
+    }
+
   }
 
   @override
@@ -33,9 +52,13 @@ class EventsChannelCourierFlutter extends CourierFlutterEventsPlatform {
     // Skip other platforms. Do not show error
     if (!Platform.isIOS) return;
 
-    return await channel.invokeMethod('iOSForegroundPresentationOptions', {
-      'options': options.map((option) => option.value).toList(),
-    });
+    try {
+      return await channel.invokeMethod('iOSForegroundPresentationOptions', {
+        'options': options.map((option) => option.value).toList(),
+      });
+    } catch (error) {
+      return [];
+    }
 
   }
 

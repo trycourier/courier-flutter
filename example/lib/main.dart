@@ -3,7 +3,6 @@ import 'package:courier_flutter/ios_foreground_notification_presentation_options
 import 'package:courier_flutter_sample/env.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -53,10 +52,7 @@ StreamController<dynamic> pushClicked = StreamController<dynamic>();
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   String? _currentUserId;
-  final List<CourierProvider> _providers = [
-    CourierProvider.apns,
-    CourierProvider.fcm
-  ];
+  final List<CourierProvider> _providers = [CourierProvider.apns, CourierProvider.fcm];
 
   @override
   void initState() {
@@ -102,12 +98,10 @@ class _MyAppState extends State<MyApp> {
       final userId = await Courier.shared.userId;
       print(userId);
 
-      final fetchStatus =
-          await Courier.shared.getNotificationPermissionStatus();
+      final fetchStatus = await Courier.shared.getNotificationPermissionStatus();
       print(fetchStatus);
 
-      final requestStatus =
-          await Courier.shared.requestNotificationPermission();
+      final requestStatus = await Courier.shared.requestNotificationPermission();
       print(requestStatus);
 
       // Set the current FCM token

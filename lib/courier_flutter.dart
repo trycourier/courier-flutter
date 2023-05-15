@@ -13,27 +13,27 @@ class Courier {
     isDebugging = kDebugMode;
 
     // Set the default iOS presentation options
-    iOSForegroundNotificationPresentationOptions =
-        _iOSForegroundNotificationPresentationOptions;
+    iOSForegroundNotificationPresentationOptions = _iOSForegroundNotificationPresentationOptions;
 
     // Register listeners for when the native system receives messages
     CourierFlutterEventsPlatform.instance.registerMessagingListeners(
-      onPushNotificationDelivered: (message) =>
-          _onPushNotificationDelivered?.call(message),
-      onPushNotificationClicked: (message) =>
-          _onPushNotificationClicked?.call(message),
-      onLogPosted: (log) =>
-          {/* Empty for now. Flutter will automatically print to console */},
+      onPushNotificationDelivered: (message) => _onPushNotificationDelivered?.call(message),
+      onPushNotificationClicked: (message) => _onPushNotificationClicked?.call(message),
+      onLogPosted: (log) => {
+        /* Empty for now. Flutter will automatically print to console */
+      },
     );
   }
 
   // Singleton
   static Courier? _instance;
+
   static Courier get shared => _instance ??= Courier._();
 
   /// Called if set and a push notification is delivered while the app
   /// Is in the foreground on iOS and "background" / foreground on Android
   Function(dynamic message)? _onPushNotificationDelivered;
+
   set onPushNotificationDelivered(Function(dynamic message)? listener) {
     _onPushNotificationDelivered = listener;
   }
@@ -42,6 +42,7 @@ class Courier {
   /// Will automatically get called the first time your app starts
   /// and the user clicked on a push notification to launch your app
   Function(dynamic message)? _onPushNotificationClicked;
+
   set onPushNotificationClicked(Function(dynamic message)? listener) {
     _onPushNotificationClicked = listener;
     CourierFlutterEventsPlatform.instance.getClickedNotification();
@@ -50,7 +51,9 @@ class Courier {
   /// Allows you to show or hide Courier Native SDK debugging logs
   /// You likely want this to match your development environment debugging mode
   bool _isDebugging = kDebugMode;
+
   bool get isDebugging => _isDebugging;
+
   set isDebugging(bool isDebugging) {
     CourierFlutterCorePlatform.instance.isDebugging(isDebugging);
     _isDebugging = isDebugging;
@@ -60,16 +63,12 @@ class Courier {
   /// showing a push notification when it is received while the app is in the foreground.
   /// This will not have an affect on any other platform
   /// If you do not not want a system push to appear, pass []
+  List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions = iOSNotificationPresentationOption.values;
+
   List<iOSNotificationPresentationOption>
-      _iOSForegroundNotificationPresentationOptions =
-      iOSNotificationPresentationOption.values;
-  List<iOSNotificationPresentationOption>
-      get iOSForegroundNotificationPresentationOptions =>
-          _iOSForegroundNotificationPresentationOptions;
-  set iOSForegroundNotificationPresentationOptions(
-      List<iOSNotificationPresentationOption> options) {
-    CourierFlutterEventsPlatform.instance
-        .iOSForegroundPresentationOptions(options);
+  get iOSForegroundNotificationPresentationOptions => _iOSForegroundNotificationPresentationOptions;
+  set iOSForegroundNotificationPresentationOptions(List<iOSNotificationPresentationOption> options) {
+    CourierFlutterEventsPlatform.instance.iOSForegroundPresentationOptions(options);
     _iOSForegroundNotificationPresentationOptions = options;
   }
 
@@ -79,14 +78,12 @@ class Courier {
   /// Returns the currently stored apns token in the native SDK
   /// If you sign out, this value may still be set so that you can
   /// pass it to the next signed in userId
-  Future<String?> get apnsToken =>
-      CourierFlutterCorePlatform.instance.apnsToken();
+  Future<String?> get apnsToken => CourierFlutterCorePlatform.instance.apnsToken();
 
   /// Returns the currently stored fcm token in the native SDK
   /// If you sign out, this value may still be set so that you can
   /// pass it to the next signed in userId
-  Future<String?> get fcmToken =>
-      CourierFlutterCorePlatform.instance.fcmToken();
+  Future<String?> get fcmToken => CourierFlutterCorePlatform.instance.fcmToken();
 
   /// Sets the current FCM token in Courier Token Management
   /// Mostly used for handling the iOS Firebase SDK
@@ -114,29 +111,29 @@ class Courier {
   /// You should call this where it makes the most sense for the user experience you are building
   /// Android does NOT support this feature yet due to Android AppCompatActivity limitations
   Future<NotificationPermissionStatus> requestNotificationPermission() async {
-    final status = await CourierFlutterEventsPlatform.instance
-        .requestNotificationPermission();
+    final status = await CourierFlutterEventsPlatform.instance.requestNotificationPermission();
     return status.permissionStatus;
   }
 
   /// Returns the current push notification permission status
   /// Does not present a popup dialog to your user
   Future<NotificationPermissionStatus> getNotificationPermissionStatus() async {
-    final status = await CourierFlutterEventsPlatform.instance
-        .getNotificationPermissionStatus();
+    final status = await CourierFlutterEventsPlatform.instance.getNotificationPermissionStatus();
     return status.permissionStatus;
   }
 
   /// Sends a push notification to the provider your would like
   /// This is used to test your integration
   /// For more info: https://www.courier.com/docs/reference/send/message/
-  Future<String> sendPush(
-      {required String authKey,
-      required String userId,
-      required String title,
-      required String body,
-      required List<CourierProvider> providers}) {
-    return CourierFlutterCorePlatform.instance
-        .sendPush(authKey, userId, title, body, providers);
+  Future<String> sendPush({required String authKey, required String userId, required String title, required String body, required List<CourierProvider> providers}) {
+    return CourierFlutterCorePlatform.instance.sendPush(authKey, userId, title, body, providers);
   }
+
+  /// Show a log to the console
+  static void log(String message) {
+    if (Courier.shared._isDebugging) {
+      print(message);
+    }
+  }
+
 }
