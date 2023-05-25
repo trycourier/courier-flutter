@@ -155,11 +155,11 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     
     // MARK: Token Management
 
-    public override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    open override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         Courier.log("Unable to register for remote notifications: \(error.localizedDescription)")
     }
 
-    public override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    open override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Task {
             do {
                 try await Courier.shared.setAPNSToken(deviceToken)

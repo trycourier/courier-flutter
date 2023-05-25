@@ -16,7 +16,7 @@ class MockCourierFlutterCorePlatform
   String? _accessToken;
   String? _apnsToken;
   String? _fcmToken;
-  bool _isDebugging = false;
+  final bool _isDebugging = false;
 
   @override
   Future<bool> isDebugging(bool isDebugging) {
