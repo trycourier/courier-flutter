@@ -124,7 +124,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     
     // MARK: Messaging
     
-    public override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    open override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
         let content = notification.request.content
         let message = content.userInfo
@@ -138,7 +138,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
     }
     
-    public override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    open override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
         let content = response.notification.request.content
         let message = content.userInfo
