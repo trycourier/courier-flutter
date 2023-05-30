@@ -4,12 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import com.courier.android.Courier
 import com.google.firebase.messaging.RemoteMessage
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 
-open class CourierFlutterActivity : FlutterActivity(), CourierFlutterPushNotificationListener {
+open class CourierFlutterFragmentActivity : FlutterFragmentActivity(), CourierFlutterPushNotificationListener {
 
     private var eventsChannel: MethodChannel? = null
 
@@ -27,9 +27,10 @@ open class CourierFlutterActivity : FlutterActivity(), CourierFlutterPushNotific
 
     }
 
-    override fun detachFromFlutterEngine() {
-        super.detachFromFlutterEngine()
+    override fun onDestroy() {
+        super.onDestroy()
 
+        // Remove the callbacks
         eventsChannel?.setMethodCallHandler(null)
 
     }

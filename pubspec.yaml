@@ -1,6 +1,6 @@
 name: courier_flutter
 description: The best way to add push notifications to your Flutter app!
-version: 1.0.6
+version: 1.0.61
 homepage: https://courier.com
 
 environment:
