@@ -1,9 +1,9 @@
 # Install Github CLI if needed
-brew install gh
-gh auth login
-
-# Install yq for parsing yml
-brew install python-yq
+#brew install gh
+#gh auth login
+#
+## Install yq for parsing yml
+#brew install python-yq
 
 # Get the package version from the pubspec
 PACKAGE_VERSION=$(yq .version pubspec.yaml | tr -d '"')

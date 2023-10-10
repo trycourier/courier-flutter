@@ -44,9 +44,10 @@ packages:
   courier_flutter:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      name: courier_flutter
+      sha256: "0a205d62eb7b6ccfa55010e4b07f6d1724664b573a129081ccb9f6ee6d579ea6"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.0.61"
   cupertino_icons:
     dependency: "direct main"
@@ -262,4 +263,4 @@ packages:
     version: "0.1.4-beta"
 sdks:
   dart: ">=3.1.0-185.0.dev <4.0.0"
-  flutter: ">=3.13.6"
+  flutter: ">=2.5.0"
