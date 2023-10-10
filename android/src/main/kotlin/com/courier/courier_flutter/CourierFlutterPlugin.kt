@@ -1,5 +1,6 @@
 package com.courier.courier_flutter
 
+import android.util.Log
 import com.courier.android.BuildConfig
 import com.courier.android.Courier
 import com.courier.android.models.CourierAgent
