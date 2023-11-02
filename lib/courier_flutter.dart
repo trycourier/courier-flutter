@@ -125,6 +125,18 @@ class Courier {
     return CourierFlutterCorePlatform.instance.fetchNextPageOfMessages();
   }
 
+  Future readMessage({ required String id }) {
+    return CourierFlutterCorePlatform.instance.readMessage(id: id);
+  }
+
+  Future unreadMessage({ required String id }) {
+    return CourierFlutterCorePlatform.instance.unreadMessage(id: id);
+  }
+
+  Future readAllInboxMessages() {
+    return CourierFlutterCorePlatform.instance.readAllInboxMessages();
+  }
+
   /// Requests notification permission from your user (the popup dialog)
   /// You should call this where it makes the most sense for the user experience you are building
   /// Android does NOT support this feature yet due to Android AppCompatActivity limitations

@@ -59,4 +59,16 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('fetchNextPageOfMessages() has not been implemented.');
   }
 
+  Future readMessage({ required String id }) {
+    throw UnimplementedError('readMessage() has not been implemented.');
+  }
+
+  Future unreadMessage({ required String id }) {
+    throw UnimplementedError('unreadMessage() has not been implemented.');
+  }
+
+  Future readAllInboxMessages() {
+    throw UnimplementedError('readAllInboxMessages() has not been implemented.');
+  }
+
 }

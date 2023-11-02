@@ -115,16 +115,24 @@ class _MyAppState extends State<MyApp> {
         (error) {
           print(error);
         },
-        (messages, totalMessageCount, unreadMessageCount, canPaginate) {
+        (messages, totalMessageCount, unreadMessageCount, canPaginate) async {
 
           print(messages.length);
           print(totalMessageCount);
           print(unreadMessageCount);
           print(canPaginate);
 
-          if (canPaginate) {
-            Courier.shared.fetchNextPageOfMessages();
-          }
+          // dynamic messageId = messages.first['messageId'];
+
+          // await Courier.shared.unreadMessage(id: messageId);
+          //
+          // await Courier.shared.readMessage(id: messageId);
+          //
+          // await Courier.shared.readAllInboxMessages();
+
+          // if (canPaginate) {
+          //   Courier.shared.fetchNextPageOfMessages();
+          // }
 
         }
       );

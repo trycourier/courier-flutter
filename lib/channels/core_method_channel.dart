@@ -123,4 +123,23 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
     return await channel.invokeMethod('fetchNextPageOfMessages');
   }
 
+  @override
+  Future readMessage({ required String id }) async {
+    return await channel.invokeMethod('readMessage', {
+      'id': id,
+    });
+  }
+
+  @override
+  Future unreadMessage({ required String id }) async {
+    return await channel.invokeMethod('unreadMessage', {
+      'id': id,
+    });
+  }
+
+  @override
+  Future readAllInboxMessages() async {
+    return await channel.invokeMethod('readAllInboxMessages');
+  }
+
 }

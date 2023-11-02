@@ -106,6 +106,51 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 }
             )
             
+        case "readMessage":
+            
+            if let params = call.arguments as? Dictionary<String, Any>,
+                let id = params["id"] as? String {
+                
+                Courier.shared.readMessage(
+                    messageId: id,
+                    onSuccess: {
+                        result(nil)
+                    },
+                    onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
+                
+            }
+            
+        case "unreadMessage":
+            
+            if let params = call.arguments as? Dictionary<String, Any>,
+                let id = params["id"] as? String {
+                
+                Courier.shared.unreadMessage(
+                    messageId: id,
+                    onSuccess: {
+                        result(nil)
+                    },
+                    onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
+                
+            }
+            
+        case "readAllInboxMessages":
+            
+            Courier.shared.readAllInboxMessages(
+                onSuccess: {
+                    result(nil)
+                },
+                onFailure: { error in
+                    result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                }
+            )
+            
         case "isDebugging":
             
             if let params = call.arguments as? Dictionary<String, Any>,
