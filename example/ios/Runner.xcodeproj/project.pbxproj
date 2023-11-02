@@ -7,14 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0888643EB5CB6BE2284EED49 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4070ED500071676A387A8451 /* Pods_Runner.framework */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		19F6E51C8775CBD23D8C8FC0 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F5C19BD4D23C9BD61BBF01C /* Pods_Runner.framework */; };
 		277665312948E277009787AF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 277665302948E277009787AF /* GoogleService-Info.plist */; };
-		2787C4892AEADA01000EAF54 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F99BE31EA90CA41C5FDBF2C0 /* Pods_Runner.framework */; };
 		27E70EC728EB88F000C40E89 /* CourierService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E70EC628EB88F000C40E89 /* CourierService.swift */; };
 		27E70ECB28EB88F000C40E89 /* CourierService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 27E70EC428EB88F000C40E89 /* CourierService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		85B00920370A73A1E7CCDEB5 /* Pods_CourierService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26338B9AB07854A2FD1E6652 /* Pods_CourierService.framework */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -66,12 +67,14 @@
 		2787C47E2AEAD9DD000EAF54 /* Courier_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Courier_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2787C4822AEAD9F7000EAF54 /* courier_flutter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = courier_flutter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2787C4862AEAD9FB000EAF54 /* Courier_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Courier_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		27A053482AF31EA70074D6BC /* Courier_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Courier_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E70E8F28EB637E00C40E89 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		27E70EC428EB88F000C40E89 /* CourierService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CourierService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E70EC628EB88F000C40E89 /* CourierService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourierService.swift; sourceTree = "<group>"; };
 		27E70EC828EB88F000C40E89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2D7788E12922CD8FB9262101 /* Pods-CourierService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CourierService.release.xcconfig"; path = "Target Support Files/Pods-CourierService/Pods-CourierService.release.xcconfig"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		4070ED500071676A387A8451 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F5C19BD4D23C9BD61BBF01C /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -94,7 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2787C4892AEADA01000EAF54 /* Pods_Runner.framework in Frameworks */,
+				85B00920370A73A1E7CCDEB5 /* Pods_CourierService.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +107,7 @@
 			files = (
 				C63F5D2FABA0F22CB7B3F557 /* Pods_Runner.framework in Frameworks */,
 				19F6E51C8775CBD23D8C8FC0 /* Pods_Runner.framework in Frameworks */,
+				0888643EB5CB6BE2284EED49 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				F99BE31EA90CA41C5FDBF2C0 /* Pods_Runner.framework */,
+				5F5C19BD4D23C9BD61BBF01C /* Pods_Runner.framework */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -180,12 +185,13 @@
 		E59B6B4F2F4623837B4F91EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				27A053482AF31EA70074D6BC /* Courier_iOS.framework */,
 				2787C4862AEAD9FB000EAF54 /* Courier_iOS.framework */,
 				2787C4822AEAD9F7000EAF54 /* courier_flutter.framework */,
 				2787C47E2AEAD9DD000EAF54 /* Courier_iOS.framework */,
 				2781D7752964A39F00A24C81 /* Courier_iOS.framework */,
-				5F5C19BD4D23C9BD61BBF01C /* Pods_Runner.framework */,
 				26338B9AB07854A2FD1E6652 /* Pods_CourierService.framework */,
+				4070ED500071676A387A8451 /* Pods_Runner.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -229,14 +235,14 @@
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
 				43A15C9386FC90FF1CC3B208 /* [CP] Check Pods Manifest.lock */,
-				9740EEB61CF901F6004384FC /* Run Script */,
-				97C146EA1CF9000F007C117D /* Sources */,
+				14703E4176FA7EB70A052ED6 /* [CP] Embed Pods Frameworks */,
+				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
-				9705A1C41CF9048500538489 /* Embed Frameworks */,
-				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
-				14703E4176FA7EB70A052ED6 /* [CP] Embed Pods Frameworks */,
 				27E70E9C28EB7D6600C40E89 /* Embed Foundation Extensions */,
+				9740EEB61CF901F6004384FC /* Run Script */,
+				97C146EA1CF9000F007C117D /* Sources */,
+				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);

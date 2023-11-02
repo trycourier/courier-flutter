@@ -1,11 +1,10 @@
 import 'dart:io';
 
-import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_flutter_events_platform_interface.dart';
+import 'package:courier_flutter/channels/events_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'ios_foreground_notification_presentation_options.dart';
+import '../ios_foreground_notification_presentation_options.dart';
 
 /// An implementation of [EventsChannelCourierFlutter] that uses method channels.
 class EventsChannelCourierFlutter extends CourierFlutterEventsPlatform {

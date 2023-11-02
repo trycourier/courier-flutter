@@ -1,6 +1,6 @@
+import 'package:courier_flutter/channels/events_method_channel.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'courier_flutter_events_method_channel.dart';
 
 abstract class CourierFlutterEventsPlatform extends PlatformInterface {
 

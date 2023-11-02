@@ -3,6 +3,8 @@ package com.courier.courier_flutter
 import android.content.Intent
 import android.os.Bundle
 import com.courier.android.Courier
+import com.courier.android.modules.logListener
+import com.courier.android.utils.getLastDeliveredMessage
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -54,7 +56,7 @@ open class CourierFlutterFragmentActivity : FlutterFragmentActivity(), CourierFl
         }
 
         // Handle delivered messages on the main thread
-        Courier.getLastDeliveredMessage { message ->
+        Courier.shared.getLastDeliveredMessage { message ->
             postPushNotificationDelivered(message)
         }
 

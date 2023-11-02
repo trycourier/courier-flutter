@@ -1,5 +1,6 @@
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
+import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -104,23 +105,49 @@ class _MyAppState extends State<MyApp> {
       final requestStatus = await Courier.shared.requestNotificationPermission();
       print(requestStatus);
 
-      // Set the current FCM token
-      // Android will automatically handle this, but iOS will not
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      if (fcmToken != null) {
-        await Courier.shared.setFcmToken(token: fcmToken);
-      }
+      int limit = await Courier.shared.setInboxPaginationLimit(limit: 100);
+      print(limit);
 
-      // Handle FCM token changes
-      FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-        Courier.shared.setFcmToken(token: fcmToken);
-      }).onError((err) {
-        throw err;
-      });
+      CourierInboxListener listener = await Courier.shared.addInboxListener(
+        () {
+          print("Inbox loading");
+        },
+        (error) {
+          print(error);
+        },
+        (messages, totalMessageCount, unreadMessageCount, canPaginate) {
+
+          print(messages.length);
+          print(totalMessageCount);
+          print(unreadMessageCount);
+          print(canPaginate);
+
+          if (canPaginate) {
+            Courier.shared.fetchNextPageOfMessages();
+          }
+
+        }
+      );
+
+      print(listener);
 
       setState(() {
         _currentUserId = userId;
       });
+
+      // // Set the current FCM token
+      // // Android will automatically handle this, but iOS will not
+      // final fcmToken = await FirebaseMessaging.instance.getToken();
+      // if (fcmToken != null) {
+      //   await Courier.shared.setFcmToken(token: fcmToken);
+      // }
+      //
+      // // Handle FCM token changes
+      // FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+      //   Courier.shared.setFcmToken(token: fcmToken);
+      // }).onError((err) {
+      //   throw err;
+      // });
     } catch (e) {
       print(e);
     } finally {
@@ -172,6 +199,7 @@ class _MyAppState extends State<MyApp> {
 
       await Courier.shared.signIn(
         accessToken: Env.accessToken,
+        clientKey: Env.clientKey,
         userId: courierUserId,
       );
 
@@ -248,35 +276,35 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future _sendPush() async {
-    if (_providers.isEmpty) {
-      return;
-    }
-
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final userId = await Courier.shared.userId ?? '';
-
-      final requestId = await Courier.shared.sendPush(
-        authKey: Env.authKey,
-        userId: userId,
-        title: 'Hey $userId',
-        body: 'Push sent from: ${_providers.map((e) => e.name).join(' & ')}',
-        providers: _providers,
-      );
-
-      print(requestId);
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
+  // Future _sendPush() async {
+  //   if (_providers.isEmpty) {
+  //     return;
+  //   }
+  //
+  //   try {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     final userId = await Courier.shared.userId ?? '';
+  //
+  //     final requestId = await Courier.shared.sendPush(
+  //       authKey: Env.authKey,
+  //       userId: userId,
+  //       title: 'Hey $userId',
+  //       body: 'Push sent from: ${_providers.map((e) => e.name).join(' & ')}',
+  //       providers: _providers,
+  //     );
+  //
+  //     print(requestId);
+  //   } catch (e) {
+  //     print(e);
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
 
   Widget _buildContent() {
     if (_isLoading) {
@@ -313,10 +341,10 @@ class _MyAppState extends State<MyApp> {
               CourierProvider.fcm.name.toUpperCase(),
             ),
           ),
-          TextButton(
-            onPressed: () => _sendPush(),
-            child: const Text('Send Push'),
-          ),
+          // TextButton(
+          //   onPressed: () => _sendPush(),
+          //   child: const Text('Send Push'),
+          // ),
           const Divider(),
           TextButton(
             child: const Text('See FCM Token'),

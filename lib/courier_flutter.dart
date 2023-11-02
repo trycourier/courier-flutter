@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:courier_flutter/channels/core_platform_interface.dart';
+import 'package:courier_flutter/channels/events_platform_interface.dart';
+import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/notification_permission_status.dart';
 import 'package:flutter/foundation.dart';
-import 'courier_flutter_core_platform_interface.dart';
-import 'courier_flutter_events_platform_interface.dart';
 import 'courier_provider.dart';
 import 'ios_foreground_notification_presentation_options.dart';
 
 class Courier {
+
   Courier._() {
     // Set debugging mode to default if app is debugging
     isDebugging = kDebugMode;
@@ -96,8 +98,8 @@ class Courier {
   /// This will persist across app sessions so that messages
   /// are associated with the correct user.
   /// Be sure to call `signOut()` when you want to remove the user credentials.
-  Future signIn({required String accessToken, required String userId}) {
-    return CourierFlutterCorePlatform.instance.signIn(accessToken, userId);
+  Future signIn({ required String accessToken, required String userId, String? clientKey }) {
+    return CourierFlutterCorePlatform.instance.signIn(accessToken, userId, clientKey);
   }
 
   /// Removed native level locally stored values for the user and access token
@@ -105,6 +107,22 @@ class Courier {
   /// So your user does not receive notifications if they are not signed in
   Future signOut() {
     return CourierFlutterCorePlatform.instance.signOut();
+  }
+
+  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<dynamic> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) {
+    return CourierFlutterCorePlatform.instance.addInboxListener(onInitialLoad, onError, onMessagesChanged);
+  }
+
+  Future<String> removeInboxListener({ required String id }) {
+    return CourierFlutterCorePlatform.instance.removeInboxListener(id: id);
+  }
+
+  Future<int> setInboxPaginationLimit({ required int limit }) {
+    return CourierFlutterCorePlatform.instance.setInboxPaginationLimit(limit: limit);
+  }
+
+  Future<List> fetchNextPageOfMessages() {
+    return CourierFlutterCorePlatform.instance.fetchNextPageOfMessages();
   }
 
   /// Requests notification permission from your user (the popup dialog)
@@ -120,13 +138,6 @@ class Courier {
   Future<NotificationPermissionStatus> getNotificationPermissionStatus() async {
     final status = await CourierFlutterEventsPlatform.instance.getNotificationPermissionStatus();
     return status.permissionStatus;
-  }
-
-  /// Sends a push notification to the provider your would like
-  /// This is used to test your integration
-  /// For more info: https://www.courier.com/docs/reference/send/message/
-  Future<String> sendPush({required String authKey, required String userId, required String title, required String body, required List<CourierProvider> providers}) {
-    return CourierFlutterCorePlatform.instance.sendPush(authKey, userId, title, body, providers);
   }
 
   /// Show a log to the console

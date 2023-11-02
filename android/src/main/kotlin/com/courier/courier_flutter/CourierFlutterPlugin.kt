@@ -1,11 +1,9 @@
 package com.courier.courier_flutter
 
-import android.util.Log
 import com.courier.android.BuildConfig
 import com.courier.android.Courier
 import com.courier.android.models.CourierAgent
-import com.courier.android.models.CourierProvider
-import com.courier.android.sendPush
+import com.courier.android.modules.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -55,8 +53,14 @@ internal class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
       "fcmToken" -> {
 
-        val fcmToken = Courier.shared.fcmToken
-        result.success(fcmToken)
+        Courier.shared.getFCMToken(
+          onSuccess = { token ->
+            result.success(token)
+          },
+          onFailure = { error ->
+            result.error(COURIER_ERROR_TAG, error.message, error)
+          }
+        )
 
       }
 
@@ -72,7 +76,8 @@ internal class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
           },
           onFailure = { error ->
             result.error(COURIER_ERROR_TAG, error.message, error)
-          })
+          }
+        )
 
       }
 
@@ -110,33 +115,33 @@ internal class CourierFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
       "sendPush" -> {
 
-        val params = call.arguments as HashMap<*, *>
-        val authKey = params["authKey"] as? String
-        val userId = params["userId"] as? String
-        val title = params["title"] as? String
-        val body = params["body"] as? String
-        val providers = params["providers"] as? List<*>
+//        val params = call.arguments as HashMap<*, *>
+//        val authKey = params["authKey"] as? String
+//        val userId = params["userId"] as? String
+//        val title = params["title"] as? String
+//        val body = params["body"] as? String
+//        val providers = params["providers"] as? List<*>
+//
+//        // Map the providers to the proper enums
+//        val courierProviders = providers?.mapNotNull { value ->
+//          return@mapNotNull CourierProvider.values().firstOrNull { provider ->
+//            provider.value == value.toString()
+//          }
+//        }.orEmpty()
 
-        // Map the providers to the proper enums
-        val courierProviders = providers?.mapNotNull { value ->
-          return@mapNotNull CourierProvider.values().firstOrNull { provider ->
-            provider.value == value.toString()
-          }
-        }.orEmpty()
-
-        Courier.shared.sendPush(
-          authKey = authKey ?: "",
-          userId = userId ?: "",
-          title = title ?: "",
-          body = body ?: "",
-          providers = courierProviders,
-          onSuccess = { requestId ->
-            result.success(requestId)
-          },
-          onFailure = { error ->
-            result.error(COURIER_ERROR_TAG, error.message, error)
-          }
-        )
+//        Courier.shared.sendPush(
+//          authKey = authKey ?: "",
+//          userId = userId ?: "",
+//          title = title ?: "",
+//          body = body ?: "",
+//          providers = courierProviders,
+//          onSuccess = { requestId ->
+//            result.success(requestId)
+//          },
+//          onFailure = { error ->
+//            result.error(COURIER_ERROR_TAG, error.message, error)
+//          }
+//        )
 
       }
 

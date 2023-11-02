@@ -42,5 +42,5 @@ end
 
 target 'CourierService' do
 	use_frameworks!
-	pod 'Courier-iOS'
+	pod 'Courier_iOS'
 end

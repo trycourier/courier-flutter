@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'package:courier_flutter/courier_flutter_events_platform_interface.dart';
+import 'package:courier_flutter/platform_interfaces/courier_flutter_events_platform_interface.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/notification_permission_status.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_flutter_core_platform_interface.dart';
+import 'package:courier_flutter/platform_interfaces/courier_flutter_core_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockCourierFlutterCorePlatform

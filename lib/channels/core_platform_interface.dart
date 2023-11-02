@@ -1,20 +1,15 @@
-import 'package:courier_flutter/courier_provider.dart';
+import 'package:courier_flutter/channels/core_method_channel.dart';
+import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'courier_flutter_core_method_channel.dart';
 
 abstract class CourierFlutterCorePlatform extends PlatformInterface {
+
   CourierFlutterCorePlatform() : super(token: _token);
   static final Object _token = Object();
   static CourierFlutterCorePlatform _instance = CoreChannelCourierFlutter();
 
-  /// The default instance of [CourierFlutterCorePlatform] to use.
-  ///
-  /// Defaults to [CoreChannelCourierFlutter].
   static CourierFlutterCorePlatform get instance => _instance;
 
-  /// Platform-specific implementations should set this with their own
-  /// platform-specific class that extends [CourierFlutterCorePlatform] when
-  /// they register themselves.
   static set instance(CourierFlutterCorePlatform instance) {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
@@ -40,7 +35,7 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('setFcmToken() has not been implemented.');
   }
 
-  Future signIn(String accessToken, String userId) {
+  Future signIn(String accessToken, String userId, [String? clientKey]) {
     throw UnimplementedError('signIn() has not been implemented.');
   }
 
@@ -48,8 +43,20 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
-  Future<String> sendPush(String authKey, String userId, String title,
-      String body, List<CourierProvider> providers) {
-    throw UnimplementedError('sendPush() has not been implemented.');
+  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<dynamic> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) {
+    throw UnimplementedError('addInboxListener() has not been implemented.');
   }
+
+  Future<String> removeInboxListener({ required String id }) {
+    throw UnimplementedError('removeInboxListener() has not been implemented.');
+  }
+
+  Future<int> setInboxPaginationLimit({ required int limit }) {
+    throw UnimplementedError('setInboxPaginationLimit() has not been implemented.');
+  }
+
+  Future<List> fetchNextPageOfMessages() {
+    throw UnimplementedError('fetchNextPageOfMessages() has not been implemented.');
+  }
+
 }

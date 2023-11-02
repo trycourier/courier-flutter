@@ -1,8 +1,8 @@
 package com.courier.courier_flutter
 
 import android.content.Intent
-import com.courier.android.pushNotification
-import com.courier.android.trackPushNotificationClick
+import com.courier.android.utils.pushNotification
+import com.courier.android.utils.trackPushNotificationClick
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
