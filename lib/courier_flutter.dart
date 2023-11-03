@@ -109,7 +109,7 @@ class Courier {
     return CourierFlutterCorePlatform.instance.signOut();
   }
 
-  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<dynamic> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) {
+  Future<CourierInboxListener> addInboxListener({ Function? onInitialLoad, Function(dynamic error)? onError, Function(List<dynamic> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged }) {
     return CourierFlutterCorePlatform.instance.addInboxListener(onInitialLoad, onError, onMessagesChanged);
   }
 

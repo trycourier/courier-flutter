@@ -109,13 +109,13 @@ class _MyAppState extends State<MyApp> {
       print(limit);
 
       CourierInboxListener listener = await Courier.shared.addInboxListener(
-        () {
+        onInitialLoad: () {
           print("Inbox loading");
         },
-        (error) {
+        onError: (error) {
           print(error);
         },
-        (messages, totalMessageCount, unreadMessageCount, canPaginate) async {
+        onMessagesChanged: (messages, totalMessageCount, unreadMessageCount, canPaginate) {
 
           print(messages.length);
           print(totalMessageCount);
