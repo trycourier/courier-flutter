@@ -142,4 +142,28 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
     return await channel.invokeMethod('readAllInboxMessages');
   }
 
+  @override
+  Future<dynamic> getUserPreferences({ String? paginationCursor }) async {
+    return await channel.invokeMethod('getUserPreferences', {
+      'paginationCursor': paginationCursor,
+    });
+  }
+
+  @override
+  Future<dynamic> getUserPreferencesTopic({ required String topicId }) async {
+    return await channel.invokeMethod('getUserPreferencesTopic', {
+      'topicId': topicId,
+    });
+  }
+
+  @override
+  Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) async {
+    return await channel.invokeMethod('putUserPreferencesTopic', {
+      'topicId': topicId,
+      'status': status,
+      'hasCustomRouting': hasCustomRouting,
+      'customRouting': customRouting,
+    });
+  }
+
 }

@@ -139,6 +139,19 @@ class _MyAppState extends State<MyApp> {
 
       print(listener);
 
+      final preferences = await Courier.shared.getUserPreferences();
+      print(preferences);
+
+      final topic = await Courier.shared.getUserPreferencesTopic(topicId: '74RT1WNNQAM0SFJR59THWCDACCEV');
+      print(topic);
+
+      await Courier.shared.putUserPreferencesTopic(
+          topicId: '74RT1WNNQAM0SFJR59THWCDACCEV',
+          status: 'OPTED_IN',
+          hasCustomRouting: true,
+          customRouting: ['push']
+      );
+
       setState(() {
         _currentUserId = userId;
       });

@@ -137,6 +137,18 @@ class Courier {
     return CourierFlutterCorePlatform.instance.readAllInboxMessages();
   }
 
+  Future<dynamic> getUserPreferences({ String? paginationCursor }) {
+    return CourierFlutterCorePlatform.instance.getUserPreferences(paginationCursor: paginationCursor);
+  }
+
+  Future<dynamic> getUserPreferencesTopic({ required String topicId }) {
+    return CourierFlutterCorePlatform.instance.getUserPreferencesTopic(topicId: topicId);
+  }
+
+  Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) {
+    return CourierFlutterCorePlatform.instance.putUserPreferencesTopic(topicId: topicId, status: status, hasCustomRouting: hasCustomRouting, customRouting: customRouting);
+  }
+
   /// Requests notification permission from your user (the popup dialog)
   /// You should call this where it makes the most sense for the user experience you are building
   /// Android does NOT support this feature yet due to Android AppCompatActivity limitations

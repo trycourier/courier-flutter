@@ -151,6 +151,64 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 }
             )
             
+        case "getUserPreferences":
+            
+            if let params = call.arguments as? Dictionary<String, Any> {
+                
+                let paginationCursor = params["paginationCursor"] as? String
+                
+                Courier.shared.getUserPreferences(
+                    paginationCursor: paginationCursor,
+                    onSuccess: { preferences in
+                        result(preferences.toDictionary())
+                    },
+                    onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
+                
+            }
+            
+        case "getUserPreferencesTopic":
+            
+            if let params = call.arguments as? Dictionary<String, Any>,
+               let topicId = params["topicId"] as? String {
+                
+                Courier.shared.getUserPreferencesTopic(
+                    topicId: topicId,
+                    onSuccess: { topic in
+                        result(topic.toDictionary())
+                    },
+                    onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
+                
+            }
+            
+        case "putUserPreferencesTopic":
+            
+            if let params = call.arguments as? Dictionary<String, Any>,
+               let topicId = params["topicId"] as? String,
+               let status = params["status"] as? String,
+               let hasCustomRouting = params["hasCustomRouting"] as? Bool,
+               let customRouting = params["customRouting"] as? [String] {
+                
+                Courier.shared.putUserPreferencesTopic(
+                    topicId: topicId,
+                    status: CourierUserPreferencesStatus(rawValue: status) ?? .unknown,
+                    hasCustomRouting: hasCustomRouting,
+                    customRouting: customRouting.map { CourierUserPreferencesChannel(rawValue: $0) ?? .unknown },
+                    onSuccess: {
+                        result(nil)
+                    },
+                    onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
+                
+            }
+            
         case "isDebugging":
             
             if let params = call.arguments as? Dictionary<String, Any>,

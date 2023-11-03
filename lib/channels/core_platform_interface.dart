@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:courier_flutter/channels/core_method_channel.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -69,6 +71,18 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
 
   Future readAllInboxMessages() {
     throw UnimplementedError('readAllInboxMessages() has not been implemented.');
+  }
+
+  Future<dynamic> getUserPreferences({ String? paginationCursor }) {
+    throw UnimplementedError('getUserPreferences() has not been implemented.');
+  }
+
+  Future<dynamic> getUserPreferencesTopic({ required String topicId }) {
+    throw UnimplementedError('getUserPreferencesTopic() has not been implemented.');
+  }
+
+  Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) {
+    throw UnimplementedError('putUserPreferencesTopic() has not been implemented.');
   }
 
 }
