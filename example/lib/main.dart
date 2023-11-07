@@ -105,8 +105,12 @@ class _MyAppState extends State<MyApp> {
       final requestStatus = await Courier.shared.requestNotificationPermission();
       print(requestStatus);
 
+      // Headless Inbox 👇
+
       int limit = await Courier.shared.setInboxPaginationLimit(limit: 100);
       print(limit);
+
+      var didCall = false;
 
       CourierInboxListener listener = await Courier.shared.addInboxListener(
         onInitialLoad: () {
@@ -115,29 +119,40 @@ class _MyAppState extends State<MyApp> {
         onError: (error) {
           print(error);
         },
-        onMessagesChanged: (messages, totalMessageCount, unreadMessageCount, canPaginate) {
+        onMessagesChanged: (messages, totalMessageCount, unreadMessageCount, canPaginate) async {
 
-          print(messages.length);
+          print(messages);
           print(totalMessageCount);
           print(unreadMessageCount);
           print(canPaginate);
 
-          // dynamic messageId = messages.first['messageId'];
+          // Reading & Unreading Messages
 
-          // await Courier.shared.unreadMessage(id: messageId);
-          //
-          // await Courier.shared.readMessage(id: messageId);
-          //
-          // await Courier.shared.readAllInboxMessages();
+          // Pagination
+          if (canPaginate) {
 
-          // if (canPaginate) {
-          //   Courier.shared.fetchNextPageOfMessages();
-          // }
+            Courier.shared.fetchNextPageOfMessages();
+
+          } else if (!didCall) {
+
+            didCall = true;
+
+            dynamic messageId = messages.first['messageId'];
+
+            await Courier.shared.unreadMessage(id: messageId);
+            await Courier.shared.readMessage(id: messageId);
+            await Courier.shared.readAllInboxMessages();
+
+          }
 
         }
       );
 
       print(listener);
+
+      // await listener.remove();
+
+      // Preferences 👇
 
       final preferences = await Courier.shared.getUserPreferences();
       print(preferences);

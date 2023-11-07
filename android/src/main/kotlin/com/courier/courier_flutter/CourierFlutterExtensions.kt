@@ -1,6 +1,7 @@
 package com.courier.courier_flutter
 
 import android.content.Intent
+import com.courier.android.models.*
 import com.courier.android.utils.pushNotification
 import com.courier.android.utils.trackPushNotificationClick
 import com.google.firebase.messaging.RemoteMessage
@@ -53,6 +54,54 @@ fun FlutterEngine.setupCourierMethodChannel(onRequestNotificationPermission: ((S
     // Return the channel
     return channel
 
+}
+
+internal fun InboxMessage.toMap(): Map<String, Any?> {
+    return mapOf(
+        "messageId" to messageId,
+        "title" to title,
+        "body" to body,
+        "preview" to preview,
+        "created" to created,
+        "actions" to actions?.map { it.toMap() },
+        "data" to data,
+        "read" to isRead,
+        "isOpened" to isOpened,
+        "isArchived" to isArchived,
+    )
+}
+
+internal fun InboxAction.toMap(): Map<String, Any?> {
+    return mapOf(
+        "content" to content,
+        "href" to href,
+        "data" to data
+    )
+}
+
+internal fun CourierUserPreferences.toMap(): Map<String, Any?> {
+    return mapOf(
+        "items" to items.map { it.toMap() },
+        "paging" to paging.toMap(),
+    )
+}
+
+internal fun CourierPreferenceTopic.toMap(): Map<String, Any?> {
+    return mapOf(
+        "defaultStatus" to defaultStatus.value,
+        "hasCustomRouting" to hasCustomRouting,
+        "status" to status.value,
+        "topicId" to topicId,
+        "topicName" to topicName,
+        "customRouting" to customRouting.map { it.value }
+    )
+}
+
+internal fun Paging.toMap(): Map<String, Any?>{
+    return mapOf(
+        "cursor" to cursor,
+        "more" to more,
+    )
 }
 
 fun MethodChannel.deliverCourierPushNotification(message: RemoteMessage) {

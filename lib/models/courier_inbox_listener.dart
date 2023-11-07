@@ -9,10 +9,10 @@ class CourierInboxListener {
 
   CourierInboxListener({ required this.listenerId });
 
-  void remove() {
+  Future remove() {
 
     // Remove the native inbox listener
-    Courier.shared.removeInboxListener(id: listenerId);
+    return Courier.shared.removeInboxListener(id: listenerId);
 
   }
 
