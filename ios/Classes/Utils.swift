@@ -121,9 +121,9 @@ internal extension InboxMessage {
             "created": created,
             "actions": actions?.map { $0.toDictionary() },
             "data": data,
-            "read": isRead,
-            "opened": isOpened,
-            "archived": isArchived
+            "read": read,
+            "opened": opened,
+            "archived": archived
         ]
         
         return dictionary.clean()

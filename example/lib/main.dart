@@ -51,9 +51,12 @@ StreamController<dynamic> pushDelivered = StreamController<dynamic>();
 StreamController<dynamic> pushClicked = StreamController<dynamic>();
 
 class _MyAppState extends State<MyApp> {
+
   bool _isLoading = true;
   String? _currentUserId;
-  final List<CourierProvider> _providers = [CourierProvider.apns, CourierProvider.fcm];
+  List<InboxMessage> _messages = [];
+
+  final List<CourierPushProvider> _providers = [CourierPushProvider.apn, CourierPushProvider.firebaseFcm];
 
   @override
   void initState() {
@@ -81,11 +84,12 @@ class _MyAppState extends State<MyApp> {
 
   Future _start() async {
     try {
+
       setState(() {
         _isLoading = true;
       });
 
-      Courier.shared.isDebugging = true;
+      Courier.shared.isDebugging = false;
       print(Courier.shared.isDebugging);
 
       Courier.shared.iOSForegroundNotificationPresentationOptions = [
@@ -126,24 +130,33 @@ class _MyAppState extends State<MyApp> {
           print(unreadMessageCount);
           print(canPaginate);
 
+          setState(() {
+            _messages = messages;
+          });
+
           // Reading & Unreading Messages
 
           // Pagination
           if (canPaginate) {
-
             Courier.shared.fetchNextPageOfMessages();
-
-          } else if (!didCall) {
-
-            didCall = true;
-
-            dynamic messageId = messages.first['messageId'];
-
-            await Courier.shared.unreadMessage(id: messageId);
-            await Courier.shared.readMessage(id: messageId);
-            await Courier.shared.readAllInboxMessages();
-
           }
+
+          // // Pagination
+          // if (canPaginate) {
+          //
+          //   Courier.shared.fetchNextPageOfMessages();
+          //
+          // } else if (!didCall) {
+          //
+          //   didCall = true;
+          //
+          //   String messageId = messages.first.messageId;
+          //
+          //   await Courier.shared.unreadMessage(id: messageId);
+          //   await Courier.shared.readMessage(id: messageId);
+          //   await Courier.shared.readAllInboxMessages();
+          //
+          // }
 
         }
       );
@@ -184,6 +197,7 @@ class _MyAppState extends State<MyApp> {
       // }).onError((err) {
       //   throw err;
       // });
+
     } catch (e) {
       print(e);
     } finally {
@@ -289,18 +303,18 @@ class _MyAppState extends State<MyApp> {
   }
 
   _getFcmToken(BuildContext context) async {
-    final token = await Courier.shared.fcmToken;
+    final token = await Courier.shared.getToken(provider: 'firebase-fcm');
     print(token);
     _showAlert(context, 'FCM Token', token ?? 'No token set');
   }
 
   _getApnsToken(BuildContext context) async {
-    final token = await Courier.shared.apnsToken;
+    final token = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.apn);
     print(token);
     _showAlert(context, 'APNS Token', token ?? 'No token set');
   }
 
-  _handleProviderSwitch(CourierProvider selectedProvider) {
+  _handleProviderSwitch(CourierPushProvider selectedProvider) {
     if (_providers.contains(selectedProvider)) {
       setState(() {
         _providers.removeWhere((provider) => provider == selectedProvider);
@@ -354,27 +368,28 @@ class _MyAppState extends State<MyApp> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('Current user id: ${_currentUserId!}'),
+          Text('Message Count: ${_messages.length}'),
           TextButton(
             child: const Text('Sign Out'),
             onPressed: () => _signOut(),
           ),
           const Divider(),
           SwitchListTile(
-            value: _providers.contains(CourierProvider.apns),
+            value: _providers.contains(CourierPushProvider.apn),
             onChanged: (bool value) {
-              _handleProviderSwitch(CourierProvider.apns);
+              _handleProviderSwitch(CourierPushProvider.apn);
             },
             title: Text(
-              CourierProvider.apns.name.toUpperCase(),
+              CourierPushProvider.apn.name.toUpperCase(),
             ),
           ),
           SwitchListTile(
-            value: _providers.contains(CourierProvider.fcm),
+            value: _providers.contains(CourierPushProvider.firebaseFcm),
             onChanged: (bool value) {
-              _handleProviderSwitch(CourierProvider.fcm);
+              _handleProviderSwitch(CourierPushProvider.firebaseFcm);
             },
             title: Text(
-              CourierProvider.fcm.name.toUpperCase(),
+              CourierPushProvider.firebaseFcm.name.toUpperCase(),
             ),
           ),
           // TextButton(

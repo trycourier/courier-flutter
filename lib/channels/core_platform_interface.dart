@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:courier_flutter/channels/core_method_channel.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -25,16 +26,12 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('userId() has not been implemented.');
   }
 
-  Future<String?> apnsToken() {
-    throw UnimplementedError('apnsToken() has not been implemented.');
+  Future<String?> getToken({ required String provider }) {
+    throw UnimplementedError('getToken() has not been implemented.');
   }
 
-  Future<String?> fcmToken() {
-    throw UnimplementedError('fcmToken() has not been implemented.');
-  }
-
-  Future setFcmToken(String token) {
-    throw UnimplementedError('setFcmToken() has not been implemented.');
+  Future setToken({ required String provider, required String token }) {
+    throw UnimplementedError('setToken() has not been implemented.');
   }
 
   Future signIn(String accessToken, String userId, [String? clientKey]) {
@@ -45,7 +42,7 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
-  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<dynamic> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) {
+  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) {
     throw UnimplementedError('addInboxListener() has not been implemented.');
   }
 

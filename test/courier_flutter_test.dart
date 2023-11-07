@@ -65,7 +65,7 @@ class MockCourierFlutterCorePlatform
 
   @override
   Future<String> sendPush(String authKey, String userId, String title,
-      String body, List<CourierProvider> providers) {
+      String body, List<CourierPushProvider> providers) {
     throw Future.value('asdf');
   }
 }

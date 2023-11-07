@@ -65,9 +65,9 @@ internal fun InboxMessage.toMap(): Map<String, Any?> {
         "created" to created,
         "actions" to actions?.map { it.toMap() },
         "data" to data,
-        "read" to isRead,
-        "isOpened" to isOpened,
-        "isArchived" to isArchived,
+        "read" to read,
+        "opened" to opened,
+        "archived" to archived,
     )
 }
 

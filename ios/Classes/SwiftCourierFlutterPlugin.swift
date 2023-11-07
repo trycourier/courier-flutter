@@ -25,6 +25,8 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        
+        let params = call.arguments as? Dictionary<String, Any>
           
         switch call.method {
             
@@ -66,8 +68,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "removeInboxListener":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let id = params["id"] as? String {
+            if let id = params?["id"] as? String {
                         
                 // Remove the listener
                 let listener = inboxListeners[id]
@@ -82,8 +83,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "setInboxPaginationLimit":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let limit = params["limit"] as? Int {
+            if let limit = params?["limit"] as? Int {
                 
                 Courier.shared.inboxPaginationLimit = limit
                 result(Courier.shared.inboxPaginationLimit)
@@ -108,8 +108,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "readMessage":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let id = params["id"] as? String {
+            if let id = params?["id"] as? String {
                 
                 Courier.shared.readMessage(
                     messageId: id,
@@ -125,8 +124,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "unreadMessage":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let id = params["id"] as? String {
+            if let id = params?["id"] as? String {
                 
                 Courier.shared.unreadMessage(
                     messageId: id,
@@ -153,26 +151,21 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "getUserPreferences":
             
-            if let params = call.arguments as? Dictionary<String, Any> {
-                
-                let paginationCursor = params["paginationCursor"] as? String
-                
-                Courier.shared.getUserPreferences(
-                    paginationCursor: paginationCursor,
-                    onSuccess: { preferences in
-                        result(preferences.toDictionary())
-                    },
-                    onFailure: { error in
-                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
-                    }
-                )
-                
-            }
+            let paginationCursor = params?["paginationCursor"] as? String
+            
+            Courier.shared.getUserPreferences(
+                paginationCursor: paginationCursor,
+                onSuccess: { preferences in
+                    result(preferences.toDictionary())
+                },
+                onFailure: { error in
+                    result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                }
+            )
             
         case "getUserPreferencesTopic":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-               let topicId = params["topicId"] as? String {
+            if let topicId = params?["topicId"] as? String {
                 
                 Courier.shared.getUserPreferencesTopic(
                     topicId: topicId,
@@ -188,11 +181,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "putUserPreferencesTopic":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-               let topicId = params["topicId"] as? String,
-               let status = params["status"] as? String,
-               let hasCustomRouting = params["hasCustomRouting"] as? Bool,
-               let customRouting = params["customRouting"] as? [String] {
+            if let topicId = params?["topicId"] as? String, let status = params?["status"] as? String, let hasCustomRouting = params?["hasCustomRouting"] as? Bool, let customRouting = params?["customRouting"] as? [String] {
                 
                 Courier.shared.putUserPreferencesTopic(
                     topicId: topicId,
@@ -211,8 +200,7 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             
         case "isDebugging":
             
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let isDebugging = params["isDebugging"] as? Bool {
+            if let isDebugging = params?["isDebugging"] as? Bool {
                 
                 Courier.shared.isDebugging = isDebugging
                 result(isDebugging)
@@ -224,39 +212,37 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             let userId = Courier.shared.userId
             result(userId)
             
-        case "apnsToken":
+        case "getToken":
 
-            let token = Courier.shared.apnsToken
-            result(token)
-            
-        case "fcmToken":
-
-            let token = Courier.shared.fcmToken
-            result(token)
-            
-        case "setFcmToken":
-
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let token = params["token"] as? String {
+            if let provider = params?["provider"] as? String {
                 
-                Courier.shared.setFCMToken(
-                    token,
+                let token = Courier.shared.getToken(providerKey: provider)
+                result(token)
+                
+            }
+            
+        case "setToken":
+
+            if let provider = params?["provider"] as? String, let token = params?["token"] as? String {
+                
+                Courier.shared.setToken(
+                    providerKey: provider,
+                    token: token,
                     onSuccess: {
                         result(nil)
                     },
                     onFailure: { error in
                         result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
-                    })
+                    }
+                )
                 
             }
             
         case "signIn":
 
-            if let params = call.arguments as? Dictionary<String, Any>,
-                let accessToken = params["accessToken"] as? String,
-                let userId = params["userId"] as? String {
+            if let accessToken = params?["accessToken"] as? String, let userId = params?["userId"] as? String {
                 
-                let clientKey = params["clientKey"] as? String
+                let clientKey = params?["clientKey"] as? String
 
                 Courier.shared.signIn(
                     accessToken: accessToken,

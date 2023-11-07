@@ -2,15 +2,20 @@ import 'dart:async';
 
 import 'package:courier_flutter/channels/core_platform_interface.dart';
 import 'package:courier_flutter/channels/events_platform_interface.dart';
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/notification_permission_status.dart';
 import 'package:flutter/foundation.dart';
-import 'courier_provider.dart';
 import 'ios_foreground_notification_presentation_options.dart';
+
+export 'models/inbox_message.dart';
+export 'models/inbox_action.dart';
 
 class Courier {
 
   Courier._() {
+
     // Set debugging mode to default if app is debugging
     isDebugging = kDebugMode;
 
@@ -25,6 +30,7 @@ class Courier {
         /* Empty for now. Flutter will automatically print to console */
       },
     );
+
   }
 
   // Singleton
@@ -77,21 +83,13 @@ class Courier {
   /// Returns the currently stored userId in the native SDK
   Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();
 
-  /// Returns the currently stored apns token in the native SDK
-  /// If you sign out, this value may still be set so that you can
-  /// pass it to the next signed in userId
-  Future<String?> get apnsToken => CourierFlutterCorePlatform.instance.apnsToken();
+  /// Returns the token associated with the provider
+  Future<String?> getToken({ required String provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider);
+  Future<String?> getTokenForProvider({ required CourierPushProvider provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider.value);
 
-  /// Returns the currently stored fcm token in the native SDK
-  /// If you sign out, this value may still be set so that you can
-  /// pass it to the next signed in userId
-  Future<String?> get fcmToken => CourierFlutterCorePlatform.instance.fcmToken();
-
-  /// Sets the current FCM token in Courier Token Management
-  /// Mostly used for handling the iOS Firebase SDK
-  Future setFcmToken({required String token}) {
-    return CourierFlutterCorePlatform.instance.setFcmToken(token);
-  }
+  /// Sets the token in Courier Token Management
+  Future setToken({ required String provider, required String token }) => CourierFlutterCorePlatform.instance.setToken(provider: provider, token: token);
+  Future setTokenForProvider({ required CourierPushProvider provider, required String token }) => CourierFlutterCorePlatform.instance.setToken(provider: provider.value, token: token);
 
   /// Stores the current user credentials in native level storage.
   /// You likely want to be calling this where you normally manage your user's state.
@@ -109,7 +107,7 @@ class Courier {
     return CourierFlutterCorePlatform.instance.signOut();
   }
 
-  Future<CourierInboxListener> addInboxListener({ Function? onInitialLoad, Function(dynamic error)? onError, Function(List<dynamic> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged }) {
+  Future<CourierInboxListener> addInboxListener({ Function? onInitialLoad, Function(dynamic error)? onError, Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged }) {
     return CourierFlutterCorePlatform.instance.addInboxListener(onInitialLoad, onError, onMessagesChanged);
   }
 

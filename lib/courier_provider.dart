@@ -1,11 +1,14 @@
-enum CourierProvider {
+enum CourierPushProvider {
 
-  apns(value: "apn"),
-  fcm(value: "firebase-fcm");
+  apn(value: "apn"),
+  firebaseFcm(value: "firebase-fcm"),
+  expo(value: "expo"),
+  oneSignal(value: "onesignal"),
+  pusherBeams(value: "pusher-beams");
 
   final String value;
 
-  const CourierProvider({
+  const CourierPushProvider({
     required this.value,
   });
 
