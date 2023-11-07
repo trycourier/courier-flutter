@@ -2,8 +2,12 @@ import 'dart:async';
 
 import 'package:courier_flutter/channels/core_platform_interface.dart';
 import 'package:courier_flutter/channels/events_platform_interface.dart';
+import 'package:courier_flutter/courier_preference_channel.dart';
+import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/notification_permission_status.dart';
 import 'package:flutter/foundation.dart';
@@ -83,11 +87,11 @@ class Courier {
   /// Returns the currently stored userId in the native SDK
   Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();
 
-  /// Returns the token associated with the provider
+  /// Returns the current token for a provider
   Future<String?> getToken({ required String provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider);
   Future<String?> getTokenForProvider({ required CourierPushProvider provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider.value);
 
-  /// Sets the token in Courier Token Management
+  /// Sets the current token for a provider
   Future setToken({ required String provider, required String token }) => CourierFlutterCorePlatform.instance.setToken(provider: provider, token: token);
   Future setTokenForProvider({ required CourierPushProvider provider, required String token }) => CourierFlutterCorePlatform.instance.setToken(provider: provider.value, token: token);
 
@@ -119,7 +123,7 @@ class Courier {
     return CourierFlutterCorePlatform.instance.setInboxPaginationLimit(limit: limit);
   }
 
-  Future<List> fetchNextPageOfMessages() {
+  Future<List<InboxMessage>> fetchNextPageOfMessages() {
     return CourierFlutterCorePlatform.instance.fetchNextPageOfMessages();
   }
 
@@ -135,16 +139,16 @@ class Courier {
     return CourierFlutterCorePlatform.instance.readAllInboxMessages();
   }
 
-  Future<dynamic> getUserPreferences({ String? paginationCursor }) {
+  Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) {
     return CourierFlutterCorePlatform.instance.getUserPreferences(paginationCursor: paginationCursor);
   }
 
-  Future<dynamic> getUserPreferencesTopic({ required String topicId }) {
+  Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
     return CourierFlutterCorePlatform.instance.getUserPreferencesTopic(topicId: topicId);
   }
 
-  Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) {
-    return CourierFlutterCorePlatform.instance.putUserPreferencesTopic(topicId: topicId, status: status, hasCustomRouting: hasCustomRouting, customRouting: customRouting);
+  Future<dynamic> putUserPreferencesTopic({ required String topicId, required CourierUserPreferencesStatus status, required bool hasCustomRouting, required List<CourierUserPreferencesChannel> customRouting }) {
+    return CourierFlutterCorePlatform.instance.putUserPreferencesTopic(topicId: topicId, status: status.value, hasCustomRouting: hasCustomRouting, customRouting: customRouting.map((e) => e.value).toList());
   }
 
   /// Requests notification permission from your user (the popup dialog)

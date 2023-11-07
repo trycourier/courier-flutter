@@ -1,3 +1,5 @@
+import 'package:courier_flutter/courier_preference_channel.dart';
+import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
@@ -175,9 +177,9 @@ class _MyAppState extends State<MyApp> {
 
       await Courier.shared.putUserPreferencesTopic(
           topicId: '74RT1WNNQAM0SFJR59THWCDACCEV',
-          status: 'OPTED_IN',
+          status: CourierUserPreferencesStatus.optedIn,
           hasCustomRouting: true,
-          customRouting: ['push']
+          customRouting: [CourierUserPreferencesChannel.push]
       );
 
       setState(() {
@@ -302,6 +304,21 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  // CourierUserPreferences mapToUserPreferences(dynamic data) {
+  //   return CourierUserPreferences(
+  //     items: data['items'],
+  //     paging: mapToPagination(data['paging']),
+  //   );
+  // }
+  //
+  //
+  // CourierPagination mapToPagination(dynamic data) {
+  //   return CourierPagination(
+  //     more: data['more'],
+  //     cursor: data['cursor'],
+  //   );
+  // }
+
   _getFcmToken(BuildContext context) async {
     final token = await Courier.shared.getToken(provider: 'firebase-fcm');
     print(token);
@@ -355,6 +372,10 @@ class _MyAppState extends State<MyApp> {
   //     });
   //   }
   // }
+
+  // TODO
+  // 1. Preference Types
+  // 2. Android Courier Providers
 
   Widget _buildContent() {
     if (_isLoading) {

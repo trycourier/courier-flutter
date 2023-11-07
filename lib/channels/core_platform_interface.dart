@@ -3,6 +3,8 @@ import 'dart:ffi';
 import 'package:courier_flutter/channels/core_method_channel.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 abstract class CourierFlutterCorePlatform extends PlatformInterface {
@@ -54,7 +56,7 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('setInboxPaginationLimit() has not been implemented.');
   }
 
-  Future<List> fetchNextPageOfMessages() {
+  Future<List<InboxMessage>> fetchNextPageOfMessages() {
     throw UnimplementedError('fetchNextPageOfMessages() has not been implemented.');
   }
 
@@ -70,11 +72,11 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('readAllInboxMessages() has not been implemented.');
   }
 
-  Future<dynamic> getUserPreferences({ String? paginationCursor }) {
+  Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) {
     throw UnimplementedError('getUserPreferences() has not been implemented.');
   }
 
-  Future<dynamic> getUserPreferencesTopic({ required String topicId }) {
+  Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
     throw UnimplementedError('getUserPreferencesTopic() has not been implemented.');
   }
 

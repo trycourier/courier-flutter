@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:courier_flutter/channels/core_platform_interface.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -78,29 +80,13 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
         case 'onMessagesChanged':
           {
 
-            List<dynamic> messages = call.arguments['messages'];
+            // Map the messages
+            List<dynamic>? messages = call.arguments['messages'];
+            List<InboxMessage>? inboxMessages = messages?.map((message) => InboxMessage.fromJson(message)).toList();
 
-            List<InboxMessage> inboxMessages = messages.map((message) {
-
-              List<dynamic>? actions = call.arguments['actions'];
-
-              return InboxMessage(
-                messageId: message['messageId'],
-                title: message['title'],
-                body: message['body'],
-                preview: message['preview'],
-                created: message['created'],
-                actions: actions?.map((action) => InboxAction(content: action['content'], href: action['href'], data: action['data'])).toList(),
-                data: message['data'],
-                archived: message['archived'],
-                read: message['read'],
-                opened: message['opened'],
-              );
-
-            }).toList();
-
+            // Call the callback
             listener.onMessagesChanged?.call(
-              inboxMessages,
+              inboxMessages ??= [],
               call.arguments['totalMessageCount'],
               call.arguments['unreadMessageCount'],
               call.arguments['canPaginate'],
@@ -117,33 +103,35 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
-  Future<String> removeInboxListener({required String id}) async {
+  Future<String> removeInboxListener({ required String id }) async {
     return await channel.invokeMethod('removeInboxListener', {
       'id': id,
     });
   }
 
   @override
-  Future<int> setInboxPaginationLimit({required int limit}) async {
+  Future<int> setInboxPaginationLimit({ required int limit }) async {
     return await channel.invokeMethod('setInboxPaginationLimit', {
       'limit': limit,
     });
   }
 
   @override
-  Future<List> fetchNextPageOfMessages() async {
-    return await channel.invokeMethod('fetchNextPageOfMessages');
+  Future<List<InboxMessage>> fetchNextPageOfMessages() async {
+    List<dynamic> messages = await channel.invokeMethod('fetchNextPageOfMessages');
+    List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
+    return inboxMessages;
   }
 
   @override
-  Future readMessage({required String id}) async {
+  Future readMessage({ required String id }) async {
     return await channel.invokeMethod('readMessage', {
       'id': id,
     });
   }
 
   @override
-  Future unreadMessage({required String id}) async {
+  Future unreadMessage({ required String id }) async {
     return await channel.invokeMethod('unreadMessage', {
       'id': id,
     });
@@ -155,21 +143,23 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
-  Future<dynamic> getUserPreferences({String? paginationCursor}) async {
-    return await channel.invokeMethod('getUserPreferences', {
+  Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) async {
+    final data = await channel.invokeMethod('getUserPreferences', {
       'paginationCursor': paginationCursor,
     });
+    return CourierUserPreferences.fromJson(data);
   }
 
   @override
-  Future<dynamic> getUserPreferencesTopic({required String topicId}) async {
-    return await channel.invokeMethod('getUserPreferencesTopic', {
+  Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) async {
+    final data = await channel.invokeMethod('getUserPreferencesTopic', {
       'topicId': topicId,
     });
+    return CourierUserPreferencesTopic.fromJson(data);
   }
 
   @override
-  Future<dynamic> putUserPreferencesTopic({required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting}) async {
+  Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) async {
     return await channel.invokeMethod('putUserPreferencesTopic', {
       'topicId': topicId,
       'status': status,
