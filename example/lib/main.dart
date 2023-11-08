@@ -116,8 +116,6 @@ class _MyAppState extends State<MyApp> {
       int limit = await Courier.shared.setInboxPaginationLimit(limit: 100);
       print(limit);
 
-      var didCall = false;
-
       CourierInboxListener listener = await Courier.shared.addInboxListener(
         onInitialLoad: () {
           print("Inbox loading");
@@ -136,29 +134,16 @@ class _MyAppState extends State<MyApp> {
             _messages = messages;
           });
 
-          // Reading & Unreading Messages
-
           // Pagination
           if (canPaginate) {
             Courier.shared.fetchNextPageOfMessages();
           }
 
-          // // Pagination
-          // if (canPaginate) {
-          //
-          //   Courier.shared.fetchNextPageOfMessages();
-          //
-          // } else if (!didCall) {
-          //
-          //   didCall = true;
-          //
-          //   String messageId = messages.first.messageId;
-          //
-          //   await Courier.shared.unreadMessage(id: messageId);
-          //   await Courier.shared.readMessage(id: messageId);
-          //   await Courier.shared.readAllInboxMessages();
-          //
-          // }
+          // Reading / Unreading
+          // String messageId = messages.first.messageId;
+          // await Courier.shared.unreadMessage(id: messageId);
+          // await Courier.shared.readMessage(id: messageId);
+          // await Courier.shared.readAllInboxMessages();
 
         }
       );

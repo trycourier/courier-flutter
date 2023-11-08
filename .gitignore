@@ -34,3 +34,5 @@ coverage/
 example/lib/env.dart
 example/android/app/google-services.json
 example/ios/Runner/GoogleService-Info.plist
+example/lib/firebase_options.dart
+example/ios/firebase_app_id_file.json

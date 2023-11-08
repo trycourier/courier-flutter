@@ -19,6 +19,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		C278D233FAC3C620503CAE12 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E5F6AC61DD886538A07E4F28 /* GoogleService-Info.plist */; };
 		C63F5D2FABA0F22CB7B3F557 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F99BE31EA90CA41C5FDBF2C0 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
@@ -89,6 +90,7 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B04BE8420BD81210ACA3811C /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		E5F6AC61DD886538A07E4F28 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F99BE31EA90CA41C5FDBF2C0 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -153,6 +155,7 @@
 				F21323EE36B98ACC73F904CE /* Pods */,
 				E59B6B4F2F4623837B4F91EC /* Frameworks */,
 				27E70EE028EC776000C40E89 /* Recovered References */,
+				E5F6AC61DD886538A07E4F28 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -309,6 +312,7 @@
 				277665312948E277009787AF /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				C278D233FAC3C620503CAE12 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
