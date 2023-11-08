@@ -304,21 +304,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  // CourierUserPreferences mapToUserPreferences(dynamic data) {
-  //   return CourierUserPreferences(
-  //     items: data['items'],
-  //     paging: mapToPagination(data['paging']),
-  //   );
-  // }
-  //
-  //
-  // CourierPagination mapToPagination(dynamic data) {
-  //   return CourierPagination(
-  //     more: data['more'],
-  //     cursor: data['cursor'],
-  //   );
-  // }
-
   _getFcmToken(BuildContext context) async {
     final token = await Courier.shared.getToken(provider: 'firebase-fcm');
     print(token);

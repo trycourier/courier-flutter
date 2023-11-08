@@ -64,25 +64,29 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             }
 
-            "fcmToken" -> {
+            "getToken" -> {
 
-                Courier.shared.getFCMToken(
-                    onSuccess = { token ->
-                        result.success(token)
-                    },
-                    onFailure = { error ->
-                        result.error(COURIER_ERROR_TAG, error.message, error)
-                    }
-                )
+                val provider = params?.get("provider") as? String
+
+                provider?.let {
+                    val token = Courier.shared.getToken(provider = it)
+                    result.success(token)
+                }
 
             }
 
-            "setFcmToken" -> {
+            "setToken" -> {
 
+                val provider = params?.get("provider") as? String
                 val token = params?.get("token") as? String
 
-                Courier.shared.setFCMToken(
-                    token = token ?: "",
+                if (provider == null || token == null) {
+                    return
+                }
+
+                Courier.shared.setToken(
+                    provider = provider,
+                    token = token,
                     onSuccess = {
                         result.success(null)
                     },
