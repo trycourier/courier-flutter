@@ -90,6 +90,12 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 
             }
             
+        case "refreshInbox":
+            
+            Courier.shared.refreshInbox {
+                result(nil)
+            }
+            
         case "fetchNextPageOfMessages":
             
             Courier.shared.fetchNextPageOfMessages(

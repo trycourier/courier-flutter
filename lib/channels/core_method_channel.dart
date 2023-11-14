@@ -9,74 +9,32 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
+
   @visibleForTesting
-  final channel = const MethodChannel('courier_flutter_core');
+  final coreChannel = const MethodChannel('courier_flutter_core');
+  final inboxChannel = const MethodChannel('courier_flutter_inbox');
 
-  @override
-  Future<bool> isDebugging(bool isDebugging) async {
-    return await channel.invokeMethod('isDebugging', {
-      'isDebugging': isDebugging,
-    });
-  }
+  final Map<String, CourierInboxListener> _inboxListeners = {};
 
-  @override
-  Future<String?> userId() async {
-    return await channel.invokeMethod('userId');
-  }
+  CoreChannelCourierFlutter() {
 
-  @override
-  Future<String?> getToken({ required String provider }) async {
-    return await channel.invokeMethod('getToken');
-  }
-
-  @override
-  Future setToken({ required String provider, required String token }) async {
-    return await channel.invokeMethod('setToken', {
-      'provider': provider,
-      'token': token,
-    });
-  }
-
-  @override
-  Future signIn(String accessToken, String userId, [String? clientKey]) async {
-    return await channel.invokeMethod('signIn', {
-      'accessToken': accessToken,
-      'clientKey': clientKey,
-      'userId': userId,
-    });
-  }
-
-  @override
-  Future signOut() async {
-    return await channel.invokeMethod('signOut');
-  }
-
-  @override
-  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) async {
-
-    // Call the method
-    String id = await channel.invokeMethod('addInboxListener');
-
-    // Create the listener
-    final listener = CourierInboxListener(listenerId: id);
-    listener.onInitialLoad = onInitialLoad;
-    listener.onError = onError;
-    listener.onMessagesChanged = onMessagesChanged;
-
-    const MethodChannel('courier_flutter_inbox').setMethodCallHandler((call) {
+    // Initialize the inbox method callback
+    inboxChannel.setMethodCallHandler((call) {
       switch (call.method) {
         case 'onInitialLoad':
           {
-            listener.onInitialLoad?.call();
+            _inboxListeners.forEach((key, value) {
+              value.onInitialLoad?.call();
+            });
             break;
           }
-
         case 'onError':
           {
-            listener.onError?.call(call.arguments);
+            _inboxListeners.forEach((key, value) {
+              value.onError?.call(call.arguments);
+            });
             break;
           }
-
         case 'onMessagesChanged':
           {
 
@@ -85,66 +43,137 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
             List<InboxMessage>? inboxMessages = messages?.map((message) => InboxMessage.fromJson(message)).toList();
 
             // Call the callback
-            listener.onMessagesChanged?.call(
-              inboxMessages ??= [],
-              call.arguments['totalMessageCount'],
-              call.arguments['unreadMessageCount'],
-              call.arguments['canPaginate'],
-            );
+            _inboxListeners.forEach((key, value) {
+              value.onMessagesChanged?.call(
+                inboxMessages ??= [],
+                call.arguments['unreadMessageCount'],
+                call.arguments['totalMessageCount'],
+                call.arguments['canPaginate'],
+              );
+            });
 
             break;
           }
       }
-
       return Future.value();
     });
+
+  }
+
+  @override
+  Future<bool> isDebugging(bool isDebugging) async {
+    return await coreChannel.invokeMethod('isDebugging', {
+      'isDebugging': isDebugging,
+    });
+  }
+
+  @override
+  Future<String?> userId() async {
+    return await coreChannel.invokeMethod('userId');
+  }
+
+  @override
+  Future<String?> getToken({ required String provider }) async {
+    return await coreChannel.invokeMethod('getToken', {
+      'provider': provider,
+    });
+  }
+
+  @override
+  Future setToken({ required String provider, required String token }) async {
+    return await coreChannel.invokeMethod('setToken', {
+      'provider': provider,
+      'token': token,
+    });
+  }
+
+  @override
+  Future signIn(String accessToken, String userId, [String? clientKey]) async {
+    return await coreChannel.invokeMethod('signIn', {
+      'accessToken': accessToken,
+      'clientKey': clientKey,
+      'userId': userId,
+    });
+  }
+
+  @override
+  Future signOut() async {
+    return await coreChannel.invokeMethod('signOut');
+  }
+
+  @override
+  Future<CourierInboxListener> addInboxListener([Function? onInitialLoad, Function(dynamic error)? onError, Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged]) async {
+
+    // Call the method
+    String id = await coreChannel.invokeMethod('addInboxListener');
+
+    // Create the listener
+    final listener = CourierInboxListener(listenerId: id);
+    listener.onInitialLoad = onInitialLoad;
+    listener.onError = onError;
+    listener.onMessagesChanged = onMessagesChanged;
+
+    // Add listener to manager
+    _inboxListeners[listener.listenerId] = listener;
 
     return listener;
   }
 
   @override
   Future<String> removeInboxListener({ required String id }) async {
-    return await channel.invokeMethod('removeInboxListener', {
+
+    final listenerId = await coreChannel.invokeMethod('removeInboxListener', {
       'id': id,
     });
+
+    // Remove listener
+    _inboxListeners.remove(listenerId) ;
+
+    return listenerId;
+
   }
 
   @override
   Future<int> setInboxPaginationLimit({ required int limit }) async {
-    return await channel.invokeMethod('setInboxPaginationLimit', {
+    return await coreChannel.invokeMethod('setInboxPaginationLimit', {
       'limit': limit,
     });
   }
 
   @override
+  Future refreshInbox() async {
+    return await coreChannel.invokeMethod('refreshInbox');
+  }
+
+  @override
   Future<List<InboxMessage>> fetchNextPageOfMessages() async {
-    List<dynamic> messages = await channel.invokeMethod('fetchNextPageOfMessages');
+    List<dynamic> messages = await coreChannel.invokeMethod('fetchNextPageOfMessages');
     List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
     return inboxMessages;
   }
 
   @override
   Future readMessage({ required String id }) async {
-    return await channel.invokeMethod('readMessage', {
+    return await coreChannel.invokeMethod('readMessage', {
       'id': id,
     });
   }
 
   @override
   Future unreadMessage({ required String id }) async {
-    return await channel.invokeMethod('unreadMessage', {
+    return await coreChannel.invokeMethod('unreadMessage', {
       'id': id,
     });
   }
 
   @override
   Future readAllInboxMessages() async {
-    return await channel.invokeMethod('readAllInboxMessages');
+    return await coreChannel.invokeMethod('readAllInboxMessages');
   }
 
   @override
   Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) async {
-    final data = await channel.invokeMethod('getUserPreferences', {
+    final data = await coreChannel.invokeMethod('getUserPreferences', {
       'paginationCursor': paginationCursor,
     });
     return CourierUserPreferences.fromJson(data);
@@ -152,7 +181,7 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
 
   @override
   Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) async {
-    final data = await channel.invokeMethod('getUserPreferencesTopic', {
+    final data = await coreChannel.invokeMethod('getUserPreferencesTopic', {
       'topicId': topicId,
     });
     return CourierUserPreferencesTopic.fromJson(data);
@@ -160,7 +189,7 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
 
   @override
   Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) async {
-    return await channel.invokeMethod('putUserPreferencesTopic', {
+    return await coreChannel.invokeMethod('putUserPreferencesTopic', {
       'topicId': topicId,
       'status': status,
       'hasCustomRouting': hasCustomRouting,

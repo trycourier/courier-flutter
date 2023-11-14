@@ -56,6 +56,10 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('setInboxPaginationLimit() has not been implemented.');
   }
 
+  Future refreshInbox() {
+    throw UnimplementedError('refreshInbox() has not been implemented.');
+  }
+
   Future<List<InboxMessage>> fetchNextPageOfMessages() {
     throw UnimplementedError('fetchNextPageOfMessages() has not been implemented.');
   }

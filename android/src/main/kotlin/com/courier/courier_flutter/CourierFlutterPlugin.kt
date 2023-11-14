@@ -203,6 +203,15 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             "fetchNextPageOfMessages" -> {
 
+                Courier.shared.refreshInbox {
+                    result.success(null)
+                }
+
+
+            }
+
+            "fetchNextPageOfMessages" -> {
+
                 Courier.shared.fetchNextPageOfMessages(
                     onSuccess = { messages ->
                         result.success(messages.map { it.toMap() })

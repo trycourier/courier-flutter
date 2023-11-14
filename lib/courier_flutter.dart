@@ -7,6 +7,7 @@ import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/notification_permission_status.dart';
@@ -28,8 +29,16 @@ class Courier {
 
     // Register listeners for when the native system receives messages
     CourierFlutterEventsPlatform.instance.registerMessagingListeners(
-      onPushNotificationDelivered: (message) => _onPushNotificationDelivered?.call(message),
-      onPushNotificationClicked: (message) => _onPushNotificationClicked?.call(message),
+      onPushNotificationDelivered: (message) {
+        _pushListeners.forEach((key, value) {
+          value.onPushDelivered?.call(message);
+        });
+      },
+      onPushNotificationClicked: (message) {
+        _pushListeners.forEach((key, value) {
+          value.onPushClicked?.call(message);
+        });
+      },
       onLogPosted: (log) => {
         /* Empty for now. Flutter will automatically print to console */
       },
@@ -42,22 +51,18 @@ class Courier {
 
   static Courier get shared => _instance ??= Courier._();
 
-  /// Called if set and a push notification is delivered while the app
-  /// Is in the foreground on iOS and "background" / foreground on Android
-  Function(dynamic message)? _onPushNotificationDelivered;
+  /// Allow multiple push event listeners
+  final Map<String, CourierPushListener> _pushListeners = {};
 
-  set onPushNotificationDelivered(Function(dynamic message)? listener) {
-    _onPushNotificationDelivered = listener;
+  CourierPushListener addPushListener({ Function(dynamic message)? onPushDelivered, Function(dynamic message)? onPushClicked }) {
+    final listener = CourierPushListener.fromListeners(onPushDelivered, onPushClicked);
+    _pushListeners[listener.listenerId] = listener;
+    CourierFlutterEventsPlatform.instance.getClickedNotification();
+    return listener;
   }
 
-  /// Called if set and a user clicked on a push notification
-  /// Will automatically get called the first time your app starts
-  /// and the user clicked on a push notification to launch your app
-  Function(dynamic message)? _onPushNotificationClicked;
-
-  set onPushNotificationClicked(Function(dynamic message)? listener) {
-    _onPushNotificationClicked = listener;
-    CourierFlutterEventsPlatform.instance.getClickedNotification();
+  removePushListener({ required String id }) {
+    _pushListeners.remove(id);
   }
 
   /// Allows you to show or hide Courier Native SDK debugging logs
@@ -121,6 +126,10 @@ class Courier {
 
   Future<int> setInboxPaginationLimit({ required int limit }) {
     return CourierFlutterCorePlatform.instance.setInboxPaginationLimit(limit: limit);
+  }
+
+  Future refreshInbox() {
+    return CourierFlutterCorePlatform.instance.refreshInbox();
   }
 
   Future<List<InboxMessage>> fetchNextPageOfMessages() {
