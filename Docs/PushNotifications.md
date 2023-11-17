@@ -152,7 +152,7 @@ final token = await Courier.shared.getToken(provider: 'YOUR_PROVIDER');
 
 &emsp;
 
-# iOS Setup (Automatic Token Syncing)
+# iOS Setup
 
 <table>
     <thead>
