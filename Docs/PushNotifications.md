@@ -185,7 +185,7 @@ final token = await Courier.shared.getToken(provider: 'YOUR_PROVIDER');
 
 &emsp;
 
-## **1. Add Courier Delegate**
+## **Automatically Sync Tokens (iOS)**
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
@@ -256,7 +256,7 @@ end
     </tbody>
 </table>
 
-## **3. Android Setup**
+## **Automatically Sync Tokens (Android)**
 
 > If you don't need push notification support on Android, you can skip this step.
 
@@ -317,8 +317,6 @@ class YourNotificationService: CourierService() {
 }
 ```
 
-
-
 7. Add the Notification Service entry in your `AndroidManifest.xml` file
 
 ```xml
@@ -347,7 +345,7 @@ class YourNotificationService: CourierService() {
 
 &emsp;
 
-## **4. Support Notifications
+## **Support Notifications**
 
 ```dart
 // Support the type of notifications you want to show on iOS
@@ -377,7 +375,7 @@ final pushListener = Courier.shared.addPushListener(
 pushListener.remove();
 ```
 
-## **5. Send a Message
+## **Send a Message**
 
 ```curl
 curl --request POST \
