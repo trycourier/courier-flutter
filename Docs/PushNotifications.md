@@ -258,8 +258,6 @@ end
 
 ## **Automatically Sync Tokens (Android)**
 
-> If you don't need push notification support on Android, you can skip this step.
-
 https://user-images.githubusercontent.com/6370613/198111372-09a29aba-6507-4cf7-a59d-87e8df2ba492.mov
 
 1. Open Android project
