@@ -1,7 +1,3 @@
-<img width="1040" alt="banner-react-native-push" src="https://github.com/trycourier/courier-react-native/assets/6370613/67762338-2f2b-4b46-bf28-1462ca742fed">
-
-&emsp;
-
 # Push Notifications
 
 The easiest way to support push notifications in your app.
