@@ -2,134 +2,146 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
+import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 
 import 'package:google_fonts/google_fonts.dart';
 
-class InboxPage extends StatefulWidget {
-  const InboxPage({super.key});
+class PushPage extends StatefulWidget {
+  const PushPage({super.key});
 
   @override
-  State<InboxPage> createState() => _InboxPageState();
+  State<PushPage> createState() => _PushPageState();
 }
 
-class _InboxPageState extends State<InboxPage> {
-  late CourierInboxListener _inboxListener;
+class _PushPageState extends State<PushPage> {
+  late CourierPushListener _pushListener;
+
+  String? _apnsToken;
+  String? _fcmToken;
 
   bool _isLoading = true;
-  String? _error;
-  List<InboxMessage> _messages = [];
 
   @override
   void initState() {
     super.initState();
-
-    if (!mounted) {
-      return;
-    }
-
     _start();
   }
 
-  Future _start() async {
+  void _start() {
 
-    await Courier.shared.setInboxPaginationLimit(limit: 1000);
+    _pushListener = Courier.shared.addPushListener(
+      onPushClicked: (push) {
+        print(push);
+      },
+      onPushDelivered: (push) {
+        print(push);
+      },
+    );
 
-    _inboxListener = await Courier.shared.addInboxListener(
-        onInitialLoad: () {
-          setState(() {
-            _isLoading = true;
-            _error = null;
-          });
-        },
-        onError: (error) {
-          setState(() {
-            _isLoading = false;
-            _error = error;
-          });
-        },
-        onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-          setState(() {
-            _messages = messages;
-            _isLoading = false;
-            _error = null;
-          });
-        }
+    Courier.shared.iOSForegroundNotificationPresentationOptions = [
+      iOSNotificationPresentationOption.banner,
+      iOSNotificationPresentationOption.sound,
+      iOSNotificationPresentationOption.list,
+      iOSNotificationPresentationOption.badge,
+    ];
+    print(Courier.shared.iOSForegroundNotificationPresentationOptions);
+
+    _getTokens();
+
+  }
+
+  Future _getTokens() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final fcm = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
+    final apns = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.apn);
+
+    setState(() {
+      _isLoading = false;
+      _fcmToken = fcm;
+      _apnsToken = apns;
+    });
+  }
+
+  Future _requestPermissions() async {
+    final status = await Courier.shared.requestNotificationPermission();
+    print(status);
+  }
+
+  Widget _buildToken(BuildContext context, String title, String value) {
+    return InkWell(
+      onTap: () async {
+        print(value);
+        await Clipboard.setData(ClipboardData(text: value));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Copied: $value"),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                textAlign: TextAlign.left,
+                style: GoogleFonts.robotoMono(fontSize: 16.0).copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Flexible(
+              child: Container(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  value,
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.robotoMono(fontSize: 16.0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Future<void> _refresh() async {
-    await Courier.shared.refreshInbox();
-  }
-
-  Future<void> _onMessageClick(InboxMessage message) async {
-    message.isRead ? await message.markAsUnread() : await message.markAsRead();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _inboxListener.remove();
-  }
-
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    if (_error != null) {
-      return Center(
-        child: Text(_error!),
-      );
-    }
-
-    if (_messages.isEmpty) {
-      return const Center(
-        child: Text('No message found'),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      child: Scrollbar(
-        child: ListView.separated(
-          separatorBuilder: (context, index) => const Divider(),
-          itemCount: _messages.length,
-          itemBuilder: (BuildContext context, int index) {
-            final message = _messages[index];
-
-            return Container(
-              color: message.isRead ? Colors.transparent : Colors.red,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    _onMessageClick(message);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      jsonEncode({
-                        'messageId': message.messageId,
-                        'title': message.title,
-                        'body': message.body,
-                        'data': message.data,
-                        'actions': message.actions?.map((action) => {
-                          'title': action.content,
-                          'data': action.data,
-                        }),
-                      }),
-                      style: GoogleFonts.robotoMono(fontSize: 16.0),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildToken(context, 'APNS Token', _apnsToken ?? 'No APNS Token'),
+            Container(height: 16.0),
+            _buildToken(context, 'FCM Token', _fcmToken ?? 'No FCM Token'),
+            Container(height: 16.0),
+            ElevatedButton(
+              onPressed: () => _getTokens(),
+              child: const Text('Refresh Tokens'),
+            ),
+            Container(height: 16.0),
+            ElevatedButton(
+              onPressed: () => _requestPermissions(),
+              child: const Text('Request Permissions'),
+            ),
+          ],
         ),
       ),
     );
@@ -141,7 +153,13 @@ class _InboxPageState extends State<InboxPage> {
       appBar: AppBar(
         title: const Text('Inbox'),
       ),
-      body: _buildContent(),
+      body: _buildContent(context),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _pushListener.remove();
   }
 }

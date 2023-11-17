@@ -7,6 +7,8 @@ import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/auth.dart';
 import 'package:courier_flutter_sample/pages/inbox.dart';
+import 'package:courier_flutter_sample/pages/prefs.dart';
+import 'package:courier_flutter_sample/pages/push.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -46,56 +48,57 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late CourierInboxListener _inboxListener;
+  late CourierPushListener _pushListener;
+
   int _unreadMessageCount = 0;
+  int _currentPageIndex = 0;
 
   @override
   void initState() {
     super.initState();
-
-    if (!mounted) {
-      return;
-    }
-
     _start();
   }
 
   Future _start() async {
+
     _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
       setState(() {
         _unreadMessageCount = unreadMessageCount;
       });
     });
-  }
 
-  Future<String> _showUserIdAlert() async {
-    final textController = TextEditingController();
-
-    await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Enter User Id"),
-        content: TextField(
-          autofocus: true,
-          autocorrect: false,
-          enableSuggestions: false,
-          decoration: const InputDecoration(hintText: "Courier User Id"),
-          controller: textController,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Sign In"),
-          ),
-        ],
-      ),
+    _pushListener = Courier.shared.addPushListener(
+      onPushClicked: (push) {
+        _showAlert(context, 'Push Clicked', push.toString());
+      },
+      onPushDelivered: (push) {
+        _showAlert(context, 'Push Delivered', push.toString());
+      },
     );
 
-    return Future.value(textController.text);
+    try {
+
+      final token = await FirebaseMessaging.instance.getToken();
+
+      if (token != null) {
+        Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
+      }
+
+    } catch (e) {
+
+      print(e);
+
+    }
+
+    // Listener to firebase token change
+    FirebaseMessaging.instance.onTokenRefresh
+      .listen((fcmToken) {
+        Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
+      })
+      .onError((error) {
+        print(error);
+      });
+
   }
 
   _showAlert(BuildContext context, String title, String body) {
@@ -114,8 +117,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  int _currentPageIndex = 0;
-
   List<Tab> _getTabs(int unreadCount) {
     return [
       Tab(
@@ -131,11 +132,7 @@ class _MyAppState extends State<MyApp> {
           icon: Icon(Icons.message_outlined),
           label: 'Push',
         ),
-        page: Container(
-          color: Colors.green,
-          alignment: Alignment.center,
-          child: const Text('Push'),
-        ),
+        page: const PushPage(),
       ),
       Tab(
         tab: NavigationDestination(
@@ -151,11 +148,7 @@ class _MyAppState extends State<MyApp> {
           icon: Icon(Icons.room_preferences_outlined),
           label: 'Preferences',
         ),
-        page: Container(
-          color: Colors.yellow,
-          alignment: Alignment.center,
-          child: const Text('Preferences'),
-        ),
+        page: const PrefsPage(),
       )
     ];
   }
@@ -179,6 +172,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     super.dispose();
+    _pushListener.remove();
     _inboxListener.remove();
   }
 }

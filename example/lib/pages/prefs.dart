@@ -1,28 +1,23 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_provider.dart';
-import 'package:courier_flutter/models/courier_inbox_listener.dart';
-import 'package:courier_flutter/models/courier_push_listener.dart';
+import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 
 import 'package:google_fonts/google_fonts.dart';
 
-class PushPage extends StatefulWidget {
-  const PushPage({super.key});
+class PrefsPage extends StatefulWidget {
+  const PrefsPage({super.key});
 
   @override
-  State<PushPage> createState() => _PushPageState();
+  State<PrefsPage> createState() => _PrefsPageState();
 }
 
-class _PushPageState extends State<PushPage> {
-  late CourierPushListener _pushListener;
-
-  String? _apnsToken;
-  String? _fcmToken;
-
+class _PrefsPageState extends State<PrefsPage> {
+  CourierUserPreferences? _preferences;
+  String? _error;
   bool _isLoading = true;
 
   @override
@@ -31,87 +26,90 @@ class _PushPageState extends State<PushPage> {
     _start();
   }
 
-  void _start() {
-    _pushListener = Courier.shared.addPushListener(
-      onPushClicked: (push) {
-        print(push);
-      },
-      onPushDelivered: (push) {
-        print(push);
-      },
-    );
+  // To update a topic
+  // await Courier.shared.putUserPreferencesTopic(
+  //     topicId: 'YOUR_ID',
+  //     status: CourierUserPreferencesStatus.optedIn,
+  //     hasCustomRouting: true,
+  //     customRouting: [CourierUserPreferencesChannel.push]
+  // );
 
-    _getTokens();
-  }
-
-  Future _getTokens() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final fcm = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
-    final apns = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.apn);
-
-    setState(() {
-      _isLoading = false;
-      _fcmToken = fcm;
-      _apnsToken = apns;
-    });
-  }
-
-  Future _requestPermissions() async {
-    final status = await Courier.shared.requestNotificationPermission();
-    print(status);
-  }
-
-  Widget _buildToken(String title, BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        print(title);
-        await Clipboard.setData(ClipboardData(text: title));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Copied: $title"),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          title,
-          style: GoogleFonts.robotoMono(fontSize: 16.0),
-        ),
+  _showAlert(BuildContext context, String title, String body) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(body),
+        actions: [
+          TextButton(
+            child: const Text('Ok'),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Future<void> _start() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final preferences = await Courier.shared.getUserPreferences();
+      setState(() {
+        _error = null;
+        _isLoading = false;
+        _preferences = preferences;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+        _preferences = null;
+      });
+    }
+  }
+
+  Future<void> _refresh() async {
+    return _start();
+  }
+
+  Widget _buildContent() {
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildToken(_apnsToken ?? 'No APNS Token', context),
-            Container(height: 16.0),
-            _buildToken(_fcmToken ?? 'No FCM Token', context),
-            Container(height: 16.0),
-            ElevatedButton(
-              onPressed: () => _getTokens(),
-              child: const Text('Refresh Tokens'),
-            ),
-            Container(height: 16.0),
-            ElevatedButton(
-              onPressed: () => _requestPermissions(),
-              child: const Text('Request Permissions'),
-            ),
-          ],
+    if (_error != null) {
+      return Center(
+        child: Text(_error!),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: Scrollbar(
+        child: ListView.separated(
+          separatorBuilder: (context, index) => const Divider(),
+          itemCount: _preferences?.items.length ?? 0,
+          itemBuilder: (BuildContext context, int index) {
+            final topic = _preferences!.items[index];
+            return InkWell(
+              onTap: () async {
+                final prefTopic = await Courier.shared.getUserPreferencesTopic(topicId: topic.topicId);
+                _showAlert(context, prefTopic.topicId, prefTopic.toJson());
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  topic.toJson(),
+                  style: GoogleFonts.robotoMono(fontSize: 16.0),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -121,15 +119,20 @@ class _PushPageState extends State<PushPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inbox'),
+        title: const Text('Preferences'),
       ),
-      body: _buildContent(context),
+      body: _buildContent(),
     );
   }
+}
 
-  @override
-  void dispose() {
-    super.dispose();
-    _pushListener.remove();
-  }
+extension TopicExtension on CourierUserPreferencesTopic {
+  String toJson() => jsonEncode({
+        'topicId': topicId,
+        'topicName': topicName,
+        'status': status.value,
+        'hasCustomRouting': hasCustomRouting,
+        'defaultStatus': defaultStatus.value,
+        'customRouting': customRouting.map((e) => e.value).join(", "),
+      });
 }

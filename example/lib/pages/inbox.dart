@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -25,38 +24,32 @@ class _InboxPageState extends State<InboxPage> {
   @override
   void initState() {
     super.initState();
-
-    if (!mounted) {
-      return;
-    }
-
     _start();
   }
 
   Future _start() async {
-
     await Courier.shared.setInboxPaginationLimit(limit: 1000);
 
     _inboxListener = await Courier.shared.addInboxListener(
-        onInitialLoad: () {
-          setState(() {
-            _isLoading = true;
-            _error = null;
-          });
-        },
-        onError: (error) {
-          setState(() {
-            _isLoading = false;
-            _error = error;
-          });
-        },
-        onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-          setState(() {
-            _messages = messages;
-            _isLoading = false;
-            _error = null;
-          });
-        }
+      onInitialLoad: () {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+        });
+      },
+      onError: (error) {
+        setState(() {
+          _isLoading = false;
+          _error = error;
+        });
+      },
+      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+        setState(() {
+          _messages = messages;
+          _isLoading = false;
+          _error = null;
+        });
+      },
     );
   }
 
@@ -119,9 +112,9 @@ class _InboxPageState extends State<InboxPage> {
                         'body': message.body,
                         'data': message.data,
                         'actions': message.actions?.map((action) => {
-                          'title': action.content,
-                          'data': action.data,
-                        }),
+                              'title': action.content,
+                              'data': action.data,
+                            }),
                       }),
                       style: GoogleFonts.robotoMono(fontSize: 16.0),
                     ),
