@@ -136,6 +136,8 @@ The easiest way to support push notifications in your app.
 
 &emsp;
 
+# Manual Token Syncing
+
 If you want to manually sync tokens, you can do this here and skip the remaining parts of the setup guide. This step is commonly used with Firebase Cloud Messaging.
 
 ```dart
