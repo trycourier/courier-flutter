@@ -83,7 +83,7 @@ The easiest way to support push notifications in your app.
         </tr>
         <tr width="600px">
             <td align="left">
-                <a href="https://github.com/trycourier/courier-react-native/blob/master/Docs/PushNotifications.md#1-setup-a-push-notification-provider">
+                <a href="https://app.courier.com/integrations/catalog">
                     <code>A Configured Provider</code>
                 </a>
             </td>
@@ -133,6 +133,8 @@ The easiest way to support push notifications in your app.
         </tr>
     </tbody>
 </table>
+
+&emsp;
 
 If you want to manually sync tokens, you can do this here and skip the remaining parts of the setup guide. This step is commonly used with Firebase Cloud Messaging.
 
