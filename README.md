@@ -26,6 +26,12 @@
                 <code>13.0</code>
             </td>
         </tr>
+        <tr width="600px">
+            <td align="left">Minimum Android SDK Version</td>
+            <td align="center">
+                <code>23</code>
+            </td>
+        </tr>
     </tbody>
 </table>
 
