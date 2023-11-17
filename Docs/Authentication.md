@@ -10,13 +10,13 @@ Manages user credentials between app sessions.
     <thead>
         <tr>
             <th width="250px" align="left">Feature</th>
-            <th width="800px" align="left">Reason</th>
+            <th width="750px" align="left">Reason</th>
         </tr>
     </thead>
     <tbody>
         <tr width="600px">
             <td align="left">
-                <a href="https://github.com/trycourier/courier-ios/blob/master/Docs/Inbox.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md">
                     <code>Courier Inbox</code>
                 </a>
             </td>
@@ -26,12 +26,22 @@ Manages user credentials between app sessions.
         </tr>
         <tr width="600px">
             <td align="left">
-                <a href="https://github.com/trycourier/courier-ios/blob/master/Docs/PushNotifications.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md">
                     <code>Push Notifications</code>
                 </a>
             </td>
             <td align="left">
                 Needs Authentication to sync push notification device tokens to the current user and Courier.
+            </td>
+        </tr>
+        <tr width="600px">
+            <td align="left">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Preferences.md">
+                    <code>Preferences</code>
+                </a>
+            </td>
+            <td align="left">
+                Needs Authentication to read and write to user notification preferences.
             </td>
         </tr>
     </tbody>
@@ -41,38 +51,18 @@ Manages user credentials between app sessions.
 
 # Usage
 
-Put this code where you normally manage your user's state. The user's access to [`Courier Inbox`](https://github.com/trycourier/courier-ios/blob/master/Docs/Inbox.md) and [`Push Notifications`](https://github.com/trycourier/courier-ios/blob/master/Docs/PushNotifications.md) will automatically be managed by the SDK and stored in persistent storage. This means that if your user fully closes your app and starts it back up, they will still be "signed in".
+Put this code where you normally manage your user's state. The user's access to [`Courier Inbox`](https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md) and [`Push Notifications`](https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md) will automatically be managed by the SDK and stored in persistent storage. This means that if your user fully closes your app and starts it back up, they will still be "signed in".
 
-```swift
-import Courier_iOS
+```dart
+await Courier.shared.signIn(
+  accessToken: Env.accessToken,
+  clientKey: Env.clientKey, // Optional
+  userId: "YOUR_USER_ID",
+);
 
-Task {
+final userId = await Courier.shared.userId;
 
-    // Saves credentials locally and accesses the Courier API with them
-    // Uploads push notification devices tokens to Courier if needed
-    try await Courier.shared.signIn(
-        accessToken: "pk_prod_H12...",
-        clientKey: "YWQxN...",
-        userId: "example_user_id"
-    )
-
-    // Removes the locally saved credentials
-    // Deletes the user's push notification device tokens in Courier if needed
-    try await Courier.shared.signOut()
-
-}
-
-// Other available properties and functions
-
-let userId = Courier.shared.userId
-let isUserSignedIn = Courier.shared.isUserSignedIn
-
-let listener = Courier.shared.addAuthenticationListener { userId in
-    print(userId ?? "No userId found")
-}
-
-listener.remove()
-
+await Courier.shared.signOut();
 ```
 
 &emsp;
@@ -82,7 +72,7 @@ listener.remove()
         <tr>
             <th width="150px" align="left">Properties</th>
             <th width="450px" align="left">Details</th>
-            <th width="450px" align="left">Where is this?</th>
+            <th width="400px" align="left">Where is this?</th>
         </tr>
     </thead>
     <tbody>
@@ -95,7 +85,7 @@ listener.remove()
             </td>
             <td align="left">
                 For development only: <a href="https://app.courier.com/settings/api-keys"><code>authKey</code></a><br>
-                For development or production: <a href="https://github.com/trycourier/courier-ios/blob/master/Docs/Authentication.md#going-to-production"><code>accessToken</code></a>
+                For development or production: <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production"><code>accessToken</code></a>
             </td>
         </tr>
         <tr width="600px">
@@ -103,7 +93,7 @@ listener.remove()
                 <code>clientKey</code>
             </td>
             <td align="left">
-                The key required to get <a href="https://github.com/trycourier/courier-ios/blob/master/Docs/Inbox.md"><code>Courier Inbox</code></a> messages for the current user. Can be <code>nil</code> if you do not need Courier Inbox.
+                The key required to get <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md"><code>Courier Inbox</code></a> messages for the current user. Can be <code>nil</code> if you do not need Courier Inbox.
             </td>
             <td align="left">
                 <a href="https://app.courier.com/channels/courier"><code>Courier Inbox clientKey</code></a>
@@ -143,5 +133,3 @@ curl --request POST \
 ```
 
 More Info: [`Courier Issue Token Docs`](https://www.courier.com/docs/reference/auth/issue-token/)
-
-This request should exist in a separate endpoint served by your backend.
