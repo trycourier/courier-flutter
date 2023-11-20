@@ -1,4 +1,4 @@
-<img width="1040" alt="banner-flutter-push" src="https://github.com/trycourier/courier-flutter/assets/6370613/666e9465-254e-435c-a653-8e7859a0a1b4">
+<img width="1040" alt="banner-flutter-push" src="https://github.com/trycourier/courier-flutter/assets/6370613/45e4a58b-2bad-49fb-850d-244be3ffd0d7">
 
 &emsp;
 
