@@ -122,26 +122,30 @@ class _PushPageState extends State<PushPage> {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildToken(context, 'APNS Token', _apnsToken ?? 'No APNS Token'),
-            Container(height: 16.0),
-            _buildToken(context, 'FCM Token', _fcmToken ?? 'No FCM Token'),
-            Container(height: 16.0),
-            ElevatedButton(
-              onPressed: () => _getTokens(),
-              child: const Text('Refresh Tokens'),
+    return Scrollbar(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildToken(context, 'APNS Token', _apnsToken ?? 'No APNS Token'),
+                Container(height: 16.0),
+                _buildToken(context, 'FCM Token', _fcmToken ?? 'No FCM Token'),
+                Container(height: 16.0),
+                ElevatedButton(
+                  onPressed: () => _getTokens(),
+                  child: const Text('Refresh Tokens'),
+                ),
+                Container(height: 16.0),
+                ElevatedButton(
+                  onPressed: () => _requestPermissions(),
+                  child: const Text('Request Permissions'),
+                ),
+              ],
             ),
-            Container(height: 16.0),
-            ElevatedButton(
-              onPressed: () => _requestPermissions(),
-              child: const Text('Request Permissions'),
-            ),
-          ],
+          ),
         ),
       ),
     );
