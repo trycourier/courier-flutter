@@ -1,3 +1,7 @@
+<img width="1040" alt="banner-flutter-push" src="https://github.com/trycourier/courier-flutter/assets/6370613/666e9465-254e-435c-a653-8e7859a0a1b4">
+
+&emsp;
+
 # Push Notifications
 
 The easiest way to support push notifications in your app.
