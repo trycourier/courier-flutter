@@ -20,7 +20,7 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  late CourierPushListener _pushListener;
+  CourierPushListener? _pushListener;
 
   bool _isLoading = true;
   String? _currentUserId;
@@ -169,6 +169,6 @@ class _AuthPageState extends State<AuthPage> {
   @override
   void dispose() {
     super.dispose();
-    _pushListener.remove();
+    _pushListener?.remove();
   }
 }
