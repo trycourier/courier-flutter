@@ -1,7 +1,7 @@
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:intl/intl.dart';
 
 class InboxMessage {
-
   final String messageId;
   final String? title;
   final String? body;
@@ -43,8 +43,11 @@ class InboxMessage {
   }
 
   String? get subtitle => body ?? preview;
+
   bool get isRead => read != null;
+
   bool get isOpened => opened != null;
+
   bool get isArchived => archived ?? false;
 
   void setRead() {
@@ -59,12 +62,32 @@ class InboxMessage {
     opened = DateTime.now().toIso8601String();
   }
 
+  String get time {
+    final dateFormatter = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZZZZZ');
+
+    if (created != null) {
+      final date = dateFormatter.parse(created!);
+      final timeDifference = DateTime.now().difference(date);
+
+      final timeSince = timeDifference.inSeconds;
+
+      if (timeSince < 60) {
+        return 'now';
+      } else if (timeSince < 3600) {
+        return '${timeSince ~/ 60} minutes ago';
+      } else if (timeSince < 86400) {
+        return '${timeSince ~/ 3600} hours ago';
+      } else {
+        return '${timeSince ~/ 86400} days ago';
+      }
+    }
+
+    return 'now';
+  }
 }
 
 extension InboxMessageExtensions on InboxMessage {
-
   Future markAsRead() => Courier.shared.readMessage(id: messageId);
 
   Future markAsUnread() => Courier.shared.unreadMessage(id: messageId);
-
 }
