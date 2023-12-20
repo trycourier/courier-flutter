@@ -11,9 +11,11 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
+
+  final ScrollController _testController = ScrollController();
   TabController? _tabController;
 
-  final Map<String, Widget> pages = {
+  late final Map<String, Widget> pages = {
     'Default': CourierInbox(
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
@@ -23,11 +25,17 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
     ),
     'Styled': CourierInbox(
+      scrollController: _testController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
       },
       onActionClick: (action, message, index) {
         print(action);
+        _testController.animateTo(
+          0.0,
+          duration: Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+        );
       },
     ),
     'Custom': const CustomInboxPage(),
