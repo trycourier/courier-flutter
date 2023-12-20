@@ -29,8 +29,6 @@ class _CustomInboxPageState extends State<CustomInboxPage> {
 
   Future _start() async {
 
-    await Courier.shared.setInboxPaginationLimit(limit: 1000);
-
     _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () {
         setState(() {
