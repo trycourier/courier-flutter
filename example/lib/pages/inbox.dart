@@ -1,5 +1,6 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/inbox/courier_inbox.dart';
+import 'package:courier_flutter/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +12,7 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
-
-  final ScrollController _testController = ScrollController();
+  final ScrollController _customScrollController = ScrollController();
   TabController? _tabController;
 
   late final Map<String, Widget> pages = {
@@ -25,17 +25,33 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
     ),
     'Styled': CourierInbox(
-      scrollController: _testController,
+      lightTheme: CourierInboxTheme(
+        loadingIndicatorColor: Colors.black,
+        unreadIndicatorStyle: CourierInboxUnreadIndicatorStyle(
+          indicator: CourierInboxUnreadIndicator.line,
+          color: Colors.red,
+        ),
+        bodyStyle: TextStyle(color: Colors.green, fontSize: 20),
+        buttonStyle: TextButton.styleFrom(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+      ),
+      darkTheme: CourierInboxTheme(
+        loadingIndicatorColor: Colors.red,
+        bodyStyle: TextStyle(color: Colors.red),
+        buttonStyle: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          foregroundColor: Colors.white,
+        ),
+      ),
+      scrollController: _customScrollController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
       },
       onActionClick: (action, message, index) {
         print(action);
-        _testController.animateTo(
-          0.0,
-          duration: Duration(milliseconds: 100),
-          curve: Curves.easeInOut,
-        );
+        _customScrollController.jumpTo(0);
       },
     ),
     'Custom': const CustomInboxPage(),
@@ -50,6 +66,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _tabController?.dispose();
+    _customScrollController.dispose();
     super.dispose();
   }
 

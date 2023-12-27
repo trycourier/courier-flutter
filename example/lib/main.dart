@@ -23,7 +23,19 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   runApp(
-    const MaterialApp(
+    MaterialApp(
+      // theme: ThemeData(
+      //   primaryColor: Colors.pink,
+      //   textTheme: TextTheme(
+      //     bodyMedium: TextStyle(color: Colors.black),
+      //   ),
+      // ),
+      // darkTheme: ThemeData(
+      //   primaryColor: Colors.pink,
+      //   textTheme: TextTheme(
+      //     bodyMedium: TextStyle(color: Colors.white),
+      //   ),
+      // ),
       home: MyApp(),
     ),
   );
@@ -60,7 +72,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _start() async {
-
     _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
       setState(() {
         _unreadMessageCount = unreadMessageCount;
@@ -77,28 +88,21 @@ class _MyAppState extends State<MyApp> {
     );
 
     try {
-
       final token = await FirebaseMessaging.instance.getToken();
 
       if (token != null) {
         Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
       }
-
     } catch (e) {
-
       print(e);
-
     }
 
     // Listener to firebase token change
-    FirebaseMessaging.instance.onTokenRefresh
-      .listen((fcmToken) {
-        Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
-      })
-      .onError((error) {
-        print(error);
-      });
-
+    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+      Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
+    }).onError((error) {
+      print(error);
+    });
   }
 
   _showAlert(BuildContext context, String title, String body) {
