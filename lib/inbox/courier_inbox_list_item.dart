@@ -1,24 +1,7 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/inbox/courier_inbox_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
-
-extension WidgetListExtensions on List<Widget> {
-  List<Widget> addSeparator(Widget Function() separatorBuilder) {
-    if (isEmpty) {
-      return this;
-    }
-
-    List<Widget> resultList = [];
-    for (int i = 0; i < length; i++) {
-      resultList.add(this[i]);
-      if (i != length - 1) {
-        Widget separator = separatorBuilder();
-        resultList.add(separator);
-      }
-    }
-    return resultList;
-  }
-}
 
 class CourierInboxListItem extends StatefulWidget {
   final CourierInboxTheme theme;
@@ -41,6 +24,10 @@ class CourierInboxListItem extends StatefulWidget {
 class CourierInboxListItemState extends State<CourierInboxListItem> {
   InboxMessage get _message => widget.message;
 
+  bool get _showDotIndicator => widget.theme.unreadIndicatorStyle.indicator == CourierInboxUnreadIndicator.dot;
+  final dotSize = 12.0;
+  final margin = 16.0;
+
   List<Widget> _buildContent(BuildContext context) {
     List<Widget> items = [];
 
@@ -50,17 +37,35 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Container(
-            //   width: 10,
-            //   height: 10,
-            //   color: Colors.purple,
-            // ),
             Expanded(
-              child: Text(_message.title ?? "Missing"),
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                clipBehavior: Clip.none,
+                children: [
+                  _showDotIndicator
+                      ? Positioned(
+                          left: -(dotSize + dotSize / 2),
+                          child: Container(
+                            width: dotSize,
+                            height: dotSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _message.isRead ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                  Text(
+                    style: widget.theme.getTitleStyle(context, _message.isRead),
+                    _message.title ?? "Missing",
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 16.0),
+            SizedBox(width: margin),
             Text(
               _message.time,
+              style: widget.theme.getTimeStyle(context, _message.isRead),
               textAlign: TextAlign.right,
             ),
           ],
@@ -71,27 +76,23 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
     if (_message.subtitle != null) {
       items.add(
         Text(
-          style: widget.theme?.getBodyStyle(context),
+          style: widget.theme.getBodyStyle(context, _message.isRead),
           _message.subtitle!,
         ),
       );
     }
 
     items.add(
-      Row(
-        children: [
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: (_message.actions ?? []).map((action) {
-              return ElevatedButton(
-                style: widget.theme?.getButtonStyle(context),
-                onPressed: () => widget.onActionClick(action),
-                child: Text(action.content ?? ''),
-              );
-            }).toList(),
-          ),
-        ],
+      Wrap(
+        spacing: margin / 2,
+        runSpacing: 0.0,
+        children: (_message.actions ?? []).map((action) {
+          return FilledButton(
+            style: widget.theme.getButtonStyle(context, _message.isRead),
+            onPressed: () => widget.onActionClick(action),
+            child: Text(action.content ?? ''),
+          );
+        }).toList(),
       ),
     );
 
@@ -106,15 +107,9 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
         onTap: () => widget.onMessageClick(_message),
         child: Stack(
           children: [
-            Positioned(
-              left: 2,
-              top: 2,
-              bottom: 2,
-              width: 3.0,
-              child: Container(color: _message.isRead ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)),
-            ),
+            !_showDotIndicator ? Positioned(left: 2, top: 2, bottom: 2, width: 3.0, child: Container(color: _message.isRead ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context))) : const SizedBox(),
             Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 12.0, bottom: 6.0),
+              padding: EdgeInsets.only(left: !_showDotIndicator ? margin : margin * 1.5, right: 16.0, top: 12.0, bottom: 6.0),
               child: Row(
                 children: [
                   Expanded(
