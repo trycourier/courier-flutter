@@ -24,18 +24,9 @@ Future<void> main() async {
 
   runApp(
     MaterialApp(
-      // theme: ThemeData(
-      //   primaryColor: Colors.pink,
-      //   textTheme: TextTheme(
-      //     bodyMedium: TextStyle(color: Colors.black),
-      //   ),
-      // ),
-      // darkTheme: ThemeData(
-      //   primaryColor: Colors.pink,
-      //   textTheme: TextTheme(
-      //     bodyMedium: TextStyle(color: Colors.white),
-      //   ),
-      // ),
+      theme: ThemeData(
+        primaryColor: Colors.pink,
+      ),
       home: MyApp(),
     ),
   );

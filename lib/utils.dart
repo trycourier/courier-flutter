@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+
 String getUUID() {
 
   final Random random = Random();
@@ -13,5 +15,25 @@ String getUUID() {
   final List<String> hexChars = bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).toList();
 
   return '${hexChars.sublist(0, 4).join('')}-${hexChars.sublist(4, 6).join('')}-${hexChars.sublist(6, 8).join('')}-${hexChars.sublist(8, 10).join('')}-${hexChars.sublist(10).join('')}';
+
+}
+
+extension WidgetListExtensions on List<Widget> {
+
+  List<Widget> addSeparator(Widget Function() separatorBuilder) {
+    if (isEmpty) {
+      return this;
+    }
+
+    List<Widget> resultList = [];
+    for (int i = 0; i < length; i++) {
+      resultList.add(this[i]);
+      if (i != length - 1) {
+        Widget separator = separatorBuilder();
+        resultList.add(separator);
+      }
+    }
+    return resultList;
+  }
 
 }

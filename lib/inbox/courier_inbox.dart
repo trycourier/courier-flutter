@@ -101,13 +101,13 @@ class CourierInboxState extends State<CourierInbox> {
 
     if (_error != null) {
       return Center(
-        child: Text(_error!),
+        child: Text(_error!), // TODO
       );
     }
 
     if (_messages.isEmpty) {
       return const Center(
-        child: Text('No message found'),
+        child: Text('No message found'), // TODO
       );
     }
 
@@ -118,7 +118,7 @@ class CourierInboxState extends State<CourierInbox> {
         controller: _scrollController,
         child: ListView.separated(
           controller: _scrollController,
-          separatorBuilder: (context, index) => const Divider(height: 1),
+          separatorBuilder: (context, index) => getTheme(isDarkMode).separator ?? const SizedBox(),
           itemCount: _itemCount,
           itemBuilder: (BuildContext context, int index) {
             if (index <= _messages.length - 1) {

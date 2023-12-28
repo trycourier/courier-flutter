@@ -28,21 +28,48 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       lightTheme: CourierInboxTheme(
         loadingIndicatorColor: Colors.black,
         unreadIndicatorStyle: CourierInboxUnreadIndicatorStyle(
-          indicator: CourierInboxUnreadIndicator.line,
+          indicator: CourierInboxUnreadIndicator.dot,
           color: Colors.red,
         ),
-        bodyStyle: TextStyle(color: Colors.green, fontSize: 20),
-        buttonStyle: TextButton.styleFrom(
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
+        titleStyle: CourierInboxTextStyle(
+          read: TextStyle(color: Colors.blue, fontSize: 20),
+          unread: TextStyle(color: Colors.red, fontSize: 20),
         ),
+        timeStyle: CourierInboxTextStyle(
+          read: TextStyle(color: Colors.blue, fontSize: 16),
+          unread: TextStyle(color: Colors.red, fontSize: 16),
+        ),
+        bodyStyle: CourierInboxTextStyle(
+          read: TextStyle(color: Colors.blue, fontSize: 16),
+          unread: TextStyle(color: Colors.red, fontSize: 16),
+        ),
+        buttonStyle: CourierInboxButtonStyle(
+          read: FilledButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+          unread: FilledButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+          )
+        ),
+        separator: null,
       ),
       darkTheme: CourierInboxTheme(
         loadingIndicatorColor: Colors.red,
-        bodyStyle: TextStyle(color: Colors.red),
-        buttonStyle: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
+        bodyStyle: CourierInboxTextStyle(
+          read: TextStyle(color: Colors.red),
+          unread: TextStyle(color: Colors.green),
+        ),
+        buttonStyle: CourierInboxButtonStyle(
+          read: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+          ),
+          unread: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
         ),
       ),
       scrollController: _customScrollController,
