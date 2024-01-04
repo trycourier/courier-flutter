@@ -1,14 +1,18 @@
 package com.courier.courier_flutter
 
+import android.app.Activity
 import android.content.Intent
+import com.courier.android.Courier
 import com.courier.android.models.*
+import com.courier.android.modules.isPushPermissionGranted
+import com.courier.android.modules.requestNotificationPermission
 import com.courier.android.utils.pushNotification
 import com.courier.android.utils.trackPushNotificationClick
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-fun FlutterEngine.setupCourierMethodChannel(onRequestNotificationPermission: ((String) -> Unit)? = null, onGetNotificationPermissionStatus: ((String) -> Unit)? = null, onGetClickedNotification: (() -> Unit)? = null): MethodChannel {
+fun FlutterEngine.setupCourierMethodChannel(activity: Activity, onGetClickedNotification: (() -> Unit)? = null): MethodChannel {
 
     // Create the method channel
     val channel = MethodChannel(dartExecutor.binaryMessenger, CourierFlutterPlugin.EVENTS_CHANNEL)
@@ -20,19 +24,15 @@ fun FlutterEngine.setupCourierMethodChannel(onRequestNotificationPermission: ((S
 
             "requestNotificationPermission" -> {
 
-                // TODO: Not supported yet due to AppCompat issues
-                val value = "unknown"
-                onRequestNotificationPermission?.invoke(value)
-                result.success(value)
+                Courier.shared.requestNotificationPermission(activity)
+                result.success("unknown")
 
             }
 
             "getNotificationPermissionStatus" -> {
 
-                // TODO: Not supported yet due to AppCompat issues
-                val value = "unknown"
-                onGetNotificationPermissionStatus?.invoke(value)
-                result.success(value)
+                val isGranted = Courier.shared.isPushPermissionGranted(activity)
+                result.success(if (isGranted) "authorized" else "denied")
 
             }
 

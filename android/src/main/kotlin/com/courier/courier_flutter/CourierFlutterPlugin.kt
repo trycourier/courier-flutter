@@ -201,7 +201,7 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             }
 
-            "fetchNextPageOfMessages" -> {
+            "refreshInbox" -> {
 
                 Courier.shared.refreshInbox {
                     result.success(null)

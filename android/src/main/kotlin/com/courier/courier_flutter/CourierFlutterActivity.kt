@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.courier.android.Courier
 import com.courier.android.modules.logListener
+import com.courier.android.modules.requestNotificationPermission
 import com.courier.android.utils.getLastDeliveredMessage
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.android.FlutterActivity
@@ -20,6 +21,7 @@ open class CourierFlutterActivity : FlutterActivity(), CourierFlutterPushNotific
 
         // Setup all the supported channels Courier can use
         eventsChannel = flutterEngine.setupCourierMethodChannel(
+            activity = this.activity,
             onGetClickedNotification = {
                 intent.getAndTrackRemoteMessage()?.let { message ->
                     postPushNotificationClicked(message)

@@ -222,8 +222,10 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
 
             if let provider = params?["provider"] as? String {
                 
-                let token = Courier.shared.getToken(providerKey: provider)
-                result(token)
+                Task {
+                    let token = await Courier.shared.getToken(providerKey: provider)
+                    result(token)
+                }
                 
             }
             

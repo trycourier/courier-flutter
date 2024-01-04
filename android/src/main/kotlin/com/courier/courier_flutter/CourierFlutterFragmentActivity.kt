@@ -20,6 +20,7 @@ open class CourierFlutterFragmentActivity : FlutterFragmentActivity(), CourierFl
 
         // Setup all the supported channels Courier can use
         eventsChannel = flutterEngine.setupCourierMethodChannel(
+            activity = this,
             onGetClickedNotification = {
                 intent.getAndTrackRemoteMessage()?.let { message ->
                     postPushNotificationClicked(message)

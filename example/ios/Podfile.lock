@@ -1,8 +1,8 @@
 PODS:
   - courier_flutter (0.0.1):
-    - Courier_iOS (= 2.7.2)
+    - Courier_iOS (= 2.7.3)
     - Flutter
-  - Courier_iOS (2.7.2)
+  - Courier_iOS (2.7.3)
   - Firebase/CoreOnly (10.16.0):
     - FirebaseCore (= 10.16.0)
   - Firebase/Messaging (10.16.0):
@@ -101,8 +101,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
-  courier_flutter: 5daee1cc8eae0554a4206e819b380f881c987ca4
-  Courier_iOS: 626e90630768522dae8841b20c026f77b8568bb6
+  courier_flutter: 6543a623edd052861d33131ce970878275afd135
+  Courier_iOS: ccc6c2fe7d02e20c83d829a5ec94cfe15421031c
   Firebase: 25899099b77d255a636e3579c3d9dce10ec150d5
   firebase_core: 68027ba03585e3efe1608e35d3ab2777a64eabe9
   firebase_messaging: e11ea61b449e6e39741b8a309ddab803ef1eb5cd

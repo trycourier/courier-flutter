@@ -3,6 +3,7 @@ import 'package:courier_flutter/inbox/courier_inbox.dart';
 import 'package:courier_flutter/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class InboxPage extends StatefulWidget {
   const InboxPage({super.key});
@@ -26,51 +27,55 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
     ),
     'Styled': CourierInbox(
       lightTheme: CourierInboxTheme(
-        loadingIndicatorColor: Colors.black,
-        unreadIndicatorStyle: CourierInboxUnreadIndicatorStyle(
+        loadingIndicatorColor: Colors.purple,
+        unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
           indicator: CourierInboxUnreadIndicator.dot,
-          color: Colors.red,
+          color: Colors.pink,
         ),
         titleStyle: CourierInboxTextStyle(
-          read: TextStyle(color: Colors.blue, fontSize: 20),
-          unread: TextStyle(color: Colors.red, fontSize: 20),
+          read: GoogleFonts.notoSans().copyWith(
+            fontWeight: FontWeight.normal,
+            fontSize: 18,
+          ),
+          unread: GoogleFonts.notoSans().copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         timeStyle: CourierInboxTextStyle(
-          read: TextStyle(color: Colors.blue, fontSize: 16),
-          unread: TextStyle(color: Colors.red, fontSize: 16),
+          read: GoogleFonts.notoSans().copyWith(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+          ),
+          unread: GoogleFonts.notoSans().copyWith(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+          ),
         ),
         bodyStyle: CourierInboxTextStyle(
-          read: TextStyle(color: Colors.blue, fontSize: 16),
-          unread: TextStyle(color: Colors.red, fontSize: 16),
+          read: GoogleFonts.notoSans().copyWith(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+          ),
+          unread: GoogleFonts.notoSans().copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         buttonStyle: CourierInboxButtonStyle(
           read: FilledButton.styleFrom(
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.grey,
             foregroundColor: Colors.white,
           ),
           unread: FilledButton.styleFrom(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.purple,
             foregroundColor: Colors.white,
-          )
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+          ),
         ),
         separator: null,
-      ),
-      darkTheme: CourierInboxTheme(
-        loadingIndicatorColor: Colors.red,
-        bodyStyle: CourierInboxTextStyle(
-          read: TextStyle(color: Colors.red),
-          unread: TextStyle(color: Colors.green),
-        ),
-        buttonStyle: CourierInboxButtonStyle(
-          read: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-          ),
-          unread: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-          ),
-        ),
       ),
       scrollController: _customScrollController,
       onMessageClick: (message, index) {
@@ -87,7 +92,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: pages.length, vsync: this);
   }
 
   @override
