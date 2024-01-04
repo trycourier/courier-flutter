@@ -1,3 +1,7 @@
+<img width="1040" alt="banner-flutter-inbox" src="https://github.com/trycourier/courier-flutter/assets/6370613/57eb1876-6cf3-4ecd-a9ff-134c36c45678">
+
+&emsp;
+
 # Courier Inbox
 
 An in-app notification center list you can use to notify your users. Allows you to build high quality, flexible notification feeds very quickly.
