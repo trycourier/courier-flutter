@@ -26,8 +26,9 @@ Future<void> main() async {
     MaterialApp(
       theme: ThemeData(
         primaryColor: Colors.pink,
+        // TODO: Add more theme colors here if you would like Inbox to automatically inherit styles
       ),
-      home: MyApp(),
+      home: const MyApp(),
     ),
   );
 }
