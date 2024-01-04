@@ -41,6 +41,96 @@ An in-app notification center list you can use to notify your users. Allows you 
 
 &emsp;
 
+## Default Inbox Example
+
+The default `CourierInbox` styles.
+
+```swift
+CourierInbox(
+  onMessageClick: (message, index) {
+    message.isRead ? message.markAsUnread() : message.markAsRead();
+  },
+  onActionClick: (action, message, index) {
+    print(action);
+  },
+)
+```
+
+&emsp;
+
+## Styled Inbox Example
+
+The styles you can use to quickly customize the `CourierInbox`.
+
+```dart
+final theme = CourierInboxTheme(
+  loadingIndicatorColor: Colors.purple,
+  unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
+    indicator: CourierInboxUnreadIndicator.dot,
+    color: Colors.pink,
+  ),
+  titleStyle: CourierInboxTextStyle(
+    read: GoogleFonts.notoSans().copyWith(
+      fontWeight: FontWeight.normal,
+      fontSize: 18,
+    ),
+    unread: GoogleFonts.notoSans().copyWith(
+      fontWeight: FontWeight.bold,
+      fontSize: 18,
+    ),
+  ),
+  timeStyle: CourierInboxTextStyle(
+    read: GoogleFonts.notoSans().copyWith(
+      fontWeight: FontWeight.normal,
+      fontSize: 16,
+    ),
+    unread: GoogleFonts.notoSans().copyWith(
+      fontWeight: FontWeight.normal,
+      fontSize: 16,
+    ),
+  ),
+  bodyStyle: CourierInboxTextStyle(
+    read: GoogleFonts.notoSans().copyWith(
+      fontWeight: FontWeight.normal,
+      fontSize: 16,
+    ),
+    unread: GoogleFonts.notoSans().copyWith(
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    ),
+  ),
+  buttonStyle: CourierInboxButtonStyle(
+    read: FilledButton.styleFrom(
+      backgroundColor: Colors.grey,
+      foregroundColor: Colors.white,
+    ),
+    unread: FilledButton.styleFrom(
+      backgroundColor: Colors.purple,
+      foregroundColor: Colors.white,
+    ),
+  ),
+  separator: null,
+);
+
+// Pass the theme to the inbox
+// This example will use the same theme for light and dark mode
+CourierInbox(
+  lightTheme: theme,
+  darkTheme: theme,
+  scrollController: _customScrollController,
+  onMessageClick: (message, index) {
+    message.isRead ? message.markAsUnread() : message.markAsRead();
+  },
+  onActionClick: (action, message, index) {
+    print(action);
+    _customScrollController.jumpTo(0);
+  },
+)
+...
+```
+
+&emsp;
+
 ## Custom Inbox Example
 
 The raw data you can use to build whatever UI you'd like.
