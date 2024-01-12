@@ -16,6 +16,55 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   final ScrollController _customScrollController = ScrollController();
   TabController? _tabController;
 
+  final customTheme = CourierInboxTheme(
+    loadingIndicatorColor: Colors.purple,
+    unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
+      indicator: CourierInboxUnreadIndicator.dot,
+      color: Colors.pink,
+    ),
+    titleStyle: CourierInboxTextStyle(
+      read: GoogleFonts.notoSans().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 18,
+      ),
+      unread: GoogleFonts.notoSans().copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
+    ),
+    timeStyle: CourierInboxTextStyle(
+      read: GoogleFonts.notoSans().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+      unread: GoogleFonts.notoSans().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+    ),
+    bodyStyle: CourierInboxTextStyle(
+      read: GoogleFonts.notoSans().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+      unread: GoogleFonts.notoSans().copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+    ),
+    buttonStyle: CourierInboxButtonStyle(
+      read: FilledButton.styleFrom(
+        backgroundColor: Colors.grey,
+        foregroundColor: Colors.white,
+      ),
+      unread: FilledButton.styleFrom(
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+      ),
+    ),
+    separator: null,
+  );
+
   late final Map<String, Widget> pages = {
     'Default': CourierInbox(
       onMessageClick: (message, index) {
@@ -26,57 +75,8 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
     ),
     'Styled': CourierInbox(
-      lightTheme: CourierInboxTheme(
-        loadingIndicatorColor: Colors.purple,
-        unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
-          indicator: CourierInboxUnreadIndicator.dot,
-          color: Colors.pink,
-        ),
-        titleStyle: CourierInboxTextStyle(
-          read: GoogleFonts.notoSans().copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 18,
-          ),
-          unread: GoogleFonts.notoSans().copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        timeStyle: CourierInboxTextStyle(
-          read: GoogleFonts.notoSans().copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 16,
-          ),
-          unread: GoogleFonts.notoSans().copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 16,
-          ),
-        ),
-        bodyStyle: CourierInboxTextStyle(
-          read: GoogleFonts.notoSans().copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 16,
-          ),
-          unread: GoogleFonts.notoSans().copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        buttonStyle: CourierInboxButtonStyle(
-          read: FilledButton.styleFrom(
-            backgroundColor: Colors.grey,
-            foregroundColor: Colors.white,
-          ),
-          unread: FilledButton.styleFrom(
-            backgroundColor: Colors.purple,
-            foregroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-          ),
-        ),
-        separator: null,
-      ),
+      lightTheme: customTheme,
+      darkTheme: customTheme,
       scrollController: _customScrollController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();

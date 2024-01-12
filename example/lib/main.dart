@@ -1,10 +1,7 @@
-import 'package:courier_flutter/courier_preference_channel.dart';
-import 'package:courier_flutter/courier_preference_status.dart';
+import 'firebase_options.dart';
 import 'package:courier_flutter/courier_provider.dart';
-import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
-import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/auth.dart';
 import 'package:courier_flutter_sample/pages/inbox.dart';
 import 'package:courier_flutter_sample/pages/prefs.dart';
@@ -20,7 +17,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // This is needed to handle FCM tokens
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MaterialApp(
@@ -72,10 +71,10 @@ class _MyAppState extends State<MyApp> {
 
     _pushListener = Courier.shared.addPushListener(
       onPushClicked: (push) {
-        _showAlert(context, 'Push Clicked', push.toString());
+        showAlert(context, 'Push Clicked', push.toString());
       },
       onPushDelivered: (push) {
-        _showAlert(context, 'Push Delivered', push.toString());
+        showAlert(context, 'Push Delivered', push.toString());
       },
     );
 
@@ -95,22 +94,6 @@ class _MyAppState extends State<MyApp> {
     }).onError((error) {
       print(error);
     });
-  }
-
-  _showAlert(BuildContext context, String title, String body) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(body),
-        actions: [
-          TextButton(
-            child: const Text('Ok'),
-            onPressed: () => Navigator.pop(context),
-          )
-        ],
-      ),
-    );
   }
 
   List<Tab> _getTabs(int unreadCount) {
@@ -171,4 +154,25 @@ class _MyAppState extends State<MyApp> {
     _pushListener.remove();
     _inboxListener.remove();
   }
+}
+
+showAlert(BuildContext context, String title, String body) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Scrollbar(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Text(body),
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: const Text('Ok'),
+          onPressed: () => Navigator.pop(context),
+        )
+      ],
+    ),
+  );
 }
