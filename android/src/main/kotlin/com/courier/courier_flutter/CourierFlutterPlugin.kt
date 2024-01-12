@@ -224,6 +224,21 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             }
 
+            "setBrandId" -> {
+
+                val id = params?.get("id") as? String
+                Courier.shared.inboxBrandId = id
+                result.success(null)
+
+            }
+
+            "getBrand" -> {
+
+                val brand = Courier.shared.inboxBrand
+                result.success(brand?.toMap())
+
+            }
+
             "getUserPreferences" -> {
 
                 val paginationCursor = params?.get("paginationCursor") as? String

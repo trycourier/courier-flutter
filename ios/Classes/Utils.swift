@@ -60,6 +60,63 @@ internal extension [String: Any?] {
     
 }
 
+internal extension CourierBrand {
+    
+    @objc func toDictionary() -> NSDictionary {
+        
+        let dictionary: [String: Any?] = [
+            "settings": settings?.toDictionary(),
+        ]
+
+        return dictionary.clean()
+        
+    }
+    
+}
+
+internal extension CourierBrandSettings {
+    
+    @objc func toDictionary() -> NSDictionary {
+        
+        let dictionary: [String: Any?] = [
+            "colors": colors?.toDictionary(),
+            "inapp": inapp?.toDictionary(),
+        ]
+
+        return dictionary.clean()
+        
+    }
+    
+}
+
+internal extension CourierBrandInApp {
+    
+    @objc func toDictionary() -> NSDictionary {
+        
+        let dictionary: [String: Any?] = [
+            "showCourierFooter": showCourierFooter,
+        ]
+
+        return dictionary.clean()
+        
+    }
+    
+}
+
+internal extension CourierBrandColors {
+    
+    @objc func toDictionary() -> NSDictionary {
+        
+        let dictionary: [String: Any?] = [
+            "primary": primary,
+        ]
+
+        return dictionary.clean()
+        
+    }
+    
+}
+
 internal extension CourierUserPreferences {
     
     @objc func toDictionary() -> NSDictionary {

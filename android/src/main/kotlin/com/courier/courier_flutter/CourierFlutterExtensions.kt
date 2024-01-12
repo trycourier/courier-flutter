@@ -79,6 +79,31 @@ internal fun InboxAction.toMap(): Map<String, Any?> {
     )
 }
 
+internal fun CourierBrand.toMap(): Map<String, Any?> {
+    return mapOf(
+        "settings" to settings?.toMap(),
+    )
+}
+
+internal fun CourierBrandSettings.toMap(): Map<String, Any?> {
+    return mapOf(
+        "colors" to colors?.toMap(),
+        "inapp" to inapp?.toMap(),
+    )
+}
+
+internal fun CourierBrandInApp.toMap(): Map<String, Any?> {
+    return mapOf(
+        "showCourierFooter" to (disableCourierFooter ?: false),
+    )
+}
+
+internal fun CourierBrandColors.toMap(): Map<String, Any?> {
+    return mapOf(
+        "primary" to primary,
+    )
+}
+
 internal fun CourierUserPreferences.toMap(): Map<String, Any?> {
     return mapOf(
         "items" to items.map { it.toMap() },

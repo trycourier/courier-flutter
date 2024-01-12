@@ -155,6 +155,20 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 }
             )
             
+        case "setBrandId":
+            
+            if let id = params?["id"] as? String {
+                
+                Courier.shared.inboxBrandId = id
+                result(nil)
+                
+            }
+            
+        case "getBrand":
+            
+            let brand = Courier.shared.inboxBrand?.toDictionary()
+            result(brand)
+            
         case "getUserPreferences":
             
             let paginationCursor = params?["paginationCursor"] as? String
