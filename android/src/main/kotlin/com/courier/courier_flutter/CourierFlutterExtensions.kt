@@ -94,7 +94,7 @@ internal fun CourierBrandSettings.toMap(): Map<String, Any?> {
 
 internal fun CourierBrandInApp.toMap(): Map<String, Any?> {
     return mapOf(
-        "showCourierFooter" to (disableCourierFooter ?: false),
+        "showCourierFooter" to showCourierFooter,
     )
 }
 

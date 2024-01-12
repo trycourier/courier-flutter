@@ -207,7 +207,6 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
                     result.success(null)
                 }
 
-
             }
 
             "fetchNextPageOfMessages" -> {
@@ -220,7 +219,6 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
                         result.error(COURIER_ERROR_TAG, error.message, error)
                     }
                 )
-
 
             }
 

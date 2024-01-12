@@ -67,6 +67,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
 
   late final Map<String, Widget> pages = {
     'Default': CourierInbox(
+      keepAlive: true,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
       },
@@ -75,6 +76,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
     ),
     'Styled': CourierInbox(
+      keepAlive: true,
       lightTheme: customTheme,
       darkTheme: customTheme,
       scrollController: _customScrollController,

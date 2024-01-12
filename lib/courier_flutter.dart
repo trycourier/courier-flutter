@@ -5,6 +5,7 @@ import 'package:courier_flutter/channels/events_platform_interface.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/courier_provider.dart';
+import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
@@ -152,8 +153,9 @@ class Courier {
     return CourierFlutterCorePlatform.instance.setBrandId(id: id);
   }
 
-  Future getBrand() {
-    return CourierFlutterCorePlatform.instance.getBrand();
+  Future<CourierBrand> getBrand() async {
+    final brand = await CourierFlutterCorePlatform.instance.getBrand();
+    return CourierBrand.fromJson(brand);
   }
 
   Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) {

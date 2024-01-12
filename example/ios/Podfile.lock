@@ -1,8 +1,8 @@
 PODS:
   - courier_flutter (0.0.1):
-    - Courier_iOS (= 2.7.3)
+    - Courier_iOS (= 2.7.6)
     - Flutter
-  - Courier_iOS (2.7.3)
+  - Courier_iOS (2.7.6)
   - Firebase/CoreOnly (10.16.0):
     - FirebaseCore (= 10.16.0)
   - Firebase/Messaging (10.16.0):
@@ -66,6 +66,8 @@ PODS:
     - Flutter
     - FlutterMacOS
   - PromisesObjC (2.3.1)
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - courier_flutter (from `.symlinks/plugins/courier_flutter/ios`)
@@ -74,6 +76,7 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -99,10 +102,12 @@ EXTERNAL SOURCES:
     :path: Flutter
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  courier_flutter: 6543a623edd052861d33131ce970878275afd135
-  Courier_iOS: ccc6c2fe7d02e20c83d829a5ec94cfe15421031c
+  courier_flutter: 0b0a19f6aa3135ced4993b101500a8dcc2428a6d
+  Courier_iOS: fadb2a4794fa53242b63d55be52c492e999ea7bd
   Firebase: 25899099b77d255a636e3579c3d9dce10ec150d5
   firebase_core: 68027ba03585e3efe1608e35d3ab2777a64eabe9
   firebase_messaging: e11ea61b449e6e39741b8a309ddab803ef1eb5cd
@@ -116,6 +121,7 @@ SPEC CHECKSUMS:
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
+  url_launcher_ios: bbd758c6e7f9fd7b5b1d4cde34d2b95fcce5e812
 
 PODFILE CHECKSUM: bddbe2edccf4a6e2963ad7e2ef753cd7aa9f4199
 
