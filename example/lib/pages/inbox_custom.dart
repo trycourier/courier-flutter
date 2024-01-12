@@ -14,7 +14,11 @@ class CustomInboxPage extends StatefulWidget {
   State<CustomInboxPage> createState() => _CustomInboxPageState();
 }
 
-class _CustomInboxPageState extends State<CustomInboxPage> {
+class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+
   CourierInboxListener? _inboxListener;
 
   bool _isLoading = true;
@@ -110,6 +114,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> {
                         'title': message.title,
                         'body': message.body,
                         'data': message.data,
+                        'createAt': message.created,
                         'actions': message.actions?.map((action) => {
                           'title': action.content,
                           'data': action.data,
@@ -129,6 +134,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return _buildContent();
   }
 }

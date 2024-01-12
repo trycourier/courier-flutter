@@ -69,9 +69,6 @@ class _MyAppState extends State<MyApp> {
 
     _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
 
-      final brand = await Courier.shared.getBrand();
-      print(brand);
-
       setState(() {
         _unreadMessageCount = unreadMessageCount;
       });
