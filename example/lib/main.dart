@@ -63,10 +63,19 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _start() async {
-    _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+
+    // Set the brand of the inbox
+    await Courier.shared.setBrandId(id: 'AR1TTFKXSA49G2PGEKQ81Q9R9PT5');
+
+    _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
+
+      final brand = await Courier.shared.getBrand();
+      print(brand);
+
       setState(() {
         _unreadMessageCount = unreadMessageCount;
       });
+
     });
 
     _pushListener = Courier.shared.addPushListener(

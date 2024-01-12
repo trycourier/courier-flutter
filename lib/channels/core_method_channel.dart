@@ -172,6 +172,18 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
+  Future setBrandId({ required String id }) async {
+    return await coreChannel.invokeMethod('setBrandId', {
+      'id': id,
+    });
+  }
+
+  @override
+  Future getBrand() async {
+    return await coreChannel.invokeMethod('getBrand');
+  }
+
+  @override
   Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) async {
     final data = await coreChannel.invokeMethod('getUserPreferences', {
       'paginationCursor': paginationCursor,

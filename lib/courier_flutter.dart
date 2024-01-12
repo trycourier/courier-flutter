@@ -148,6 +148,14 @@ class Courier {
     return CourierFlutterCorePlatform.instance.readAllInboxMessages();
   }
 
+  Future setBrandId({ required String id }) {
+    return CourierFlutterCorePlatform.instance.setBrandId(id: id);
+  }
+
+  Future getBrand() {
+    return CourierFlutterCorePlatform.instance.getBrand();
+  }
+
   Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) {
     return CourierFlutterCorePlatform.instance.getUserPreferences(paginationCursor: paginationCursor);
   }
