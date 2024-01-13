@@ -37,3 +37,14 @@ extension WidgetListExtensions on List<Widget> {
   }
 
 }
+
+Color hexToColor(String hexColor) {
+  // Remove the '#' character if present
+  hexColor = hexColor.replaceAll("#", "");
+
+  // Parse the hex color code
+  int hexValue = int.parse(hexColor, radix: 16);
+
+  // Create a Color object from the hex value
+  return Color(hexValue | 0xFF000000);
+}

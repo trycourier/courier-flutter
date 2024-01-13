@@ -55,6 +55,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   double _triggerPoint = 0;
 
   CourierBrand? _brand;
+  String? _userId;
 
   @override
   void initState() {
@@ -75,22 +76,31 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     // Attach inbox message listener
     _inboxListener = await Courier.shared.addInboxListener(
-      onInitialLoad: () {
+      onInitialLoad: () async {
+        final brand = await _refreshBrand();
+        final userId = await Courier.shared.userId;
         setState(() {
+          _userId = userId;
+          _brand = brand;
           _isLoading = true;
           _error = null;
         });
       },
-      onError: (error) {
+      onError: (error) async {
+        final brand = await _refreshBrand();
+        final userId = await Courier.shared.userId;
         setState(() {
+          _userId = userId;
+          _brand = brand;
           _isLoading = false;
           _error = error;
         });
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
-        final brand = await Courier.shared.getBrand();
-
+        final brand = await _refreshBrand();
+        final userId = await Courier.shared.userId;
         setState(() {
+          _userId = userId;
           _brand = brand;
           _messages = messages;
           _isLoading = false;
@@ -101,7 +111,22 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     );
   }
 
+  Future<CourierBrand?> _refreshBrand() async {
+    final brand = await Courier.shared.getBrand();
+    widget._lightTheme.brand = brand;
+    widget._darkTheme.brand = brand;
+    return brand;
+  }
+
   Future<void> _refresh() async {
+    await Courier.shared.refreshInbox();
+  }
+
+  Future<void> _retry() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     await Courier.shared.refreshInbox();
   }
 
@@ -122,13 +147,31 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     if (_error != null) {
       return Center(
-        child: Text(_error!), // TODO: Styles
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
+              _userId == null ? 'No User Found' : _error!,
+            ),
+            const SizedBox(height: 16.0),
+            FilledButton(
+              style: getTheme(isDarkMode).getInfoViewButtonStyle(context),
+              onPressed: () => _retry(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
       );
     }
 
     if (_messages.isEmpty) {
-      return const Center(
-        child: Text('No message found'), // TODO
+      return Center(
+        child: Text(
+          style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
+          'No message found',
+        ),
       );
     }
 
@@ -192,7 +235,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             padding: const EdgeInsets.all(4.0),
             child: TextButton(
               onPressed: () => _showSheet(context),
-              child: Watermark(),
+              child: const Watermark(),
             ),
           ),
         ),
@@ -207,7 +250,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -217,11 +260,11 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
                   Navigator.pop(context);
                   _launchURL();
                 },
-                child: Text('Go to Courier'),
+                child: const Text('Go to Courier'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Cancel'),
+                child: const Text('Cancel'),
               ),
             ],
           ),

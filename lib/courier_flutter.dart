@@ -153,9 +153,9 @@ class Courier {
     return CourierFlutterCorePlatform.instance.setBrandId(id: id);
   }
 
-  Future<CourierBrand> getBrand() async {
+  Future<CourierBrand?> getBrand() async {
     final brand = await CourierFlutterCorePlatform.instance.getBrand();
-    return CourierBrand.fromJson(brand);
+    return brand != null ? CourierBrand.fromJson(brand) : null;
   }
 
   Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) {
