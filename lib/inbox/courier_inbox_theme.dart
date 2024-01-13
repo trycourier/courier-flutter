@@ -1,3 +1,4 @@
+import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:flutter/material.dart';
 
 class CourierInboxTheme {
@@ -8,7 +9,10 @@ class CourierInboxTheme {
   final CourierInboxTextStyle? timeStyle;
   final CourierInboxTextStyle? bodyStyle;
   final CourierInboxButtonStyle? buttonStyle;
+  final CourierInboxInfoViewStyle? infoViewStyle;
   final Widget? separator;
+
+  CourierBrand? brand;
 
   CourierInboxTheme({
     this.loadingIndicatorColor,
@@ -17,19 +21,55 @@ class CourierInboxTheme {
     this.timeStyle,
     this.bodyStyle,
     this.buttonStyle,
+    this.infoViewStyle,
     this.separator = const Divider(height: 1, indent: 16, endIndent: 16),
   });
 
+  Color? get _brandColor => brand?.settings?.colors?.primaryColor();
+
+  ButtonStyle? _brandButtonColor(BuildContext context) {
+
+    final themeStyles = Theme.of(context).elevatedButtonTheme.style;
+
+    final backgroundColor = _brandColor != null ? MaterialStateProperty.all(_brandColor) : themeStyles?.backgroundColor;
+
+    return ButtonStyle(
+      textStyle: themeStyles?.textStyle,
+      backgroundColor: backgroundColor,
+      foregroundColor: themeStyles?.foregroundColor,
+      overlayColor: themeStyles?.overlayColor,
+      shadowColor: themeStyles?.shadowColor,
+      surfaceTintColor: themeStyles?.surfaceTintColor,
+      elevation: themeStyles?.elevation,
+      padding: themeStyles?.padding,
+      minimumSize: themeStyles?.minimumSize,
+      fixedSize: themeStyles?.fixedSize,
+      maximumSize: themeStyles?.maximumSize,
+      iconColor: themeStyles?.iconColor,
+      iconSize: themeStyles?.iconSize,
+      side: themeStyles?.side,
+      shape: themeStyles?.shape,
+      mouseCursor: themeStyles?.mouseCursor,
+      visualDensity: themeStyles?.visualDensity,
+      tapTargetSize: themeStyles?.tapTargetSize,
+      animationDuration: themeStyles?.animationDuration,
+      enableFeedback: themeStyles?.enableFeedback,
+      alignment: themeStyles?.alignment,
+      splashFactory: themeStyles?.splashFactory,
+    );
+
+  }
+
   ButtonStyle? getButtonStyle(BuildContext context, bool isRead) {
-    return (isRead ? buttonStyle?.read : buttonStyle?.unread) ?? Theme.of(context).elevatedButtonTheme.style;
+    return (isRead ? buttonStyle?.read : buttonStyle?.unread) ?? _brandButtonColor(context);
   }
 
   Color getLoadingColor(BuildContext context) {
-    return loadingIndicatorColor ?? Theme.of(context).primaryColor;
+    return loadingIndicatorColor ?? _brandColor ?? Theme.of(context).primaryColor;
   }
 
   Color getUnreadIndicatorColor(BuildContext context) {
-    return unreadIndicatorStyle.color ?? Theme.of(context).primaryColor;
+    return unreadIndicatorStyle.color ?? _brandColor ?? Theme.of(context).primaryColor;
   }
 
   TextStyle? getTitleStyle(BuildContext context, bool isRead) {
@@ -42,6 +82,14 @@ class CourierInboxTheme {
 
   TextStyle? getTimeStyle(BuildContext context, bool isRead) {
     return (isRead ? timeStyle?.read : timeStyle?.unread) ?? Theme.of(context).textTheme.labelMedium;
+  }
+
+  TextStyle? getInfoViewTitleStyle(BuildContext context) {
+    return infoViewStyle?.textStyle ?? Theme.of(context).textTheme.titleMedium;
+  }
+
+  ButtonStyle? getInfoViewButtonStyle(BuildContext context) {
+    return infoViewStyle?.buttonStyle ?? _brandButtonColor(context);
   }
 
 }
@@ -75,5 +123,15 @@ class CourierInboxUnreadIndicatorStyle {
   const CourierInboxUnreadIndicatorStyle({
     this.indicator = CourierInboxUnreadIndicator.line,
     this.color,
+  });
+}
+
+class CourierInboxInfoViewStyle {
+  final TextStyle? textStyle;
+  final ButtonStyle? buttonStyle;
+
+  const CourierInboxInfoViewStyle({
+    this.textStyle,
+    this.buttonStyle,
   });
 }

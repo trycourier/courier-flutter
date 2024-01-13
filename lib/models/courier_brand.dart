@@ -1,3 +1,6 @@
+import 'package:courier_flutter/utils.dart';
+import 'package:flutter/material.dart';
+
 class CourierBrand {
 
   final CourierBrandSettings? settings;
@@ -61,6 +64,16 @@ class CourierBrandColors {
     return CourierBrandColors(
       primary: data['primary'],
     );
+  }
+
+  Color? primaryColor() {
+
+    if (primary != null) {
+      return hexToColor(primary!);
+    }
+
+    return null;
+
   }
 
 }
