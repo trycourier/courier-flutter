@@ -194,20 +194,14 @@ Widget build(BuildContext context) {
 <table>
     <thead>
         <tr>
-            <th width="850px" align="left">Link</th>
-            <th width="200px" align="center">Style</th>
+            <th width="1001px" align="left">Link</th>
         </tr>
     </thead>
     <tbody>
         <tr width="600px">
             <td align="left">
                 <a href="https://github.com/trycourier/courier-flutter/blob/master/example/lib/pages/inbox.dart">
-                    <code>Custom Example</code>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md#custom-inbox-example">
-                    <code>Custom</code>
+                    <code>Examples</code>
                 </a>
             </td>
         </tr>
