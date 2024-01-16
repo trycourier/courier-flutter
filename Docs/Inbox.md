@@ -60,6 +60,19 @@ CourierInbox(
 
 &emsp;
 
+⚠️ Courier Flutter will automatically use your app's Theme unless you specifically apply a `CourierTheme`. Here are the values that will automatically be used by your Theme.
+
+Button Style = `Theme.of(context).elevatedButtonTheme.style`
+Loading Indicator Color = `Theme.of(context).primaryColor`
+Unread Indicator Color = `Theme.of(context).primaryColor`
+Title Style = `Theme.of(context).textTheme.titleMedium`
+Body Style = `Theme.of(context).textTheme.bodyMedium`
+Time Style = `Theme.of(context).textTheme.labelMedium`
+Empty / Error State Text Style = `Theme.of(context).textTheme.titleMedium`
+Empty / Error State Button Style = `Theme.of(context).elevatedButtonTheme.style`
+
+&emsp;
+
 ## Styled Inbox Example
 
 The styles you can use to quickly customize the `CourierInbox`.
