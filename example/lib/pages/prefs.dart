@@ -31,6 +31,7 @@ class _PrefsPageState extends State<PrefsPage> {
   }
 
   Future<void> _start() async {
+
     setState(() {
       _isLoading = true;
     });
@@ -49,6 +50,7 @@ class _PrefsPageState extends State<PrefsPage> {
         _preferences = null;
       });
     }
+
   }
 
   Future<void> _refresh() async {
