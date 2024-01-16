@@ -45,6 +45,8 @@ An in-app notification center list you can use to notify your users. Allows you 
 
 The default `CourierInbox` styles.
 
+<img width="415" alt="item" src="https://github.com/trycourier/courier-flutter/assets/6370613/979c38aa-b2f0-4c56-bc34-516bacdfb823">
+
 ```swift
 CourierInbox(
   onMessageClick: (message, index) {
@@ -61,6 +63,9 @@ CourierInbox(
 ## Styled Inbox Example
 
 The styles you can use to quickly customize the `CourierInbox`.
+
+<img width="415" alt="item" src="https://github.com/trycourier/courier-flutter/assets/6370613/11681111-0019-4457-9c74-6db83bdc0810">
+
 
 ```dart
 final theme = CourierInboxTheme(
@@ -134,6 +139,8 @@ CourierInbox(
 ## Custom Inbox Example
 
 The raw data you can use to build whatever UI you'd like.
+
+<img width="415" alt="item" src="https://github.com/trycourier/courier-flutter/assets/6370613/f032c26e-720b-48fb-8818-24eaa52ad867">
 
 ```dart
 late CourierInboxListener _inboxListener;
