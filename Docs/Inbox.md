@@ -233,6 +233,10 @@ await Courier.shared.unreadMessage(id: 'messageId');
 await Courier.shared.readMessage(id: 'messageId');
 await Courier.shared.readAllInboxMessages();
 
+// Brands
+await Courier.shared.setBrandId(id: 'CR1TTFKXSA49G2PGEKQ81Q9R9PT6');
+final brand = await Courier.shared.getBrand();
+
 // Listener
 final inboxListener = await Courier.shared.addInboxListener(
   onInitialLoad: () {
