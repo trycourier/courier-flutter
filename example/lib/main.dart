@@ -24,9 +24,9 @@ Future<void> main() async {
   runApp(
     MaterialApp(
       theme: ThemeData(
-        // primaryColor: Colors.pink,
-        // TODO: Add more theme colors here if you would like Inbox to automatically inherit styles
-      ),
+          // primaryColor: Colors.pink,
+          // TODO: Add more theme colors here if you would like Inbox to automatically inherit styles
+          ),
       home: const MyApp(),
     ),
   );
@@ -63,30 +63,20 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _start() async {
-
     // Set the brand of the inbox
     await Courier.shared.setBrandId(id: 'AR1TTFKXSA49G2PGEKQ81Q9R9PT5');
 
-    _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
-
-      setState(() {
-        _unreadMessageCount = unreadMessageCount;
-      });
-
+    _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+      setState(() => _unreadMessageCount = unreadMessageCount);
     });
 
     _pushListener = Courier.shared.addPushListener(
-      onPushClicked: (push) {
-        showAlert(context, 'Push Clicked', push.toString());
-      },
-      onPushDelivered: (push) {
-        showAlert(context, 'Push Delivered', push.toString());
-      },
+      onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
+      onPushDelivered: (push) => showAlert(context, 'Push Delivered', push.toString()),
     );
 
     try {
       final token = await FirebaseMessaging.instance.getToken();
-
       if (token != null) {
         Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
       }
