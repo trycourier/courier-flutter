@@ -87,7 +87,7 @@ class InboxMessage {
 }
 
 extension InboxMessageExtensions on InboxMessage {
+  Future markAsClicked() => Courier.shared.clickMessage(id: messageId);
   Future markAsRead() => Courier.shared.readMessage(id: messageId);
-
   Future markAsUnread() => Courier.shared.unreadMessage(id: messageId);
 }

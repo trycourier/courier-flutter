@@ -151,15 +151,43 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             }
 
+            "clickMessage" -> {
+
+                val id = params?.get("id") as? String
+
+                id?.let {
+
+                    Courier.shared.clickMessage(
+                        it,
+                        onSuccess = {
+                            result.success(null)
+                        },
+                        onFailure = { error ->
+                            result.error(COURIER_ERROR_TAG, error.message, error)
+                        }
+                    )
+
+                    result.success(null)
+
+                }
+
+            }
+
             "readMessage" -> {
 
                 val id = params?.get("id") as? String
 
                 id?.let {
 
-                    Courier.shared.readMessage(it)
-
-                    result.success(null)
+                    Courier.shared.readMessage(
+                        it,
+                        onSuccess = {
+                            result.success(null)
+                        },
+                        onFailure = { error ->
+                            result.error(COURIER_ERROR_TAG, error.message, error)
+                        }
+                    )
 
                 }
 
@@ -171,9 +199,15 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
                 id?.let {
 
-                    Courier.shared.unreadMessage(it)
-
-                    result.success(null)
+                    Courier.shared.unreadMessage(
+                        it,
+                        onSuccess = {
+                            result.success(null)
+                        },
+                        onFailure = { error ->
+                            result.error(COURIER_ERROR_TAG, error.message, error)
+                        }
+                    )
 
                 }
 

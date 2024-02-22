@@ -137,6 +137,10 @@ class Courier {
     return CourierFlutterCorePlatform.instance.fetchNextPageOfMessages();
   }
 
+  Future clickMessage({ required String id }) {
+    return CourierFlutterCorePlatform.instance.clickMessage(id: id);
+  }
+
   Future readMessage({ required String id }) {
     return CourierFlutterCorePlatform.instance.readMessage(id: id);
   }

@@ -153,6 +153,13 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
+  Future clickMessage({ required String id }) async {
+    return await coreChannel.invokeMethod('clickMessage', {
+      'id': id,
+    });
+  }
+
+  @override
   Future readMessage({ required String id }) async {
     return await coreChannel.invokeMethod('readMessage', {
       'id': id,

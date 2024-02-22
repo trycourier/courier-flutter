@@ -194,7 +194,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
                     return CourierInboxListItem(
                       theme: getTheme(isDarkMode),
                       message: message,
-                      onMessageClick: (message) => widget.onMessageClick != null ? widget.onMessageClick!(message, index) : null,
+                      onMessageClick: (message) {
+                        message.markAsClicked();
+                        widget.onMessageClick != null ? widget.onMessageClick!(message, index) : null;
+                      },
                       onActionClick: (action) => widget.onActionClick != null ? widget.onActionClick!(action, message, index) : null,
                     );
                   } else {

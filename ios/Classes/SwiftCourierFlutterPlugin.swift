@@ -112,6 +112,22 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 }
             )
             
+        case "clickMessage":
+            
+            if let id = params?["id"] as? String {
+                
+                Courier.shared.clickMessage(
+                    messageId: id,
+                    onSuccess: {
+                        result(nil)
+                    },
+                    onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
+                
+            }
+            
         case "readMessage":
             
             if let id = params?["id"] as? String {

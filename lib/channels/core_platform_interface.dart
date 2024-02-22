@@ -64,6 +64,10 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('fetchNextPageOfMessages() has not been implemented.');
   }
 
+  Future clickMessage({ required String id }) {
+    throw UnimplementedError('clickMessage() has not been implemented.');
+  }
+
   Future readMessage({ required String id }) {
     throw UnimplementedError('readMessage() has not been implemented.');
   }
