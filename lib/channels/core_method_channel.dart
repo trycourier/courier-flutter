@@ -179,15 +179,10 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
-  Future setBrandId({ required String id }) async {
-    return await coreChannel.invokeMethod('setBrandId', {
+  Future getBrand({ required String id }) async {
+    return await coreChannel.invokeMethod('getBrand', {
       'id': id,
     });
-  }
-
-  @override
-  Future getBrand() async {
-    return await coreChannel.invokeMethod('getBrand');
   }
 
   @override

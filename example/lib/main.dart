@@ -1,3 +1,5 @@
+import 'env.dart';
+import 'example_server.dart';
 import 'firebase_options.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
@@ -62,9 +64,40 @@ class _MyAppState extends State<MyApp> {
     _start();
   }
 
+  Future _refreshJwt() async {
+
+    final currentUserId = await Courier.shared.userId;
+
+    if (currentUserId != null) {
+
+      try {
+
+        // Get the new token
+        final token = await ExampleServer.generateJwt(
+            authKey: Env.accessToken,
+            userId: currentUserId
+        );
+
+        // Sign in with new token
+        await Courier.shared.signIn(
+            accessToken: token,
+            userId: currentUserId
+        );
+
+      } catch (error) {
+
+        print(error);
+        await Courier.shared.signOut();
+
+      }
+
+    }
+
+  }
+
   Future _start() async {
-    // Set the brand of the inbox
-    await Courier.shared.setBrandId(id: 'AR1TTFKXSA49G2PGEKQ81Q9R9PT5');
+
+    await _refreshJwt();
 
     _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
       setState(() => _unreadMessageCount = unreadMessageCount);

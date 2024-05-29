@@ -12,6 +12,8 @@ import 'dart:async';
 
 import 'package:courier_flutter/courier_flutter.dart';
 
+import '../example_server.dart';
+
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
 
@@ -95,9 +97,13 @@ class _AuthPageState extends State<AuthPage> {
       final courierUserId = await _showUserIdAlert();
       if (courierUserId.isEmpty) return;
 
+      final token = await ExampleServer.generateJwt(
+          authKey: Env.accessToken,
+          userId: courierUserId
+      );
+
       await Courier.shared.signIn(
-        accessToken: Env.accessToken,
-        clientKey: Env.clientKey,
+        accessToken: token,
         userId: courierUserId,
       );
 

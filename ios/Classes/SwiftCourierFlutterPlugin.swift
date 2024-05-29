@@ -171,19 +171,20 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 }
             )
             
-        case "setBrandId":
+        case "getBrand":
             
             if let id = params?["id"] as? String {
                 
-                Courier.shared.inboxBrandId = id
-                result(nil)
+                Courier.shared.getBrand(
+                    brandId: id,
+                    onSuccess: { brand in
+                        result(brand.toDictionary())
+                    }, onFailure: { error in
+                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
+                    }
+                )
                 
             }
-            
-        case "getBrand":
-            
-            let brand = Courier.shared.inboxBrand?.toDictionary()
-            result(brand)
             
         case "getUserPreferences":
             
@@ -282,28 +283,17 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
                 
                 let clientKey = params?["clientKey"] as? String
 
-                Courier.shared.signIn(
-                    accessToken: accessToken,
-                    clientKey: clientKey,
-                    userId: userId,
-                    onSuccess: {
-                        result(nil)
-                    },
-                    onFailure: { error in
-                        result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
-                    })
+                Courier.shared.signIn(accessToken: accessToken, clientKey: clientKey, userId: userId) {
+                    result(nil)
+                }
             
             }
             
         case "signOut":
             
-            Courier.shared.signOut(
-                onSuccess: {
-                    result(nil)
-                },
-                onFailure: { error in
-                    result(FlutterError.init(code: SwiftCourierFlutterPlugin.COURIER_ERROR_TAG, message: String(describing: error), details: nil))
-                })
+            Courier.shared.signOut {
+                result(nil)
+            }
             
         default:
             

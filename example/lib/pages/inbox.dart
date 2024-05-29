@@ -17,10 +17,9 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
   final customTheme = CourierInboxTheme(
-    loadingIndicatorColor: Colors.purple,
+    brandId: 'AR1TTFKXSA49G2PGEKQ81Q9R9PT5',
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
       indicator: CourierInboxUnreadIndicator.dot,
-      color: Colors.pink,
     ),
     titleStyle: CourierInboxTextStyle(
       read: GoogleFonts.notoSans().copyWith(

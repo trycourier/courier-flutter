@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class CourierInboxTheme {
 
+  final String? brandId;
   final Color? loadingIndicatorColor;
   final CourierInboxUnreadIndicatorStyle unreadIndicatorStyle;
   final CourierInboxTextStyle? titleStyle;
@@ -15,6 +16,7 @@ class CourierInboxTheme {
   CourierBrand? brand;
 
   CourierInboxTheme({
+    this.brandId,
     this.loadingIndicatorColor,
     this.unreadIndicatorStyle = const CourierInboxUnreadIndicatorStyle(),
     this.titleStyle,

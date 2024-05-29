@@ -153,12 +153,8 @@ class Courier {
     return CourierFlutterCorePlatform.instance.readAllInboxMessages();
   }
 
-  Future setBrandId({ required String id }) {
-    return CourierFlutterCorePlatform.instance.setBrandId(id: id);
-  }
-
-  Future<CourierBrand?> getBrand() async {
-    final brand = await CourierFlutterCorePlatform.instance.getBrand();
+  Future<CourierBrand?> getBrand({ required String id }) async {
+    final brand = await CourierFlutterCorePlatform.instance.getBrand(id: id);
     return brand != null ? CourierBrand.fromJson(brand) : null;
   }
 

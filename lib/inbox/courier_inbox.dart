@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'courier_inbox_list_item.dart';
 
 class CourierInbox extends StatefulWidget {
+
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
 
@@ -60,7 +61,12 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   @override
   void initState() {
     super.initState();
-    _start();
+
+    // Ensure widget is mounted
+    if (mounted) {
+      _start();
+    }
+
   }
 
   void _scrollListener() {
@@ -71,13 +77,16 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   }
 
   Future _start() async {
+
     // Attach scroll listener
     _scrollController.addListener(_scrollListener);
+
+    // Get the brand if needed
+    final brand = await _refreshBrand();
 
     // Attach inbox message listener
     _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () async {
-        final brand = await _refreshBrand();
         final userId = await Courier.shared.userId;
         setState(() {
           _userId = userId;
@@ -87,7 +96,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         });
       },
       onError: (error) async {
-        final brand = await _refreshBrand();
         final userId = await Courier.shared.userId;
         setState(() {
           _userId = userId;
@@ -97,7 +105,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         });
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
-        final brand = await _refreshBrand();
         final userId = await Courier.shared.userId;
         setState(() {
           _userId = userId;
@@ -112,10 +119,26 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   }
 
   Future<CourierBrand?> _refreshBrand() async {
-    final brand = await Courier.shared.getBrand();
+
+    if (!mounted) return null;
+
+    // Get the theme
+    Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
+    final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+
+    CourierBrand? brand;
+
+    // Get the brand
+    if (brandId != null) {
+      brand = await Courier.shared.getBrand(id: brandId);
+    }
+
+    // Set the theme brand
     widget._lightTheme.brand = brand;
     widget._darkTheme.brand = brand;
+
     return brand;
+
   }
 
   Future<void> _refresh() async {
@@ -127,6 +150,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       _isLoading = true;
       _error = null;
     });
+    await _refreshBrand();
     await Courier.shared.refreshInbox();
   }
 
@@ -296,6 +320,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   @override
   void dispose() {
+
     // Remove the listeners
     _inboxListener?.remove();
     _scrollController.removeListener(_scrollListener);
@@ -306,5 +331,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     }
 
     super.dispose();
+
   }
 }

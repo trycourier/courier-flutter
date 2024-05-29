@@ -80,11 +80,7 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('readAllInboxMessages() has not been implemented.');
   }
 
-  Future setBrandId({ required String id }) {
-    throw UnimplementedError('setBrandId() has not been implemented.');
-  }
-
-  Future getBrand() {
+  Future getBrand({ required String id }) {
     throw UnimplementedError('getBrand() has not been implemented.');
   }
 
