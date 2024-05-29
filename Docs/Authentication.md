@@ -51,11 +51,11 @@ Manages user credentials between app sessions.
 
 # Usage
 
-Put this code where you normally manage your user's state. The user's access to [`Courier Inbox`](https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md) and [`Push Notifications`](https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md) will automatically be managed by the SDK and stored in persistent storage. This means that if your user fully closes your app and starts it back up, they will still be "signed in".
+Put this code where you normally manage your user's state. The user's access to [`Inbox`](https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md), [`Push Notifications`](https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md) and [`Preferences`](https://github.com/trycourier/courier-flutter/blob/master/Docs/Preferences.md) will automatically be managed by the SDK and stored in persistent storage. This means that if your user fully closes your app and starts it back up, they will still be "signed in".
 
 ```dart
 await Courier.shared.signIn(
-  accessToken: Env.accessToken,
+  accessToken: Env.accessToken, // Can be a Courier API key or a Generated JWT. More info here: https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production
   clientKey: Env.clientKey, // Optional
   userId: "YOUR_USER_ID",
 );
@@ -127,7 +127,7 @@ curl --request POST \
      --header 'Content-Type: application/json' \
      --data
  '{
-    "scope": "user_id:$YOUR_USER_ID write:user-tokens",
+    "scope": "user_id:$YOUR_USER_ID write:user-tokens inbox:read:messages inbox:write:events read:preferences write:preferences read:brands",
     "expires_in": "$YOUR_NUMBER days"
   }'
 ```
