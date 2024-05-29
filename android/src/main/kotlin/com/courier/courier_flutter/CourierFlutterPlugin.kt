@@ -256,18 +256,23 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             }
 
-            "setBrandId" -> {
-
-                val id = params?.get("id") as? String
-                Courier.shared.inboxBrandId = id
-                result.success(null)
-
-            }
-
             "getBrand" -> {
 
-                val brand = Courier.shared.inboxBrand
-                result.success(brand?.toMap())
+                val id = params?.get("id") as? String
+
+                id?.let {
+
+                    Courier.shared.getBrand(
+                        brandId = id,
+                        onSuccess = { brand ->
+                            result.success(brand.toMap())
+                        },
+                        onFailure = { error ->
+                            result.error(COURIER_ERROR_TAG, error.message, error)
+                        }
+                    )
+
+                }
 
             }
 
