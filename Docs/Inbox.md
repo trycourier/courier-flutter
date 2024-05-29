@@ -82,6 +82,7 @@ The styles you can use to quickly customize the `CourierInbox`.
 
 ```dart
 final theme = CourierInboxTheme(
+  brandId: 'ASDF...', // Optional
   loadingIndicatorColor: Colors.purple,
   unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
     indicator: CourierInboxUnreadIndicator.dot,
