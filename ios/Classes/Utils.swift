@@ -140,9 +140,11 @@ internal extension CourierUserPreferencesTopic {
             "defaultStatus": defaultStatus.rawValue,
             "hasCustomRouting": hasCustomRouting,
             "customRouting": customRouting.map { $0.rawValue },
-            "status": status,
+            "status": status.rawValue,
             "topicId": topicId,
             "topicName": topicName,
+            "sectionName": sectionName,
+            "sectionId": sectionId,
         ]
 
         return dictionary.clean()

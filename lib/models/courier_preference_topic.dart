@@ -8,6 +8,8 @@ class CourierUserPreferencesTopic {
   final CourierUserPreferencesStatus status;
   final String topicId;
   final String topicName;
+  final String sectionName;
+  final String sectionId;
 
   CourierUserPreferencesTopic({
     required this.defaultStatus,
@@ -16,6 +18,8 @@ class CourierUserPreferencesTopic {
     required this.status,
     required this.topicId,
     required this.topicName,
+    required this.sectionName,
+    required this.sectionId,
   });
 
   factory CourierUserPreferencesTopic.fromJson(dynamic data) {
@@ -26,6 +30,8 @@ class CourierUserPreferencesTopic {
       status: CourierUserPreferencesStatus.fromJson(data['status']),
       topicId: data['topicId'],
       topicName: data['topicName'],
+      sectionName: data['sectionName'],
+      sectionId: data['sectionId'],
     );
   }
 }

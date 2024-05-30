@@ -118,6 +118,8 @@ internal fun CourierPreferenceTopic.toMap(): Map<String, Any?> {
         "status" to status.value,
         "topicId" to topicId,
         "topicName" to topicName,
+        "sectionName" to sectionName,
+        "sectionId" to sectionId,
         "customRouting" to customRouting.map { it.value }
     )
 }
