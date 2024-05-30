@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 String getUUID() {
 
@@ -47,4 +49,11 @@ Color hexToColor(String hexColor) {
 
   // Create a Color object from the hex value
   return Color(hexValue | 0xFF000000);
+}
+
+void launchCourierURL() async {
+  final url = Uri.parse('https://www.courier.com');
+  if (!await launchUrl(url) && kDebugMode) {
+    print('Could not launch $url');
+  }
 }
