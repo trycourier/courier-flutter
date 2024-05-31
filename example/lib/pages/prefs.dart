@@ -20,7 +20,8 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
 
   late final Map<String, Widget> pages = {
     'Default': CourierPreferences(
-      keepAlive: true
+      keepAlive: true,
+      mode: TopicMode(),
     ),
     'Styled': CourierPreferences(
       keepAlive: true,
