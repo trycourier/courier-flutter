@@ -1,22 +1,32 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/inbox/courier_inbox_builder.dart';
-import 'package:courier_flutter/inbox/watermark.dart';
+import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
-import 'package:courier_flutter/preferences/courier_preferences_list_item.dart';
+import 'package:courier_flutter/preferences/courier_preferences_section.dart';
+import 'package:courier_flutter/preferences/courier_preferences_sheet.dart';
 import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
-import 'package:courier_flutter/utils.dart';
+import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+abstract class Mode {}
+
+class TopicMode extends Mode {}
+
+class ChannelsMode extends Mode {
+  final List<CourierUserPreferencesChannel> channels;
+  ChannelsMode({required this.channels});
+}
 
 class CourierPreferences extends StatefulWidget {
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
 
   // The theming for your Inbox
+  final Mode mode;
   final CourierPreferencesTheme _lightTheme;
   final CourierPreferencesTheme _darkTheme;
 
@@ -26,11 +36,13 @@ class CourierPreferences extends StatefulWidget {
   CourierPreferences({
     super.key,
     this.keepAlive = false,
+    Mode? mode,
     CourierPreferencesTheme? lightTheme,
     CourierPreferencesTheme? darkTheme,
     this.scrollController,
-  })  : _lightTheme = lightTheme ?? CourierPreferencesTheme(),
-        _darkTheme = darkTheme ?? CourierPreferencesTheme();
+  }) : mode = mode ?? ChannelsMode(channels: CourierUserPreferencesChannel.allCases),
+      _lightTheme = lightTheme ?? CourierPreferencesTheme(),
+      _darkTheme = darkTheme ?? CourierPreferencesTheme();
 
   @override
   CourierInboxState createState() => CourierInboxState();
@@ -44,7 +56,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
   bool _isLoading = true;
   String? _error;
-  List<CourierUserPreferencesTopic> _topics = [];
+  List<PreferenceSection> _sections = [];
 
   CourierBrand? _brand;
   String? _userId;
@@ -55,20 +67,13 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
     // Ensure widget is mounted
     if (mounted) {
-      _start();
+      _retry();
     }
   }
 
-  Future _start() async {
+  Future<void> _getPreferences() async {
 
     final userId = await Courier.shared.userId;
-
-    setState(() {
-      _userId = userId;
-      _topics = [];
-      _isLoading = true;
-      _error = null;
-    });
 
     final brand = await _refreshBrand();
 
@@ -76,10 +81,37 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       final preferences = await Courier.shared.getUserPreferences();
 
+      List<PreferenceSection> sections = [];
+
+      for (var topic in preferences.items) {
+
+        String sectionId = topic.sectionId;
+
+        // Add the item to the proper section
+        int sectionIndex = sections.indexWhere((section) => section.id == sectionId);
+
+        if (sectionIndex != -1) {
+
+          sections[sectionIndex].topics.add(topic);
+
+        } else {
+
+          PreferenceSection newSection = PreferenceSection(
+            title: topic.sectionName,
+            id: topic.sectionId,
+            topics: [topic],
+          );
+
+          sections.add(newSection);
+
+        }
+
+      }
+
       setState(() {
         _userId = userId;
         _brand = brand;
-        _topics = preferences.items;
+        _sections = sections;
         _isLoading = false;
         _error = null;
       });
@@ -89,7 +121,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
       setState(() {
         _userId = userId;
         _brand = brand;
-        _topics = [];
+        _sections = [];
         _isLoading = false;
         _error = error.toString();
       });
@@ -99,71 +131,56 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
   }
 
   Future<CourierBrand?> _refreshBrand() async {
+
     if (!mounted) return null;
 
     // Get the theme
     Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
     final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
 
-    CourierBrand? brand;
-
-    // Get the brand
-    if (brandId != null) {
-      brand = await Courier.shared.getBrand(id: brandId);
+    if (brandId == null) {
+      widget._lightTheme.brand = null;
+      widget._darkTheme.brand = null;
+      return null;
     }
 
-    // Set the theme brand
+    // Get / set the brand
+    CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
     widget._lightTheme.brand = brand;
     widget._darkTheme.brand = brand;
-
     return brand;
-  }
 
-  Future<void> _refresh() async {
-    await Courier.shared.refreshInbox();
   }
 
   Future<void> _retry() async {
+
+    final userId = await Courier.shared.userId;
+
     setState(() {
+      _userId = userId;
+      _sections = [];
       _isLoading = true;
       _error = null;
     });
-    await _refreshBrand();
-    await Courier.shared.refreshInbox();
+
+    await _getPreferences();
+
   }
 
-  int get _itemCount => _topics.length;
+  int get _itemCount => _sections.length;
 
   CourierPreferencesTheme getTheme(bool isDarkMode) {
     return isDarkMode ? widget._darkTheme : widget._lightTheme;
   }
 
-  void _showTopicSheet(BuildContext context, CourierUserPreferencesTopic topic) {
+  void _showTopicSheet(BuildContext context, bool isDarkMode, CourierUserPreferencesTopic topic) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  jsonEncode({
-                    'topicId': topic.topicId,
-                    'topicName': topic.topicName,
-                    'sectionName': topic.sectionName,
-                    'sectionId': topic.sectionId,
-                  }),
-                  style: const TextStyle(
-                    fontFamily: 'Courier',
-                  ),
-                ),
-              )
-            ],
-          ),
+        return CourierPreferencesSheet(
+          mode: widget.mode,
+          theme: getTheme(isDarkMode),
+          topic: topic,
         );
       },
     );
@@ -199,11 +216,11 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
       );
     }
 
-    if (_topics.isEmpty) {
+    if (_sections.isEmpty) {
       return Center(
         child: Text(
           style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
-          'No topics found',
+          'No preferences found',
         ),
       );
     }
@@ -213,7 +230,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
         Expanded(
           child: RefreshIndicator(
             color: getTheme(isDarkMode).getLoadingColor(context),
-            onRefresh: _refresh,
+            onRefresh: _getPreferences,
             child: Scrollbar(
               controller: _scrollController,
               child: ListView.separated(
@@ -222,10 +239,10 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
                 separatorBuilder: (context, index) => getTheme(isDarkMode).separator ?? const SizedBox(),
                 itemCount: _itemCount,
                 itemBuilder: (BuildContext context, int index) {
-                  return CourierPreferencesListItem(
+                  return CourierPreferencesSection(
                     theme: getTheme(isDarkMode),
-                    topic: _topics[index],
-                    onTopicClick: (topic) => _showTopicSheet(context, topic),
+                    section: _sections[index],
+                    onTopicClick: (topic) => _showTopicSheet(context, isDarkMode, topic),
                   );
                 },
               ),
@@ -241,7 +258,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
   Widget build(BuildContext context) {
     super.build(context);
     return ClipRect(
-      child: CourierInboxBuilder(builder: (context, constraints, isDarkMode) {
+      child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
         return _buildContent(context, isDarkMode);
       }),
     );

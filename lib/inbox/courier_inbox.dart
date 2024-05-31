@@ -1,14 +1,11 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/inbox/courier_inbox_builder.dart';
 import 'package:courier_flutter/inbox/courier_inbox_theme.dart';
-import 'package:courier_flutter/inbox/watermark.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
-import 'package:courier_flutter/utils.dart';
+import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'courier_inbox_list_item.dart';
 
@@ -128,22 +125,22 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
     final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
 
-    CourierBrand? brand;
-
-    // Get the brand
-    if (brandId != null) {
-      brand = await Courier.shared.getBrand(id: brandId);
+    if (brandId == null) {
+      widget._lightTheme.brand = null;
+      widget._darkTheme.brand = null;
+      return null;
     }
 
-    // Set the theme brand
+    // Get / set the brand
+    CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
     widget._lightTheme.brand = brand;
     widget._darkTheme.brand = brand;
-
     return brand;
 
   }
 
   Future<void> _refresh() async {
+    await _refreshBrand();
     await Courier.shared.refreshInbox();
   }
 
@@ -256,7 +253,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   Widget build(BuildContext context) {
     super.build(context);
     return ClipRect(
-      child: CourierInboxBuilder(builder: (context, constraints, isDarkMode) {
+      child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
         _triggerPoint = constraints.maxHeight / 2;
         return _buildContent(context, isDarkMode);
       }),

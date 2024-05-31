@@ -9,9 +9,7 @@ enum CourierUserPreferencesChannel {
 
   final String value;
 
-  const CourierUserPreferencesChannel({
-    required this.value,
-  });
+  const CourierUserPreferencesChannel({required this.value});
 
   factory CourierUserPreferencesChannel.fromJson(dynamic data) {
     switch (data) {
@@ -29,5 +27,30 @@ enum CourierUserPreferencesChannel {
         return CourierUserPreferencesChannel.unknown;
     }
   }
+
+  String get title {
+    switch (this) {
+      case CourierUserPreferencesChannel.directMessage:
+        return 'In App Messages';
+      case CourierUserPreferencesChannel.email:
+        return 'Emails';
+      case CourierUserPreferencesChannel.push:
+        return 'Push Notifications';
+      case CourierUserPreferencesChannel.sms:
+        return 'Text Messages';
+      case CourierUserPreferencesChannel.webhook:
+        return 'Webhooks';
+      case CourierUserPreferencesChannel.unknown:
+        return 'Unknown';
+    }
+  }
+
+  static List<CourierUserPreferencesChannel> get allCases => [
+    CourierUserPreferencesChannel.push,
+    CourierUserPreferencesChannel.sms,
+    CourierUserPreferencesChannel.email,
+    CourierUserPreferencesChannel.directMessage,
+    CourierUserPreferencesChannel.webhook,
+  ];
 
 }
