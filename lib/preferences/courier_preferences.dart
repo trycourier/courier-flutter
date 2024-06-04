@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
@@ -9,6 +7,7 @@ import 'package:courier_flutter/preferences/courier_preferences_section.dart';
 import 'package:courier_flutter/preferences/courier_preferences_sheet.dart';
 import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
+import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -447,10 +446,11 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
               child: ListView.separated(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _scrollController,
-                separatorBuilder: (context, index) => getTheme(isDarkMode).separator ?? const SizedBox(),
+                separatorBuilder: (context, index) => const SizedBox(height: CourierTheme.margin),
                 itemCount: _itemCount,
                 itemBuilder: (BuildContext context, int index) {
                   return CourierPreferencesSection(
+                    mode: widget.mode,
                     theme: getTheme(isDarkMode),
                     section: _sections[index],
                     onTopicClick: (topic) => _showTopicSheet(context, isDarkMode, topic),

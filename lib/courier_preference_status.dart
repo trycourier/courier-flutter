@@ -24,4 +24,17 @@ enum CourierUserPreferencesStatus {
     }
   }
 
+  String get title {
+    switch (this) {
+      case CourierUserPreferencesStatus.optedIn:
+        return 'Opted In';
+      case CourierUserPreferencesStatus.optedOut:
+        return 'Opted Out';
+      case CourierUserPreferencesStatus.required:
+        return 'Required';
+      default:
+        return 'Unknown';
+    }
+  }
+
 }
