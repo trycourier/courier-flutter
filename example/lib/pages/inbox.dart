@@ -1,6 +1,6 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/inbox/courier_inbox.dart';
-import 'package:courier_flutter/inbox/courier_inbox_theme.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:flutter/material.dart';

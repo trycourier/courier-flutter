@@ -3,12 +3,12 @@ import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
-import 'package:courier_flutter/preferences/courier_preferences_section.dart';
-import 'package:courier_flutter/preferences/courier_preferences_sheet.dart';
-import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_section.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_sheet.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 

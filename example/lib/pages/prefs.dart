@@ -1,6 +1,6 @@
 import 'package:courier_flutter/courier_preference_channel.dart';
-import 'package:courier_flutter/preferences/courier_preferences.dart';
-import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +17,7 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
 
   final customTheme = CourierPreferencesTheme(
     brandId: Env.brandId,
-    separator: null,
+    topicListItemSeparator: null,
   );
 
   late final Map<String, Widget> pages = {
@@ -36,6 +36,12 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
       color: Colors.red,
     ),
   };
+
+  // late final Map<String, Widget> pages = {
+  //   'From Scratch': CourierPreferences(
+  //     mode: TopicMode()
+  //   ),
+  // };
 
   // CourierUserPreferences? _preferences;
   // String? _error;
@@ -126,7 +132,7 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Inbox'),
+        title: Text('Preferences'),
         bottom: TabBar(
           controller: _tabController,
           tabs: pages.keys.map((String title) => Tab(text: title)).toList(),
