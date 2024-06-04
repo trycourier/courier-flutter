@@ -98,7 +98,7 @@ class _AuthPageState extends State<AuthPage> {
       if (courierUserId.isEmpty) return;
 
       final token = await ExampleServer.generateJwt(
-          authKey: Env.accessToken,
+          authKey: Env.authKey,
           userId: courierUserId
       );
 

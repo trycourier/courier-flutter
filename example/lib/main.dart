@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
 
         // Get the new token
         final token = await ExampleServer.generateJwt(
-            authKey: Env.accessToken,
+            authKey: Env.authKey,
             userId: currentUserId
         );
 

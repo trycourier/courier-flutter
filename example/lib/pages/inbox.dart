@@ -1,6 +1,7 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/inbox/courier_inbox.dart';
 import 'package:courier_flutter/inbox/courier_inbox_theme.dart';
+import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,7 +18,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
   final customTheme = CourierInboxTheme(
-    brandId: 'AR1TTFKXSA49G2PGEKQ81Q9R9PT5',
+    brandId: Env.brandId,
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
       indicator: CourierInboxUnreadIndicator.dot,
     ),

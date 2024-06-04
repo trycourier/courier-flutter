@@ -1,5 +1,6 @@
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
+import 'package:flutter/foundation.dart';
 
 class CourierUserPreferencesTopic {
   final CourierUserPreferencesStatus defaultStatus;
@@ -34,4 +35,19 @@ class CourierUserPreferencesTopic {
       sectionId: data['sectionId'],
     );
   }
+
+  bool isEqual(CourierUserPreferencesTopic topic) {
+
+    if (this == topic) return true;
+
+    return defaultStatus == topic.defaultStatus &&
+        hasCustomRouting == topic.hasCustomRouting &&
+        listEquals(customRouting, topic.customRouting) &&
+        status == topic.status &&
+        topicId == topic.topicId &&
+        topicName == topic.topicName &&
+        sectionName == topic.sectionName &&
+        sectionId == topic.sectionId;
+  }
+
 }

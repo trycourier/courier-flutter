@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
+import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
 import 'package:courier_flutter/preferences/courier_preferences_section.dart';
@@ -33,6 +34,9 @@ class CourierPreferences extends StatefulWidget {
   // Scroll handling
   final ScrollController? scrollController;
 
+  // Error callbacks
+  final Function(String)? onError;
+
   CourierPreferences({
     super.key,
     this.keepAlive = false,
@@ -40,6 +44,7 @@ class CourierPreferences extends StatefulWidget {
     CourierPreferencesTheme? lightTheme,
     CourierPreferencesTheme? darkTheme,
     this.scrollController,
+    this.onError,
   }) : mode = mode ?? ChannelsMode(channels: CourierUserPreferencesChannel.allCases),
       _lightTheme = lightTheme ?? CourierPreferencesTheme(),
       _darkTheme = darkTheme ?? CourierPreferencesTheme();
@@ -134,21 +139,35 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
     if (!mounted) return null;
 
-    // Get the theme
-    Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
-    final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+    try {
 
-    if (brandId == null) {
+      // Get the theme
+      Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
+      final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+
+      if (brandId == null) {
+        widget._lightTheme.brand = null;
+        widget._darkTheme.brand = null;
+        return null;
+      }
+
+      // Get / set the brand
+      CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
+      widget._lightTheme.brand = brand;
+      widget._darkTheme.brand = brand;
+      return brand;
+
+    } catch (error) {
+
+      if (widget.onError != null) {
+        widget.onError!(error.toString());
+      }
+
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;
       return null;
-    }
 
-    // Get / set the brand
-    CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
-    widget._lightTheme.brand = brand;
-    widget._darkTheme.brand = brand;
-    return brand;
+    }
 
   }
 
@@ -174,16 +193,208 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
   }
 
   void _showTopicSheet(BuildContext context, bool isDarkMode, CourierUserPreferencesTopic topic) {
+
+    final items = <CourierSheetItem>[];
+
+    if (widget.mode is TopicMode) {
+
+      final isRequired = topic.status == CourierUserPreferencesStatus.required;
+      var isOn = true;
+
+      if (!isRequired) {
+        isOn = topic.status != CourierUserPreferencesStatus.optedOut;
+      }
+
+      items.add(CourierSheetItem(
+        title: 'Receive Notifications',
+        isOn: isOn,
+        isDisabled: isRequired,
+        channel: null,
+      ));
+
+    } else if (widget.mode is ChannelsMode) {
+
+      final mode = widget.mode as ChannelsMode;
+
+      items.addAll(mode.channels.map((channel) {
+        final isRequired = topic.status == CourierUserPreferencesStatus.required;
+        var isOn = true;
+
+        if (topic.customRouting.isEmpty) {
+          isOn = topic.status != CourierUserPreferencesStatus.optedOut;
+        } else {
+          isOn = topic.customRouting.contains(channel);
+        }
+
+        return CourierSheetItem(
+          title: channel.title,
+          isOn: isOn,
+          isDisabled: isRequired,
+          channel: channel,
+        );
+      }));
+
+    }
+
+    final sheet = CourierPreferencesSheet(
+      mode: widget.mode,
+      theme: getTheme(isDarkMode),
+      topic: topic,
+      items: items,
+    );
+
     showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
-        return CourierPreferencesSheet(
-          mode: widget.mode,
-          theme: getTheme(isDarkMode),
-          topic: topic,
+      builder: (BuildContext context) => sheet,
+    ).then((value) {
+      _updatePreferences(widget.mode, topic, sheet.items);
+    });
+
+  }
+
+  Future<void> _updatePreferences(Mode mode, CourierUserPreferencesTopic topic, List<CourierSheetItem> items) async {
+
+    if (topic.defaultStatus == CourierUserPreferencesStatus.required && topic.status == CourierUserPreferencesStatus.required) {
+      return;
+    }
+
+    if (widget.mode is TopicMode) {
+
+      final selectedItems = items.where((item) => item.isOn).toList();
+      final isSelected = selectedItems.isNotEmpty;
+
+      if (topic.status == CourierUserPreferencesStatus.optedIn && isSelected) {
+        return;
+      }
+
+      if (topic.status == CourierUserPreferencesStatus.optedOut && !isSelected) {
+        return;
+      }
+
+      final newStatus = isSelected ? CourierUserPreferencesStatus.optedIn : CourierUserPreferencesStatus.optedOut;
+
+      final newTopic = CourierUserPreferencesTopic(
+        defaultStatus: topic.defaultStatus,
+        hasCustomRouting: false,
+        customRouting: [],
+        status: newStatus,
+        topicId: topic.topicId,
+        topicName: topic.topicName,
+        sectionName: topic.sectionName,
+        sectionId: topic.sectionId,
+      );
+
+      if (newTopic.isEqual(topic)) {
+        return;
+      }
+
+      _updateTopic(topic.topicId, newTopic);
+
+      try {
+
+        await Courier.shared.putUserPreferencesTopic(
+            topicId: topic.topicId,
+            status: newStatus,
+            hasCustomRouting: topic.hasCustomRouting,
+            customRouting: topic.customRouting
         );
-      },
-    );
+
+        Courier.log("Topic updated: ${topic.topicId}");
+
+      } catch (error) {
+
+        Courier.log(error.toString());
+
+        if (widget.onError != null) {
+          widget.onError!(error.toString());
+        }
+
+        _updateTopic(topic.topicId, topic);
+
+      }
+
+    } else if (widget.mode is ChannelsMode) {
+
+      final selectedItems = items.where((item) => item.isOn).map((item) => item.channel as CourierUserPreferencesChannel).toList();
+
+      var newStatus = CourierUserPreferencesStatus.unknown;
+
+      if (selectedItems.isEmpty) {
+        newStatus = CourierUserPreferencesStatus.optedOut;
+      } else {
+        newStatus = CourierUserPreferencesStatus.optedIn;
+      }
+
+      var hasCustomRouting = false;
+      var customRouting = <CourierUserPreferencesChannel>[];
+      final areAllSelected = selectedItems.length == items.length;
+
+      if (areAllSelected && topic.defaultStatus == CourierUserPreferencesStatus.optedIn) {
+        hasCustomRouting = false;
+        customRouting = [];
+      } else if (selectedItems.isEmpty && topic.defaultStatus == CourierUserPreferencesStatus.optedOut) {
+        hasCustomRouting = false;
+        customRouting = [];
+      } else {
+        hasCustomRouting = true;
+        customRouting = selectedItems;
+      }
+
+      final newTopic = CourierUserPreferencesTopic(
+        defaultStatus: topic.defaultStatus,
+        hasCustomRouting: hasCustomRouting,
+        customRouting: customRouting.map((channel) => channel).toList(),
+        status: newStatus,
+        topicId: topic.topicId,
+        topicName: topic.topicName,
+        sectionName: topic.sectionName,
+        sectionId: topic.sectionId,
+      );
+
+      if (newTopic.isEqual(topic)) {
+        return;
+      }
+
+      _updateTopic(topic.topicId, newTopic);
+
+      try {
+
+        await Courier.shared.putUserPreferencesTopic(
+            topicId: topic.topicId,
+            status: newStatus,
+            hasCustomRouting: hasCustomRouting,
+            customRouting: customRouting
+        );
+
+        Courier.log("Topic updated: ${topic.topicId}");
+
+      } catch (error) {
+
+        Courier.log(error.toString());
+
+        if (widget.onError != null) {
+          widget.onError!(error.toString());
+        }
+
+        _updateTopic(topic.topicId, topic);
+
+      }
+
+    }
+
+  }
+
+  void _updateTopic(String topicId, CourierUserPreferencesTopic newTopic) {
+    for (int sectionIndex = 0; sectionIndex < _sections.length; sectionIndex++) {
+      final section = _sections[sectionIndex];
+      final topicIndex = section.topics.indexWhere((topic) => topic.topicId == topicId);
+      if (topicIndex != -1) {
+        setState(() {
+          _sections[sectionIndex].topics[topicIndex] = newTopic;
+        });
+        return;
+      }
+    }
   }
 
   Widget _buildContent(BuildContext context, bool isDarkMode) {

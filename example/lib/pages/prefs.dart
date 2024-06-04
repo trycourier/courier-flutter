@@ -1,5 +1,6 @@
 import 'package:courier_flutter/preferences/courier_preferences.dart';
 import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter/material.dart';
 
 class PrefsPage extends StatefulWidget {
@@ -14,7 +15,7 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
   TabController? _tabController;
 
   final customTheme = CourierPreferencesTheme(
-    brandId: 'AR1TTFKXSA49G2PGEKQ81Q9R9PT5',
+    brandId: Env.brandId,
     separator: null,
   );
 
@@ -22,11 +23,13 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
     'Default': CourierPreferences(
       keepAlive: true,
       mode: TopicMode(),
+      onError: (error) => print(error),
     ),
     'Styled': CourierPreferences(
       keepAlive: true,
       lightTheme: customTheme,
       darkTheme: customTheme,
+      onError: (error) => print(error),
     ),
     'Custom': Container(
       color: Colors.red,
