@@ -7,7 +7,8 @@ class CourierPreferencesTheme {
 
   final String? brandId;
   final Color? loadingIndicatorColor;
-  final Widget? separator;
+  final Widget? topicListItemSeparator;
+  final Widget? sheetListItemSeparator;
   final CourierInboxInfoViewStyle? infoViewStyle;
 
   CourierBrand? brand;
@@ -16,7 +17,8 @@ class CourierPreferencesTheme {
     this.brandId,
     this.loadingIndicatorColor,
     this.infoViewStyle,
-    this.separator = const Divider(height: 1, indent: 16, endIndent: 16),
+    this.topicListItemSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
+    this.sheetListItemSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
   });
 
   Color? get _brandColor => brand?.settings?.colors?.primaryColor();

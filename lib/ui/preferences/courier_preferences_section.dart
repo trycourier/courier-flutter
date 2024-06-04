@@ -1,8 +1,8 @@
 import 'package:courier_flutter/models/courier_preference_topic.dart';
-import 'package:courier_flutter/preferences/courier_preferences.dart';
-import 'package:courier_flutter/preferences/courier_preferences_list_item.dart';
-import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_list_item.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -41,6 +41,21 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
 
   @override
   Widget build(BuildContext context) {
+
+    // Interleave list items with separators
+    List<Widget> listItems = [];
+    for (int i = 0; i < _section.topics.length; i++) {
+      if (i > 0) {
+        listItems.add(widget.theme.topicListItemSeparator ?? const SizedBox());
+      }
+      listItems.add(CourierPreferencesListItem(
+        mode: widget.mode,
+        theme: widget.theme,
+        topic: _section.topics[i],
+        onTopicClick: widget.onTopicClick,
+      ));
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -56,14 +71,7 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
           ),
         ),
         Column(
-          children: _section.topics.map((topic) {
-            return CourierPreferencesListItem(
-              mode: widget.mode,
-              theme: widget.theme,
-              topic: topic,
-              onTopicClick: widget.onTopicClick,
-            );
-          }).toList(),
+          children: listItems,
         ),
       ],
     );

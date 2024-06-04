@@ -1,8 +1,8 @@
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
-import 'package:courier_flutter/preferences/courier_preferences.dart';
-import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:flutter/material.dart';
 
 class CourierSheetItem {
@@ -66,17 +66,6 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      separatorBuilder: (context, index) => const SizedBox(),
-      // TODO
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.items.length,
-      itemBuilder: (context, index) => _getListItem(index, widget.items[index]),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -93,7 +82,13 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
               ),
             ),
           ),
-          _buildContent(context)
+          ListView.separated(
+            shrinkWrap: true,
+            separatorBuilder: (context, index) => widget.theme.sheetListItemSeparator ?? const SizedBox(),
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: widget.items.length,
+            itemBuilder: (context, index) => _getListItem(index, widget.items[index]),
+          )
         ],
       ),
     );
