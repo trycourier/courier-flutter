@@ -2,6 +2,7 @@ import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/models/courier_preference_topic.dart';
 import 'package:courier_flutter/preferences/courier_preferences.dart';
 import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:flutter/material.dart';
 
 class CourierSheetItem {
@@ -37,17 +38,22 @@ class CourierPreferencesSheet extends StatefulWidget {
 }
 
 class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
-
   Widget _getListItem(int index, CourierSheetItem item) {
-
-    final onChanged = item.isDisabled ? null : (bool value) {
-      setState(() {
-        widget.items[index].isOn = value;
-      });
-    };
+    final onChanged = item.isDisabled
+        ? null
+        : (bool value) {
+            setState(() {
+              widget.items[index].isOn = value;
+            });
+          };
 
     return ListTile(
-      title: Text(item.title),
+      title: Text(
+        item.title,
+        style: TextStyle(
+          fontFamily: 'Courier',
+        ),
+      ),
       onTap: () {
         if (onChanged != null) {
           onChanged(!item.isOn);
@@ -58,41 +64,17 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
         onChanged: onChanged,
       ),
     );
-
   }
 
   Widget _buildContent(BuildContext context) {
-
     return ListView.separated(
       shrinkWrap: true,
-      separatorBuilder: (context, index) => const Divider(),
+      separatorBuilder: (context, index) => const SizedBox(),
+      // TODO
       physics: const NeverScrollableScrollPhysics(),
       itemCount: widget.items.length,
       itemBuilder: (context, index) => _getListItem(index, widget.items[index]),
     );
-
-    // if (widget.mode is TopicMode) {
-    //   return ListView.separated(
-    //     shrinkWrap: true,
-    //     separatorBuilder: (context, index) => const Divider(),
-    //     physics: const NeverScrollableScrollPhysics(),
-    //     itemCount: 1,
-    //     itemBuilder: (context, index) {
-    //       return _getListItem('Receive Notifications');
-    //     },
-    //   );
-    // } else if (widget.mode is ChannelsMode) {
-    //   final mode = widget.mode as ChannelsMode;
-    //   return ListView.separated(
-    //     shrinkWrap: true,
-    //     separatorBuilder: (context, index) => const Divider(),
-    //     physics: const NeverScrollableScrollPhysics(),
-    //     itemCount: mode.channels.length,
-    //     itemBuilder: (context, index) => _getListItem(mode.channels[index].title),
-    //   );
-    // } else {
-    //   return const SizedBox();
-    // }
   }
 
   @override
@@ -101,8 +83,15 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(widget.topic.topicName),
+            padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin * 1.5, right: CourierTheme.margin, bottom: CourierTheme.margin),
+            child: Text(
+              widget.topic.topicName,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Courier',
+              ),
+            ),
           ),
           _buildContent(context)
         ],

@@ -1,3 +1,4 @@
+import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/preferences/courier_preferences.dart';
 import 'package:courier_flutter/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter_sample/env.dart';
@@ -23,12 +24,12 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
     'Default': CourierPreferences(
       keepAlive: true,
       mode: TopicMode(),
-      onError: (error) => print(error),
     ),
     'Styled': CourierPreferences(
       keepAlive: true,
       lightTheme: customTheme,
       darkTheme: customTheme,
+      mode: ChannelsMode(channels: [CourierUserPreferencesChannel.push, CourierUserPreferencesChannel.sms, CourierUserPreferencesChannel.email]),
       onError: (error) => print(error),
     ),
     'Custom': Container(
