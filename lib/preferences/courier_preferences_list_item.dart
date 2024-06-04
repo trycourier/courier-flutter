@@ -32,6 +32,9 @@ class CourierPreferencesListItemState extends State<CourierPreferencesListItem> 
           'topicName': _topic.topicName,
           'sectionName': _topic.sectionName,
           'sectionId': _topic.sectionId,
+          'customRouting': _topic.customRouting.map((e) => e.value).toList(),
+          'hasCustomRouting': _topic.hasCustomRouting,
+          'status': _topic.status.value,
         }),
         style: const TextStyle(
           fontFamily: 'Courier',
