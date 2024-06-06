@@ -244,6 +244,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
     showModalBottomSheet(
       context: context,
+      shape: getTheme(isDarkMode).sheetShape,
       builder: (BuildContext context) => sheet,
     ).then((value) {
       _updatePreferences(widget.mode, topic, sheet.items);

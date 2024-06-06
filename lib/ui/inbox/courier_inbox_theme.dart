@@ -10,7 +10,7 @@ class CourierInboxTheme {
   final CourierInboxTextStyle? timeStyle;
   final CourierInboxTextStyle? bodyStyle;
   final CourierInboxButtonStyle? buttonStyle;
-  final CourierInboxInfoViewStyle? infoViewStyle;
+  final CourierInfoViewStyle? infoViewStyle;
   final Widget? separator;
 
   CourierBrand? brand;
@@ -128,12 +128,13 @@ class CourierInboxUnreadIndicatorStyle {
   });
 }
 
-class CourierInboxInfoViewStyle {
+class CourierInfoViewStyle {
   final TextStyle? textStyle;
   final ButtonStyle? buttonStyle;
 
-  const CourierInboxInfoViewStyle({
+  const CourierInfoViewStyle({
     this.textStyle,
     this.buttonStyle,
   });
+
 }

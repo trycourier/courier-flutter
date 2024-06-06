@@ -50,9 +50,7 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
     return ListTile(
       title: Text(
         item.title,
-        style: TextStyle(
-          fontFamily: 'Courier',
-        ),
+        style: widget.theme.sheetSettingStyles?.textStyle,
       ),
       onTap: () {
         if (onChanged != null) {
@@ -60,6 +58,10 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
         }
       },
       trailing: Switch(
+        activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
+        activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,
+        inactiveThumbColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveThumbColor,
+        inactiveTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveTrackColor,
         value: item.isOn,
         onChanged: onChanged,
       ),
@@ -72,19 +74,26 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin * 1.5, right: CourierTheme.margin, bottom: CourierTheme.margin),
+            padding: const EdgeInsets.all(CourierTheme.margin),
+            child: Container(
+              width: 32,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).bottomSheetTheme.dragHandleColor ?? Colors.grey,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin / 2, right: CourierTheme.margin, bottom: CourierTheme.margin),
             child: Text(
               widget.topic.topicName,
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Courier',
-              ),
+              style: widget.theme.sheetTitleStyle ?? Theme.of(context).textTheme.titleLarge,
             ),
           ),
           ListView.separated(
             shrinkWrap: true,
-            separatorBuilder: (context, index) => widget.theme.sheetListItemSeparator ?? const SizedBox(),
+            separatorBuilder: (context, index) => widget.theme.sheetSeparator ?? const SizedBox(),
             physics: const NeverScrollableScrollPhysics(),
             itemCount: widget.items.length,
             itemBuilder: (context, index) => _getListItem(index, widget.items[index]),

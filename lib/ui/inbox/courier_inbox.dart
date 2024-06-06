@@ -77,6 +77,11 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   Future _start() async {
 
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
     // Attach scroll listener
     _scrollController.addListener(_scrollListener);
 
@@ -121,21 +126,33 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     if (!mounted) return null;
 
-    // Get the theme
-    Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
-    final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+    try {
 
-    if (brandId == null) {
+      // Get the theme
+      Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
+      final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+
+      if (brandId == null) {
+        widget._lightTheme.brand = null;
+        widget._darkTheme.brand = null;
+        return null;
+      }
+
+      // Get / set the brand
+      CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
+      widget._lightTheme.brand = brand;
+      widget._darkTheme.brand = brand;
+      return brand;
+
+    } catch (error) {
+
+      Courier.log(error.toString());
+
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;
       return null;
-    }
 
-    // Get / set the brand
-    CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
-    widget._lightTheme.brand = brand;
-    widget._darkTheme.brand = brand;
-    return brand;
+    }
 
   }
 

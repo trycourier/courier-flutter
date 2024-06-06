@@ -28,8 +28,8 @@ class CourierPreferencesListItem extends StatefulWidget {
 class CourierPreferencesListItemState extends State<CourierPreferencesListItem> {
   CourierUserPreferencesTopic get _topic => widget.topic;
 
-  Widget _buildContent(BuildContext context) {
-
+  @override
+  Widget build(BuildContext context) {
     final title = _topic.topicName;
     var subtitle = "";
 
@@ -48,40 +48,17 @@ class CourierPreferencesListItemState extends State<CourierPreferencesListItem> 
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(CourierTheme.margin),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Courier',
-            ),
-          ),
-          const SizedBox(height: CourierTheme.margin / 2),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Courier',
-              color: Colors.black54
-            ),
-          ),
-        ],
+    return ListTile(
+      title: Text(
+        title,
+        style: widget.theme.topicTitleStyle,
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => widget.onTopicClick(widget.topic),
-        child: _buildContent(context),
+      subtitle: Text(
+        subtitle,
+        style: widget.theme.topicSubtitleStyle,
       ),
+      trailing: widget.theme.topicTrailing,
+      onTap: () => widget.onTopicClick(widget.topic),
     );
   }
 }

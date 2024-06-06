@@ -46,7 +46,7 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
     List<Widget> listItems = [];
     for (int i = 0; i < _section.topics.length; i++) {
       if (i > 0) {
-        listItems.add(widget.theme.topicListItemSeparator ?? const SizedBox());
+        listItems.add(widget.theme.topicSeparator ?? const SizedBox());
       }
       listItems.add(CourierPreferencesListItem(
         mode: widget.mode,
@@ -63,11 +63,7 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
           padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin, right: CourierTheme.margin, bottom: CourierTheme.margin / 2),
           child: Text(
             _section.title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Courier',
-            ),
+            style: widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge,
           ),
         ),
         Column(
