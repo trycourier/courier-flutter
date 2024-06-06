@@ -4,27 +4,39 @@ import 'package:flutter/material.dart';
 import '../inbox/courier_inbox_theme.dart';
 
 class CourierPreferencesTheme {
-
   final String? brandId;
   final Color? loadingIndicatorColor;
-  final Widget? topicListItemSeparator;
-  final Widget? sheetListItemSeparator;
-  final CourierInboxInfoViewStyle? infoViewStyle;
+  final TextStyle? sectionTitleStyle;
+  final Widget? topicSeparator;
+  final TextStyle? topicTitleStyle;
+  final TextStyle? topicSubtitleStyle;
+  final Widget? topicTrailing;
+  final TextStyle? sheetTitleStyle;
+  final Widget? sheetSeparator;
+  final SheetSettingStyles? sheetSettingStyles;
+  final ShapeBorder? sheetShape;
+  final CourierInfoViewStyle? infoViewStyle;
 
   CourierBrand? brand;
 
   CourierPreferencesTheme({
     this.brandId,
     this.loadingIndicatorColor,
+    this.topicSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
+    this.sectionTitleStyle,
+    this.topicTitleStyle,
+    this.topicSubtitleStyle,
+    this.topicTrailing,
+    this.sheetTitleStyle,
+    this.sheetSettingStyles,
+    this.sheetShape,
+    this.sheetSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
     this.infoViewStyle,
-    this.topicListItemSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
-    this.sheetListItemSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
   });
 
   Color? get _brandColor => brand?.settings?.colors?.primaryColor();
 
   ButtonStyle? _brandButtonColor(BuildContext context) {
-
     final themeStyles = Theme.of(context).elevatedButtonTheme.style;
 
     final backgroundColor = _brandColor != null ? MaterialStateProperty.all(_brandColor) : themeStyles?.backgroundColor;
@@ -53,7 +65,6 @@ class CourierPreferencesTheme {
       alignment: themeStyles?.alignment,
       splashFactory: themeStyles?.splashFactory,
     );
-
   }
 
   Color getLoadingColor(BuildContext context) {
@@ -67,5 +78,23 @@ class CourierPreferencesTheme {
   ButtonStyle? getInfoViewButtonStyle(BuildContext context) {
     return infoViewStyle?.buttonStyle ?? _brandButtonColor(context);
   }
+
+}
+
+class SheetSettingStyles {
+
+  final TextStyle? textStyle;
+  final Color? activeThumbColor;
+  final Color? activeTrackColor;
+  final Color? inactiveThumbColor;
+  final Color? inactiveTrackColor;
+
+  SheetSettingStyles({
+    this.textStyle,
+    this.activeThumbColor,
+    this.activeTrackColor,
+    this.inactiveThumbColor,
+    this.inactiveTrackColor,
+  });
 
 }

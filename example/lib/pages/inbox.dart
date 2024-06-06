@@ -3,6 +3,7 @@ import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
+import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -23,24 +24,12 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       indicator: CourierInboxUnreadIndicator.dot,
     ),
     titleStyle: CourierInboxTextStyle(
-      read: GoogleFonts.notoSans().copyWith(
-        fontWeight: FontWeight.normal,
-        fontSize: 18,
-      ),
-      unread: GoogleFonts.notoSans().copyWith(
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
-      ),
+      read: AppTheme.titleText,
+      unread: AppTheme.unreadTitleText,
     ),
     timeStyle: CourierInboxTextStyle(
-      read: GoogleFonts.notoSans().copyWith(
-        fontWeight: FontWeight.normal,
-        fontSize: 16,
-      ),
-      unread: GoogleFonts.notoSans().copyWith(
-        fontWeight: FontWeight.normal,
-        fontSize: 16,
-      ),
+      read: AppTheme.bodyText,
+      unread: AppTheme.unreadBodyText,
     ),
     bodyStyle: CourierInboxTextStyle(
       read: GoogleFonts.notoSans().copyWith(
@@ -57,10 +46,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.grey,
         foregroundColor: Colors.white,
       ),
-      unread: FilledButton.styleFrom(
-        backgroundColor: Colors.purple,
-        foregroundColor: Colors.white,
-      ),
+      unread: AppTheme.buttonStyle,
     ),
     separator: null,
   );

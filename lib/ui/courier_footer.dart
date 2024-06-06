@@ -1,4 +1,4 @@
-import 'package:courier_flutter/ui/inbox/watermark.dart';
+import 'package:courier_flutter/ui/watermark.dart';
 import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 

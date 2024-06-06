@@ -1,7 +1,9 @@
 import 'package:courier_flutter/courier_preference_channel.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter_sample/env.dart';
+import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
 
 class PrefsPage extends StatefulWidget {
@@ -12,12 +14,36 @@ class PrefsPage extends StatefulWidget {
 }
 
 class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMixin {
-
   TabController? _tabController;
 
   final customTheme = CourierPreferencesTheme(
     brandId: Env.brandId,
-    topicListItemSeparator: null,
+    topicSeparator: null,
+    sectionTitleStyle: AppTheme.sectionText,
+    topicTitleStyle: AppTheme.titleText,
+    topicSubtitleStyle: AppTheme.bodyText,
+    topicTrailing: const Icon(
+      Icons.edit_outlined,
+      color: AppTheme.secondaryColor,
+    ),
+    sheetSeparator: null,
+    sheetTitleStyle: AppTheme.sectionText,
+    sheetSettingStyles: SheetSettingStyles(
+      textStyle: AppTheme.titleText,
+      activeTrackColor: AppTheme.primaryColor,
+      activeThumbColor: AppTheme.lightColor,
+      inactiveTrackColor: AppTheme.secondaryColor,
+      inactiveThumbColor: AppTheme.lightColor,
+    ),
+    sheetShape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(16.0),
+      ),
+    ),
+    infoViewStyle: CourierInfoViewStyle(
+      textStyle: AppTheme.titleText,
+      buttonStyle: AppTheme.buttonStyle,
+    ),
   );
 
   late final Map<String, Widget> pages = {
@@ -32,16 +58,10 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
       mode: ChannelsMode(channels: [CourierUserPreferencesChannel.push, CourierUserPreferencesChannel.sms, CourierUserPreferencesChannel.email]),
       onError: (error) => print(error),
     ),
-    'Custom': Container(
-      color: Colors.red,
-    ),
+    // 'Custom': Container(
+    //   color: Colors.red,
+    // ),
   };
-
-  // late final Map<String, Widget> pages = {
-  //   'From Scratch': CourierPreferences(
-  //     mode: TopicMode()
-  //   ),
-  // };
 
   // CourierUserPreferences? _preferences;
   // String? _error;
@@ -151,56 +171,56 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  // Widget _buildContent(BuildContext buildContext) {
-  //   if (_isLoading) {
-  //     return const Center(
-  //       child: CircularProgressIndicator(),
-  //     );
-  //   }
-  //
-  //   if (_error != null) {
-  //     return Center(
-  //       child: Text(_error!),
-  //     );
-  //   }
-  //
-  //   return RefreshIndicator(
-  //     onRefresh: _refresh,
-  //     child: Scrollbar(
-  //       child: ListView.separated(
-  //         separatorBuilder: (context, index) => const Divider(),
-  //         itemCount: _preferences?.items.length ?? 0,
-  //         itemBuilder: (BuildContext context, int index) {
-  //           final topic = _preferences!.items[index];
-  //           return InkWell(
-  //             onTap: () {
-  //               _updateTopic(context, topic.topicId).catchError((error) {
-  //                 showAlert(buildContext, "Error Updating Preferences", error.toString());
-  //               });
-  //             },
-  //             child: Padding(
-  //               padding: const EdgeInsets.all(16.0),
-  //               child: Text(
-  //                 topic.toJson(),
-  //                 style: GoogleFonts.robotoMono(fontSize: 16.0),
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: const Text('Preferences'),
-  //     ),
-  //     body: _buildContent(context),
-  //   );
-  // }
+// Widget _buildContent(BuildContext buildContext) {
+//   if (_isLoading) {
+//     return const Center(
+//       child: CircularProgressIndicator(),
+//     );
+//   }
+//
+//   if (_error != null) {
+//     return Center(
+//       child: Text(_error!),
+//     );
+//   }
+//
+//   return RefreshIndicator(
+//     onRefresh: _refresh,
+//     child: Scrollbar(
+//       child: ListView.separated(
+//         separatorBuilder: (context, index) => const Divider(),
+//         itemCount: _preferences?.items.length ?? 0,
+//         itemBuilder: (BuildContext context, int index) {
+//           final topic = _preferences!.items[index];
+//           return InkWell(
+//             onTap: () {
+//               _updateTopic(context, topic.topicId).catchError((error) {
+//                 showAlert(buildContext, "Error Updating Preferences", error.toString());
+//               });
+//             },
+//             child: Padding(
+//               padding: const EdgeInsets.all(16.0),
+//               child: Text(
+//                 topic.toJson(),
+//                 style: GoogleFonts.robotoMono(fontSize: 16.0),
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     ),
+//   );
+// }
+//
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(
+//       title: const Text('Preferences'),
+//     ),
+//     body: _buildContent(context),
+//   );
+// }
 }
 
 // extension TopicExtension on CourierUserPreferencesTopic {
