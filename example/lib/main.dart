@@ -28,7 +28,7 @@ Future<void> main() async {
       theme: ThemeData(
           // primaryColor: Colors.pink,
           // TODO: Add more theme colors here if you would like Inbox to automatically inherit styles
-          ),
+      ),
       home: const MyApp(),
     ),
   );

@@ -34,9 +34,15 @@ class AppTheme {
   );
 
   static final ButtonStyle buttonStyle = FilledButton.styleFrom(
-    backgroundColor: primaryColor,
+    backgroundColor: Colors.grey,
     foregroundColor: Colors.white,
     textStyle: bodyText
+  );
+
+  static final ButtonStyle unreadButtonStyle = FilledButton.styleFrom(
+      backgroundColor: primaryColor,
+      foregroundColor: Colors.white,
+      textStyle: bodyText
   );
 
 }
