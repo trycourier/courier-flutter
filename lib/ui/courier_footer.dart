@@ -1,3 +1,4 @@
+import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/watermark.dart';
 import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
@@ -10,25 +11,23 @@ class CourierFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildFooter(context);
-  }
-
-  Widget _buildFooter(BuildContext context) {
     if (shouldShow) {
       return Material(
         elevation: 8,
-        child: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          alignment: Alignment.center,
-          width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: TextButton(
-              onPressed: () => _showSheet(context),
-              child: const Watermark(),
+        child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
+          return Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            alignment: Alignment.center,
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: TextButton(
+                onPressed: () => _showSheet(context),
+                child: Watermark(isDarkMode: isDarkMode),
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       );
     }
     return const SizedBox();

@@ -100,29 +100,11 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
 
             return Container(
               color: message.isRead ? Colors.transparent : Colors.red,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    _onMessageClick(message);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      jsonEncode({
-                        'messageId': message.messageId,
-                        'title': message.title,
-                        'body': message.body,
-                        'data': message.data,
-                        'createAt': message.created,
-                        'actions': message.actions?.map((action) => {
-                          'title': action.content,
-                          'data': action.data,
-                        }).toList() ?? [],
-                      }),
-                      style: GoogleFonts.robotoMono(fontSize: 16.0),
-                    ),
-                  ),
+              child: ListTile(
+                onTap: () => _onMessageClick(message),
+                subtitle: Text(
+                  message.toJson(),
+                  style: GoogleFonts.robotoMono(),
                 ),
               ),
             );
@@ -137,4 +119,25 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
     super.build(context);
     return _buildContent();
   }
+}
+
+extension InboxExtension on InboxMessage {
+
+  String toJson() {
+    var jsonObject = {
+      'messageId': messageId,
+      'title': title,
+      'body': body,
+      'data': data,
+      'created': created,
+      'actions': actions?.map((action) => {
+        'title': action.content,
+        'data': action.data,
+      }).toList() ?? [],
+    };
+
+    var encoder = const JsonEncoder.withIndent('  ');
+    return encoder.convert(jsonObject);
+  }
+
 }

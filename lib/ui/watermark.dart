@@ -1,4 +1,4 @@
-import 'package:courier_flutter/utils.dart';
+import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -18,19 +18,18 @@ class Watermark extends StatelessWidget {
 </svg>
 ''';
 
-  const Watermark({super.key});
+  final bool isDarkMode;
+
+  const Watermark({Key? key, required this.isDarkMode}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
-    Color color = Theme.of(context).iconTheme.color ?? hexToColor('#73819B');
-
+    Color color = Theme.of(context).iconTheme.color ?? (isDarkMode ? Colors.white : CourierTheme.poweredByColor);
     return SvgPicture.string(
       svg,
       width: 134.0,
       height: 16.0,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
-
   }
 }

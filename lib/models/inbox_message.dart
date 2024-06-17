@@ -33,7 +33,7 @@ class InboxMessage {
       title: data['title'],
       body: data['body'],
       preview: data['preview'],
-      created: data['created'],
+      created: data['x'],
       actions: actions?.map((action) => InboxAction(content: action['content'], href: action['href'], data: action['data'])).toList(),
       data: data['data'],
       archived: data['archived'],

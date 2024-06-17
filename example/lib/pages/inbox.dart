@@ -22,6 +22,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
     brandId: Env.brandId,
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
       indicator: CourierInboxUnreadIndicator.dot,
+      color: AppTheme.primaryColor,
     ),
     titleStyle: CourierInboxTextStyle(
       read: AppTheme.titleText,
@@ -32,21 +33,12 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       unread: AppTheme.unreadBodyText,
     ),
     bodyStyle: CourierInboxTextStyle(
-      read: GoogleFonts.notoSans().copyWith(
-        fontWeight: FontWeight.normal,
-        fontSize: 16,
-      ),
-      unread: GoogleFonts.notoSans().copyWith(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+      read: AppTheme.bodyText,
+      unread: AppTheme.unreadBodyText,
     ),
     buttonStyle: CourierInboxButtonStyle(
-      read: FilledButton.styleFrom(
-        backgroundColor: Colors.grey,
-        foregroundColor: Colors.white,
-      ),
-      unread: AppTheme.buttonStyle,
+      read: AppTheme.buttonStyle,
+      unread: AppTheme.unreadButtonStyle,
     ),
     separator: null,
   );
