@@ -28,6 +28,10 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('userId() has not been implemented.');
   }
 
+  Future<String?> tenantId() {
+    throw UnimplementedError('tenantId() has not been implemented.');
+  }
+
   Future<String?> getToken({ required String provider }) {
     throw UnimplementedError('getToken() has not been implemented.');
   }
@@ -36,7 +40,7 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('setToken() has not been implemented.');
   }
 
-  Future signIn(String accessToken, String userId, [String? clientKey]) {
+  Future signIn({ required String accessToken, required String userId, String? clientKey, String? tenantId }) {
     throw UnimplementedError('signIn() has not been implemented.');
   }
 

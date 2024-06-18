@@ -5,6 +5,7 @@ import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
+import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -33,7 +34,6 @@ class _PushPageState extends State<PushPage> {
   }
 
   void _start() {
-
     _pushListener = Courier.shared.addPushListener(
       onPushClicked: (push) {
         print(push);
@@ -52,7 +52,6 @@ class _PushPageState extends State<PushPage> {
     print(Courier.shared.iOSForegroundNotificationPresentationOptions);
 
     _getTokens();
-
   }
 
   Future _getTokens() async {
@@ -96,7 +95,7 @@ class _PushPageState extends State<PushPage> {
               child: Text(
                 title,
                 textAlign: TextAlign.left,
-                style: GoogleFonts.robotoMono(fontSize: 16.0).copyWith(fontWeight: FontWeight.bold),
+                style: AppTheme.title,
               ),
             ),
             Flexible(
@@ -105,7 +104,7 @@ class _PushPageState extends State<PushPage> {
                 child: Text(
                   value,
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.robotoMono(fontSize: 16.0),
+                  style: AppTheme.body,
                 ),
               ),
             ),
@@ -136,12 +135,18 @@ class _PushPageState extends State<PushPage> {
                 Container(height: 16.0),
                 ElevatedButton(
                   onPressed: () => _getTokens(),
-                  child: const Text('Refresh Tokens'),
+                  child: Text(
+                    'Refresh Tokens',
+                    style: AppTheme.body,
+                  ),
                 ),
                 Container(height: 16.0),
                 ElevatedButton(
                   onPressed: () => _requestPermissions(),
-                  child: const Text('Request Permissions'),
+                  child: Text(
+                    'Request Permissions',
+                    style: AppTheme.body,
+                  ),
                 ),
               ],
             ),
