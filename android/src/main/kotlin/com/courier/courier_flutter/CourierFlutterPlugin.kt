@@ -64,6 +64,13 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             }
 
+            "tenantId" -> {
+
+                val tenantId = Courier.shared.tenantId
+                result.success(tenantId)
+
+            }
+
             "getToken" -> {
 
                 val provider = params?.get("provider") as? String
@@ -343,11 +350,13 @@ internal class CourierFlutterPlugin : FlutterPlugin, MethodCallHandler {
                 val accessToken = params?.get("accessToken") as? String
                 val clientKey = params?.get("clientKey") as? String
                 val userId = params?.get("userId") as? String
+                val tenantId = params?.get("tenantId") as? String
 
                 Courier.shared.signIn(
                     accessToken = accessToken ?: "",
                     clientKey = clientKey,
                     userId = userId ?: "",
+                    tenantId = tenantId,
                     onSuccess = {
                         result.success(null)
                     },

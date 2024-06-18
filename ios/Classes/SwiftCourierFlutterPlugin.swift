@@ -249,6 +249,11 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             let userId = Courier.shared.userId
             result(userId)
             
+        case "tenantId":
+
+            let tenantId = Courier.shared.tenantId
+            result(tenantId)
+            
         case "getToken":
 
             if let provider = params?["provider"] as? String {
@@ -282,8 +287,9 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
             if let accessToken = params?["accessToken"] as? String, let userId = params?["userId"] as? String {
                 
                 let clientKey = params?["clientKey"] as? String
+                let tenantId = params?["tenantId"] as? String
 
-                Courier.shared.signIn(accessToken: accessToken, clientKey: clientKey, userId: userId) {
+                Courier.shared.signIn(accessToken: accessToken, clientKey: clientKey, userId: userId, tenantId: tenantId) {
                     result(nil)
                 }
             

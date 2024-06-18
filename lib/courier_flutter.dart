@@ -90,8 +90,9 @@ class Courier {
     _iOSForegroundNotificationPresentationOptions = options;
   }
 
-  /// Returns the currently stored userId in the native SDK
+  /// Returns the currently stored ids in the native SDK
   Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();
+  Future<String?> get tenantId => CourierFlutterCorePlatform.instance.tenantId();
 
   /// Returns the current token for a provider
   Future<String?> getToken({ required String provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider);
@@ -106,8 +107,8 @@ class Courier {
   /// This will persist across app sessions so that messages
   /// are associated with the correct user.
   /// Be sure to call `signOut()` when you want to remove the user credentials.
-  Future signIn({ required String accessToken, required String userId, String? clientKey }) {
-    return CourierFlutterCorePlatform.instance.signIn(accessToken, userId, clientKey);
+  Future signIn({ required String accessToken, required String userId, String? clientKey, String? tenantId }) {
+    return CourierFlutterCorePlatform.instance.signIn(accessToken: accessToken, userId: userId, clientKey: clientKey, tenantId: tenantId);
   }
 
   /// Removed native level locally stored values for the user and access token

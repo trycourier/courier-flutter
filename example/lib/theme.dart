@@ -45,4 +45,14 @@ class AppTheme {
       textStyle: bodyText
   );
 
+  static final TextStyle body = GoogleFonts.sen().copyWith(
+    fontWeight: FontWeight.normal,
+    fontSize: 16,
+  );
+
+  static final TextStyle title = GoogleFonts.sen().copyWith(
+    fontWeight: FontWeight.bold,
+    fontSize: 16,
+  );
+
 }

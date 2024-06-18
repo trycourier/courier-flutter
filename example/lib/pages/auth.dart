@@ -5,12 +5,14 @@ import 'package:courier_flutter/ios_foreground_notification_presentation_options
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter_sample/env.dart';
+import 'package:courier_flutter_sample/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../example_server.dart';
 
@@ -26,6 +28,7 @@ class _AuthPageState extends State<AuthPage> {
 
   bool _isLoading = true;
   String? _currentUserId;
+  String? _currentTenantId;
 
   @override
   void initState() {
@@ -34,8 +37,6 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   Future _start() async {
-
-
     try {
       setState(() {
         _isLoading = true;
@@ -44,10 +45,13 @@ class _AuthPageState extends State<AuthPage> {
       final userId = await Courier.shared.userId;
       print(userId);
 
+      final tenantId = await Courier.shared.tenantId;
+      print(tenantId);
+
       setState(() {
         _currentUserId = userId;
+        _currentTenantId = tenantId;
       });
-
     } catch (e) {
       print(e);
     } finally {
@@ -57,35 +61,67 @@ class _AuthPageState extends State<AuthPage> {
     }
   }
 
-  Future<String> _showUserIdAlert() async {
-    final textController = TextEditingController();
+  Future<Map<String, String>> _showUserAlert() async {
+    final userTextController = TextEditingController();
+    final tenantTextController = TextEditingController();
 
     await showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Enter User Id"),
-        content: TextField(
-          autofocus: true,
-          autocorrect: false,
-          enableSuggestions: false,
-          decoration: const InputDecoration(hintText: "Courier User Id"),
-          controller: textController,
+        title: Text(
+          "Enter User Details",
+          style: AppTheme.title,
+        ),
+        content: Column(
+          children: [
+            TextField(
+              autofocus: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              style: AppTheme.body,
+              decoration: InputDecoration(
+                labelText: "Courier User Id",
+                labelStyle: AppTheme.title,
+              ),
+              controller: userTextController,
+            ),
+            TextField(
+              autofocus: false,
+              autocorrect: false,
+              enableSuggestions: false,
+              style: AppTheme.body,
+              decoration: InputDecoration(
+                labelText: "Courier Tenant Id",
+                labelStyle: AppTheme.title,
+              ),
+              controller: tenantTextController,
+            ),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: Text(
+              "Cancel",
+              style: AppTheme.body,
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Sign In"),
+            child: Text(
+              "Sign In",
+              style: AppTheme.body,
+            ),
           ),
         ],
       ),
     );
 
-    return Future.value(textController.text);
+    return Future.value({
+      'userId': userTextController.text,
+      'tenantId': tenantTextController.text,
+    });
   }
 
   _signIn() async {
@@ -94,22 +130,25 @@ class _AuthPageState extends State<AuthPage> {
         _isLoading = true;
       });
 
-      final courierUserId = await _showUserIdAlert();
-      if (courierUserId.isEmpty) return;
+      final values = await _showUserAlert();
+      final newUserId = values['userId'];
+      final newTenantId = values['tenantId'];
 
-      final token = await ExampleServer.generateJwt(
-          authKey: Env.authKey,
-          userId: courierUserId
-      );
+      if (newUserId == null || newUserId.isEmpty == true) return;
+
+      final token = await ExampleServer.generateJwt(authKey: Env.authKey, userId: newUserId);
 
       await Courier.shared.signIn(
         accessToken: token,
-        userId: courierUserId,
+        userId: newUserId,
+        tenantId: newTenantId,
       );
 
       final userId = await Courier.shared.userId;
+      final tenantId = await Courier.shared.tenantId;
       setState(() {
         _currentUserId = userId;
+        _currentTenantId = tenantId;
       });
     } catch (e) {
       print(e);
@@ -128,8 +167,10 @@ class _AuthPageState extends State<AuthPage> {
 
       await Courier.shared.signOut();
       final userId = await Courier.shared.userId;
+      final tenantId = await Courier.shared.tenantId;
       setState(() {
         _currentUserId = userId;
+        _currentTenantId = tenantId;
       });
     } catch (e) {
       print(e);
@@ -151,10 +192,51 @@ class _AuthPageState extends State<AuthPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(_currentUserId != null ? 'Current user id: ${_currentUserId!}' : 'No user found'),
-          Container(height: 16.0),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'User ID:',
+                  textAlign: TextAlign.end,
+                  style: AppTheme.body,
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: Text(
+                  _currentUserId ?? 'None',
+                  textAlign: TextAlign.start,
+                  style: AppTheme.title,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Tenant ID:',
+                  textAlign: TextAlign.end,
+                  style: AppTheme.body,
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: Text(
+                  _currentTenantId ?? 'None',
+                  textAlign: TextAlign.start,
+                  style: AppTheme.title,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
           ElevatedButton(
-            child: _currentUserId != null ? const Text('Sign Out') : const Text('Sign In'),
+            child: Text(
+              _currentUserId != null ? 'Sign Out' : 'Sign In',
+              style: AppTheme.body,
+            ),
             onPressed: () => _currentUserId != null ? _signOut() : _signIn(),
           ),
         ],

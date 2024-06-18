@@ -73,6 +73,11 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
+  Future<String?> tenantId() async {
+    return await coreChannel.invokeMethod('tenantId');
+  }
+
+  @override
   Future<String?> getToken({ required String provider }) async {
     return await coreChannel.invokeMethod('getToken', {
       'provider': provider,
@@ -88,11 +93,12 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
   }
 
   @override
-  Future signIn(String accessToken, String userId, [String? clientKey]) async {
+  Future signIn({ required String accessToken, required String userId, String? clientKey, String? tenantId }) async {
     return await coreChannel.invokeMethod('signIn', {
       'accessToken': accessToken,
       'clientKey': clientKey,
       'userId': userId,
+      'tenantId': tenantId,
     });
   }
 
