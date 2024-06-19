@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Install Github CLI if needed
 #brew install gh
 #gh auth login
