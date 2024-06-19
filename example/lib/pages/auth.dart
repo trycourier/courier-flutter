@@ -141,7 +141,7 @@ class _AuthPageState extends State<AuthPage> {
       await Courier.shared.signIn(
         accessToken: token,
         userId: newUserId,
-        tenantId: newTenantId,
+        tenantId: newTenantId?.isEmpty == true ? null : newTenantId,
       );
 
       final userId = await Courier.shared.userId;

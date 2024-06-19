@@ -81,7 +81,7 @@ class _PushPageState extends State<PushPage> {
         await Clipboard.setData(ClipboardData(text: value));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Copied: $value"),
+            content: Text("Copied $title:\n$value", style: AppTheme.body),
           ),
         );
       },
