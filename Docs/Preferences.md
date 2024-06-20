@@ -36,27 +36,16 @@ The default `CourierPreferences` styles.
 <img width="296" alt="default-preference-styles" src="https://github.com/trycourier/courier-flutter/assets/6370613/522caa39-7c62-434b-add3-fa9b2eb5dfcf">
 
 ```swift
-import Courier_iOS
+import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 
-// Create the view
-let courierPreferences = CourierPreferences(
-    mode: .topic,
-    onError: { error in
-        print(error.localizedDescription)
-    }
-)
+...
 
-// Add the view to your UI
-courierPreferences.translatesAutoresizingMaskIntoConstraints = false
-view.addSubview(courierPreferences)
-
-// Constrain the view how you'd like
-NSLayoutConstraint.activate([
-    courierPreferences.topAnchor.constraint(equalTo: view.topAnchor),
-    courierPreferences.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    courierPreferences.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-    courierPreferences.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-])
+@override
+Widget build(BuildContext context) {
+  return CourierPreferences(
+    mode: TopicMode(),
+  );
+}
 ```
 
 &emsp;
@@ -72,6 +61,8 @@ import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
+
+...
 
 final customTheme = CourierPreferencesTheme(
   brandId: "YOUR_BRAND_ID",
