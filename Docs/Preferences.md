@@ -1,3 +1,5 @@
+<img width="1000" alt="ios-preferences-banner" src="https://github.com/trycourier/courier-ios/assets/6370613/52414bb0-b546-4a29-8137-65ec8d9c410e">
+
 # Courier Preferences
 
 Allow users to update which types of notifications they would like to receive.
