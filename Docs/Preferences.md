@@ -135,6 +135,8 @@ Widget build(BuildContext context) {
 }
 ```
 
+&emsp;
+
 If you are interested in using a Courier "Brand", here is where you can adjust that: [`Courier Studio`](https://app.courier.com/designer/brands). 
 
 <table>
