@@ -33,7 +33,7 @@ Allow users to update which types of notifications they would like to receive.
 
 The default `CourierPreferences` styles.
 
-<img width="296" alt="default-preference-styles" src="https://github.com/trycourier/courier-flutter/assets/6370613/6685ccc0-7a21-419c-90fd-6a3400c13b6d">
+<img width="296" alt="default-preference-styles" src="https://github.com/trycourier/courier-flutter/assets/6370613/522caa39-7c62-434b-add3-fa9b2eb5dfcf">
 
 ```swift
 import Courier_iOS
