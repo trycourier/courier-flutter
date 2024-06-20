@@ -68,68 +68,75 @@ The styles you can use to quickly customize the `CourierPreferences`.
 <img width="296" alt="default-inbox-styles" src="https://github.com/trycourier/courier-flutter/assets/6370613/116cb22c-5a3c-4eb3-bd14-c3137cb8a2ab">
 
 ```swift
-import Courier_iOS
+final customTheme = CourierPreferencesTheme(
+  brandId: "YOUR_BRAND_ID",
+  topicSeparator: null,
+  sectionTitleStyle: GoogleFonts.sen().copyWith(
+    fontWeight: FontWeight.bold,
+    fontSize: 20,
+    color: Color(0xFF9747FF),
+  ),
+  topicTitleStyle: GoogleFonts.sen().copyWith(
+    fontWeight: FontWeight.normal,
+    fontSize: 18,
+  ),
+  topicSubtitleStyle: GoogleFonts.sen().copyWith(
+    fontWeight: FontWeight.normal,
+    fontSize: 16,
+  ),
+  topicTrailing: const Icon(
+    Icons.edit_outlined,
+    color: Colors.black45,
+  ),
+  sheetSeparator: null,
+  sheetTitleStyle: GoogleFonts.sen().copyWith(
+    fontWeight: FontWeight.bold,
+    fontSize: 20,
+    color: Color(0xFF9747FF),
+  ),
+  sheetSettingStyles: SheetSettingStyles(
+    textStyle: GoogleFonts.sen().copyWith(
+      fontWeight: FontWeight.normal,
+      fontSize: 18,
+    ),
+    activeTrackColor: Color(0xFF9747FF),
+    activeThumbColor: Colors.white,
+    inactiveTrackColor: Colors.black45,
+    inactiveThumbColor: Colors.white,
+  ),
+  sheetShape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.vertical(
+      top: Radius.circular(16.0),
+    ),
+  ),
+  infoViewStyle: CourierInfoViewStyle(
+    textStyle: GoogleFonts.sen().copyWith(
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    ),
+    buttonStyle: FilledButton.styleFrom(
+      backgroundColor: Colors.grey,
+      foregroundColor: Colors.white,
+      textStyle: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+    ),
+  ),
+);
 
-let textColor = UIColor(red: 42 / 255, green: 21 / 255, blue: 55 / 255, alpha: 100)
-let primaryColor = UIColor(red: 136 / 255, green: 45 / 255, blue: 185 / 255, alpha: 100)
-let secondaryColor = UIColor(red: 234 / 255, green: 104 / 255, blue: 102 / 255, alpha: 100)
-
-// Theme object containing all the styles you want to apply 
-let preferencesTheme = CourierPreferencesTheme(
-    brandId: "7S9R...3Q1M", // Optional. Theme colors will override this brand.
-    loadingIndicatorColor: secondaryColor,
-    sectionTitleFont: CourierStyles.Font(
-        font: UIFont(name: "Avenir Black", size: 20)!,
-        color: .white
-    ),
-    topicCellStyles: CourierStyles.Cell(
-        separatorStyle: .none
-    ),
-    topicTitleFont: CourierStyles.Font(
-        font: UIFont(name: "Avenir Medium", size: 18)!,
-        color: .white
-    ),
-    topicSubtitleFont: CourierStyles.Font(
-        font: UIFont(name: "Avenir Medium", size: 16)!,
-        color: .white
-    ),
-    topicButton: CourierStyles.Button(
-        font: CourierStyles.Font(
-            font: UIFont(name: "Avenir Medium", size: 16)!,
-            color: .white
-        ),
-        backgroundColor: secondaryColor,
-        cornerRadius: 8
-    ),
-    sheetTitleFont: CourierStyles.Font(
-        font: UIFont(name: "Avenir Medium", size: 18)!,
-        color: .white
-    ),
-    sheetSettingStyles: CourierStyles.Preferences.SettingStyles(
-        font: CourierStyles.Font(
-            font: UIFont(name: "Avenir Medium", size: 18)!,
-            color: .white
-        ),
-        toggleColor: secondaryColor
-    ),
-    sheetCornerRadius: 0,
-    sheetCellStyles: CourierStyles.Cell(
-        separatorStyle: .none
-    )
-)
-
-// Pass the theme to the view
-let courierPreferences = CourierPreferences(
-    mode: .channels([.push, .sms, .email]),
-    lightTheme: preferencesTheme,
-    darkTheme: preferencesTheme,
-    onError: { error in
-        print(error.localizedDescription)
-    }
-)
-
-view.addSubview(courierPreferences)
 ...
+
+@override
+Widget build(BuildContext context) {
+  return CourierPreferences(
+    // keepAlive: true, // Useful if you are adding this widget to a TabBarView
+    lightTheme: customTheme,
+    darkTheme: customTheme,
+    mode: ChannelsMode(channels: [CourierUserPreferencesChannel.push, CourierUserPreferencesChannel.sms, CourierUserPreferencesChannel.email]),
+    onError: (error) => print(error),
+  );
+}
 ```
 
 If you are interested in using a Courier "Brand", here is where you can adjust that: [`Courier Studio`](https://app.courier.com/designer/brands). 
