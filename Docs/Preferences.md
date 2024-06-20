@@ -68,6 +68,11 @@ The styles you can use to quickly customize the `CourierPreferences`.
 <img width="296" alt="default-inbox-styles" src="https://github.com/trycourier/courier-flutter/assets/6370613/116cb22c-5a3c-4eb3-bd14-c3137cb8a2ab">
 
 ```swift
+import 'package:courier_flutter/courier_preference_channel.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
+
 final customTheme = CourierPreferencesTheme(
   brandId: "YOUR_BRAND_ID",
   topicSeparator: null,
