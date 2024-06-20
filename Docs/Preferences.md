@@ -1,4 +1,4 @@
-<img width="1000" alt="ios-preferences-banner" src="https://github.com/trycourier/courier-ios/assets/6370613/52414bb0-b546-4a29-8137-65ec8d9c410e">
+<img width="1000" alt="banner-flutter-preferences" src="https://github.com/trycourier/courier-flutter/assets/6370613/29da0de2-bd74-4ed8-9245-ebbe1d74ff19">
 
 # Courier Preferences
 
