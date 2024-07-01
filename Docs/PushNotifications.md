@@ -283,7 +283,7 @@ allprojects {
     - `minSdkVersion 21`
     - `compileSdkVersion 33`
 4. Run Gradle sync
-5. Change your `MainActivity` to extend the `CourierFlutterActivity`
+5. Change your `MainActivity` to extend the `CourierFlutterActivity` (or `CourierFlutterFragmentActivity` if you're using a `FragmentActivity`)
     - This allows Courier to handle when push notifications are delivered and clicked
 6. Setup a new Notification Service by creating a new file and pasting the code below in it
     - This allows you to present a notification to your user when a new notification arrives
