@@ -30,6 +30,12 @@ public class SwiftCourierFlutterPlugin: NSObject, FlutterPlugin {
           
         switch call.method {
             
+        case "getPlatformVersion":
+            
+            print(params)
+            
+            result("Something")
+            
         case "addInboxListener":
             
             let channel = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.messanger?.channel(id: SwiftCourierFlutterPlugin.INBOX_CHANNEL)
