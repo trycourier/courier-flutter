@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
-    api 'com.github.trycourier:courier-android:3.4.0'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    api 'com.github.trycourier:courier-android:4.0.14'
     api 'com.google.firebase:firebase-messaging-ktx:24.0.0'
 }

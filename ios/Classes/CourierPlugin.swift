@@ -2,13 +2,18 @@ import Flutter
 import UIKit
 import Courier_iOS
 
-public class CourierFlutterAPI: NSObject, FlutterPlugin {
+public class CourierPlugin: NSObject, FlutterPlugin {
+    
+    internal static let COURIER_ERROR_TAG = "Courier iOS SDK Error"
     
     public enum Channels: String {
         case client = "courier_flutter_client"
     }
     
-    private static let COURIER_ERROR_TAG = "Courier iOS SDK Error"
+    public enum CourierFlutterError: Error {
+        case missingParameter
+    }
+    
     private var inboxListeners = [String: CourierInboxListener]()
     
     public override init() {
@@ -20,7 +25,7 @@ public class CourierFlutterAPI: NSObject, FlutterPlugin {
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: Channels.client.rawValue, binaryMessenger: registrar.messenger())
-        let instance = CourierFlutterAPI()
+        let instance = CourierPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
@@ -30,13 +35,29 @@ public class CourierFlutterAPI: NSObject, FlutterPlugin {
           
         switch call.method {
             
-        case "getPlatformVersion":
+        case "getBrand":
             
-//            let client = CourierClient(userId: <#T##String#>)
+            guard let client = params?.toClient(), let brandId = params?["brandId"] as? String else {
+                result(CourierFlutterError.missingParameter.toFlutterError())
+                return
+            }
             
-            print(params)
-            
-            result("Something")
+            Task {
+                do {
+                    
+                    let brand = try await client.brands.getBrand(brandId: brandId)
+                    
+                    let encoder = JSONEncoder()
+                    encoder.outputFormatting = .prettyPrinted
+                    let data = try encoder.encode(brand)
+                    let jsonString = String(data: data, encoding: .utf8)
+                    
+                    result(jsonString)
+                    
+                } catch {
+                    result(error.toFlutterError())
+                }
+            }
             
 //        case "addInboxListener":
 //            

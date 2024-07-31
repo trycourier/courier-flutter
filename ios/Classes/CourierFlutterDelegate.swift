@@ -50,71 +50,71 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         if let flutterViewController = window?.rootViewController as? FlutterViewController, let binaryMessenger = flutterViewController as? FlutterBinaryMessenger {
 
             // Create a method channel to listen to platform events
-            methodChannel = FlutterMethodChannel(name: SwiftCourierFlutterPlugin.EVENTS_CHANNEL, binaryMessenger: binaryMessenger)
-            methodChannel?.setMethodCallHandler({ [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-
-                switch call.method {
-
-                    case "requestNotificationPermission":
-
-                        Courier.requestNotificationPermission { status in
-                            result(status.name)
-                        }
-
-                    case "getNotificationPermissionStatus":
-
-                        Courier.getNotificationPermissionStatus { status in
-                            result(status.name)
-                        }
-
-                    case "openSettingsForApp":
-
-                        Courier.openSettingsForApp()
-                        result(nil)
-                    
-                    case "getClickedNotification":
-
-                    
-                        // Fetch the last push notification that was clicked
-                        if let self = self, let _ = self.lastClickedPushNotification {
-                            
-                            // Seems to be working well on iOS
-                            // Commented out for now
-                            // self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
-                            self.lastClickedPushNotification = nil
-                            
-                        }
-                    
-                        result(nil)
-                    
-                    case "iOSForegroundPresentationOptions":
-                        
-                        if let params = call.arguments as? Dictionary<String, Any>,
-                            let options = params["options"] as? [String] {
-                            
-                            // Clear out and add presentation optionset
-                            self?.foregroundPresentationOptions = []
-                            options.forEach { option in
-                                switch option {
-                                case "sound": self?.foregroundPresentationOptions.insert(.sound)
-                                case "badge": self?.foregroundPresentationOptions.insert(.badge)
-                                case "list": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.list) } else { self?.foregroundPresentationOptions.insert(.alert) }
-                                case "banner": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.banner) } else { self?.foregroundPresentationOptions.insert(.alert) }
-                                default: break
-                                }
-                            }
-                            
-                        }
-                        
-                        result(nil)
-
-                    default:
-
-                        result(FlutterMethodNotImplemented)
-
-                }
-
-            })
+//            methodChannel = FlutterMethodChannel(name: CourierFlutterPlugin.EVENTS_CHANNEL, binaryMessenger: binaryMessenger)
+//            methodChannel?.setMethodCallHandler({ [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+//
+//                switch call.method {
+//
+//                    case "requestNotificationPermission":
+//
+//                        Courier.requestNotificationPermission { status in
+//                            result(status.name)
+//                        }
+//
+//                    case "getNotificationPermissionStatus":
+//
+//                        Courier.getNotificationPermissionStatus { status in
+//                            result(status.name)
+//                        }
+//
+//                    case "openSettingsForApp":
+//
+//                        Courier.openSettingsForApp()
+//                        result(nil)
+//                    
+//                    case "getClickedNotification":
+//
+//                    
+//                        // Fetch the last push notification that was clicked
+//                        if let self = self, let _ = self.lastClickedPushNotification {
+//                            
+//                            // Seems to be working well on iOS
+//                            // Commented out for now
+//                            // self.methodChannel?.invokeMethod("pushNotificationClicked", arguments: lastPush)
+//                            self.lastClickedPushNotification = nil
+//                            
+//                        }
+//                    
+//                        result(nil)
+//                    
+//                    case "iOSForegroundPresentationOptions":
+//                        
+//                        if let params = call.arguments as? Dictionary<String, Any>,
+//                            let options = params["options"] as? [String] {
+//                            
+//                            // Clear out and add presentation optionset
+//                            self?.foregroundPresentationOptions = []
+//                            options.forEach { option in
+//                                switch option {
+//                                case "sound": self?.foregroundPresentationOptions.insert(.sound)
+//                                case "badge": self?.foregroundPresentationOptions.insert(.badge)
+//                                case "list": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.list) } else { self?.foregroundPresentationOptions.insert(.alert) }
+//                                case "banner": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.banner) } else { self?.foregroundPresentationOptions.insert(.alert) }
+//                                default: break
+//                                }
+//                            }
+//                            
+//                        }
+//                        
+//                        result(nil)
+//
+//                    default:
+//
+//                        result(FlutterMethodNotImplemented)
+//
+//                }
+//
+//            })
 
         }
         
@@ -129,7 +129,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         let content = notification.request.content
         let message = content.userInfo
         
-        Courier.shared.trackNotification(message: message, event: .delivered)
+//        Courier.shared.trackNotification(message: message, event: .delivered)
 
         let pushNotification = Courier.formatPushNotification(content: content)
         methodChannel?.invokeMethod("pushNotificationDelivered", arguments: pushNotification)
@@ -143,7 +143,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         let content = response.notification.request.content
         let message = content.userInfo
         
-        Courier.shared.trackNotification(message: message, event: .clicked)
+//        Courier.shared.trackNotification(message: message, event: .clicked)
         
         let pushNotification = Courier.formatPushNotification(content: content)
         lastClickedPushNotification = pushNotification
@@ -156,7 +156,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     // MARK: Token Management
 
     open override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        Courier.log("Unable to register for remote notifications: \(error.localizedDescription)")
+//        Courier.log("Unable to register for remote notifications: \(error.localizedDescription)")
     }
 
     open override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -164,7 +164,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
             do {
                 try await Courier.shared.setAPNSToken(deviceToken)
             } catch {
-                Courier.log(String(describing: error))
+//                Courier.log(String(describing: error))
             }
         }
     }

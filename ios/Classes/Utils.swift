@@ -276,3 +276,45 @@ internal extension String {
     }
     
 }
+
+extension Dictionary<String, Any> {
+    
+    func toClient() -> CourierClient? {
+        
+        guard let options = self["options"] as? [String: Any] else {
+            return nil
+        }
+        
+        guard let userId = options["userId"] as? String, let showLogs = options["showLogs"] as? Bool else {
+            return nil
+        }
+        
+        let jwt = options["jwt"] as? String
+        let clientKey = options["clientKey"] as? String
+        let connectionId = options["connectionId"] as? String
+        let tenantId = options["tenantId"] as? String
+        
+        return CourierClient(
+            jwt: jwt,
+            clientKey: clientKey,
+            userId: userId,
+            connectionId: connectionId,
+            tenantId: tenantId,
+            showLogs: showLogs
+        )
+        
+    }
+    
+}
+
+extension Error {
+    
+    func toFlutterError() -> FlutterError {
+        return FlutterError.init(
+            code: CourierPlugin.COURIER_ERROR_TAG,
+            message: String(describing: self),
+            details: nil
+        )
+    }
+    
+}

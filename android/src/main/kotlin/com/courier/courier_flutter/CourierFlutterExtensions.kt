@@ -15,7 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 fun FlutterEngine.setupCourierMethodChannel(activity: Activity, onGetClickedNotification: (() -> Unit)? = null): MethodChannel {
 
     // Create the method channel
-    val channel = MethodChannel(dartExecutor.binaryMessenger, CourierFlutterPlugin.EVENTS_CHANNEL)
+    val channel = MethodChannel(dartExecutor.binaryMessenger, CourierPlugin.Channels.CLIENT.channelName)
 
     // Handle the calls
     channel.setMethodCallHandler { call, result ->

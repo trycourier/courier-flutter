@@ -1,3 +1,4 @@
+import 'package:courier_flutter/courier_client.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -16,8 +17,8 @@ abstract class CourierClientInterface extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String> getPlatformVersion() async {
-    throw UnimplementedError('getPlatformVersion() has not been implemented.');
+  Future<String> getBrand({ required CourierClientOptions options, required String brandId }) async {
+    throw UnimplementedError('getBrand() has not been implemented.');
   }
 
 }
@@ -25,11 +26,14 @@ abstract class CourierClientInterface extends PlatformInterface {
 class CourierClientChannel extends CourierClientInterface {
 
   @visibleForTesting
-  final channel = const MethodChannel('courier_flutter_core');
+  final channel = const MethodChannel('courier_flutter_client');
 
   @override
-  Future<String> getPlatformVersion() async {
-    return await channel.invokeMethod('getPlatformVersion');
+  Future<String> getBrand({ required CourierClientOptions options, required String brandId }) async {
+    return await channel.invokeMethod('getBrand', {
+      'options': options.toJson(),
+      'brandId': brandId,
+    });
   }
 
 }

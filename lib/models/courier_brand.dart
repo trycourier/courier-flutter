@@ -1,8 +1,35 @@
 import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 
-class CourierBrand {
+class CourierBrandResponse {
+  final CourierBrandData? data;
 
+  CourierBrandResponse({
+    this.data,
+  });
+
+  factory CourierBrandResponse.fromJson(dynamic data) {
+    return CourierBrandResponse(
+      data: CourierBrandData.fromJson(data['data']),
+    );
+  }
+}
+
+class CourierBrandData {
+  final CourierBrand? brand;
+
+  CourierBrandData({
+    this.brand,
+  });
+
+  factory CourierBrandData.fromJson(dynamic data) {
+    return CourierBrandData(
+      brand: CourierBrand.fromJson(data['brand']),
+    );
+  }
+}
+
+class CourierBrand {
   final CourierBrandSettings? settings;
 
   CourierBrand({
@@ -14,11 +41,9 @@ class CourierBrand {
       settings: CourierBrandSettings.fromJson(data['settings']),
     );
   }
-
 }
 
 class CourierBrandSettings {
-
   final CourierBrandInApp? inapp;
   final CourierBrandColors? colors;
 
@@ -33,27 +58,27 @@ class CourierBrandSettings {
       colors: CourierBrandColors.fromJson(data['colors']),
     );
   }
-
 }
 
 class CourierBrandInApp {
-
-  final bool showCourierFooter;
+  final bool disableCourierFooter;
 
   CourierBrandInApp({
-    required this.showCourierFooter,
+    required this.disableCourierFooter,
   });
 
   factory CourierBrandInApp.fromJson(dynamic data) {
     return CourierBrandInApp(
-      showCourierFooter: data['showCourierFooter'],
+      disableCourierFooter: data['disableCourierFooter'],
     );
   }
 
+  bool get showCourierFooter {
+    return !disableCourierFooter;
+  }
 }
 
 class CourierBrandColors {
-
   final String? primary;
 
   CourierBrandColors({
@@ -67,13 +92,10 @@ class CourierBrandColors {
   }
 
   Color? primaryColor() {
-
     if (primary != null) {
       return hexToColor(primary!);
     }
 
     return null;
-
   }
-
 }

@@ -3,8 +3,6 @@ package com.courier.courier_flutter
 import android.content.Intent
 import android.os.Bundle
 import com.courier.android.Courier
-import com.courier.android.modules.logListener
-import com.courier.android.modules.requestNotificationPermission
 import com.courier.android.utils.getLastDeliveredMessage
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.android.FlutterActivity
@@ -19,15 +17,15 @@ open class CourierFlutterActivity : FlutterActivity(), CourierFlutterPushNotific
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        // Setup all the supported channels Courier can use
-        eventsChannel = flutterEngine.setupCourierMethodChannel(
-            activity = this.activity,
-            onGetClickedNotification = {
-                intent.getAndTrackRemoteMessage()?.let { message ->
-                    postPushNotificationClicked(message)
-                }
-            }
-        )
+//        // Setup all the supported channels Courier can use
+//        eventsChannel = flutterEngine.setupCourierMethodChannel(
+//            activity = this.activity,
+//            onGetClickedNotification = {
+//                intent.getAndTrackRemoteMessage()?.let { message ->
+//                    postPushNotificationClicked(message)
+//                }
+//            }
+//        )
 
     }
 
@@ -45,11 +43,11 @@ open class CourierFlutterActivity : FlutterActivity(), CourierFlutterPushNotific
         Courier.initialize(context = this)
 
         // Set the events listener
-        Courier.shared.logListener = { log ->
-            runOnUiThread {
-                eventsChannel?.invokeMethod("log", log)
-            }
-        }
+//        Courier.shared.logListener = { log ->
+//            runOnUiThread {
+//                eventsChannel?.invokeMethod("log", log)
+//            }
+//        }
 
         // See if there is a pending click event
         intent.getAndTrackRemoteMessage()?.let { message ->

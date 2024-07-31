@@ -10,6 +10,6 @@
 
 @implementation CourierFlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftCourierFlutterPlugin registerWithRegistrar:registrar];
+  [CourierPlugin registerWithRegistrar:registrar];
 }
 @end

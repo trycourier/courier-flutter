@@ -41,9 +41,9 @@ flutter:
     platforms:
       android:
         package: com.courier.courier_flutter
-        pluginClass: CourierFlutterPlugin
+        pluginClass: CourierPlugin
       ios:
-        pluginClass: CourierFlutterPlugin
+        pluginClass: CourierPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
