@@ -8,9 +8,9 @@ class CourierBrandResponse {
     this.data,
   });
 
-  factory CourierBrandResponse.fromJson(dynamic data) {
+  factory CourierBrandResponse.fromJson(Map<String, dynamic> json) {
     return CourierBrandResponse(
-      data: CourierBrandData.fromJson(data['data']),
+      data: CourierBrandData.fromJson(json['data']),
     );
   }
 }
@@ -22,9 +22,12 @@ class CourierBrandData {
     this.brand,
   });
 
-  factory CourierBrandData.fromJson(dynamic data) {
+  factory CourierBrandData.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return CourierBrandData();
+    }
     return CourierBrandData(
-      brand: CourierBrand.fromJson(data['brand']),
+      brand: CourierBrand.fromJson(json['brand']),
     );
   }
 }
@@ -36,9 +39,12 @@ class CourierBrand {
     this.settings,
   });
 
-  factory CourierBrand.fromJson(dynamic data) {
+  factory CourierBrand.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return CourierBrand();
+    }
     return CourierBrand(
-      settings: CourierBrandSettings.fromJson(data['settings']),
+      settings: CourierBrandSettings.fromJson(json['settings']),
     );
   }
 }
@@ -52,30 +58,32 @@ class CourierBrandSettings {
     this.colors,
   });
 
-  factory CourierBrandSettings.fromJson(dynamic data) {
+  factory CourierBrandSettings.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return CourierBrandSettings();
+    }
     return CourierBrandSettings(
-      inapp: CourierBrandInApp.fromJson(data['inapp']),
-      colors: CourierBrandColors.fromJson(data['colors']),
+      inapp: CourierBrandInApp.fromJson(json['inapp']),
+      colors: CourierBrandColors.fromJson(json['colors']),
     );
   }
 }
 
 class CourierBrandInApp {
-  final bool disableCourierFooter;
+  final bool? disableCourierFooter;
 
   CourierBrandInApp({
-    required this.disableCourierFooter,
+    this.disableCourierFooter = false,
   });
 
-  factory CourierBrandInApp.fromJson(dynamic data) {
+  factory CourierBrandInApp.fromJson(Map<String, dynamic>? json) {
     return CourierBrandInApp(
-      disableCourierFooter: data['disableCourierFooter'],
+      disableCourierFooter: json?['disableCourierFooter'],
     );
   }
 
-  bool get showCourierFooter {
-    return !disableCourierFooter;
-  }
+  bool get showCourierFooter =>
+      disableCourierFooter != null ? !disableCourierFooter! : true;
 }
 
 class CourierBrandColors {
@@ -85,17 +93,13 @@ class CourierBrandColors {
     this.primary,
   });
 
-  factory CourierBrandColors.fromJson(dynamic data) {
+  factory CourierBrandColors.fromJson(Map<String, dynamic>? json) {
     return CourierBrandColors(
-      primary: data['primary'],
+      primary: json?['primary'] as String?,
     );
   }
 
   Color? primaryColor() {
-    if (primary != null) {
-      return hexToColor(primary!);
-    }
-
-    return null;
+    return primary != null ? hexToColor(primary!) : null;
   }
 }

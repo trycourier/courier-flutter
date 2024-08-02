@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:courier_flutter/client/brand_client.dart';
+import 'package:courier_flutter/client/token_client.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -21,8 +23,7 @@ class CourierClientOptions {
     required this.showLogs,
   });
 
-  @visibleForTesting
-  final channel = const MethodChannel('courier_flutter_client');
+  final client = const MethodChannel('courier_flutter_client');
 
   Map<String, dynamic> toJson() {
     return {
@@ -34,12 +35,20 @@ class CourierClientOptions {
       'showLogs': showLogs,
     };
   }
+
+  Future<dynamic> invokeClient(String method, [dynamic arguments]) {
+    final Map<String, dynamic> invokingArguments = {
+      'options': toJson(),
+      if (arguments is Map<String, dynamic>) ...arguments,
+    };
+    return client.invokeMethod(method, invokingArguments);
+  }
 }
 
 class CourierClient {
   final CourierClientOptions options;
 
-  late final TokenClient tokens = TokenClient(options: options);
+  late final TokenClient tokens = TokenClient(options);
   late final BrandClient brands = BrandClient(options);
   late final InboxClient inbox = InboxClient(options: options);
   late final PreferenceClient preferences = PreferenceClient(options: options);
@@ -60,25 +69,6 @@ class CourierClient {
           tenantId: tenantId,
           showLogs: showLogs ?? kDebugMode,
         );
-}
-
-class TokenClient {
-  TokenClient({required CourierClientOptions options});
-}
-
-class BrandClient {
-  final CourierClientOptions _options;
-
-  BrandClient(this._options);
-
-  Future<CourierBrandResponse> getBrand({required String id}) async {
-    final data = await _options.channel.invokeMethod('getBrand', {
-      'options': _options.toJson(),
-      'brandId': id,
-    });
-    final Map<String, dynamic> map = json.decode(data);
-    return CourierBrandResponse.fromJson(map);
-  }
 }
 
 class InboxClient {

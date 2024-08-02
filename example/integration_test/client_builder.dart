@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_client.dart';
+import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'example_server.dart';
 

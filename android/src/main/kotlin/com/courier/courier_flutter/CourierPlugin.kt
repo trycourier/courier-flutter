@@ -9,22 +9,14 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import kotlin.collections.HashMap
 
-internal class CourierPlugin : FlutterPlugin, MethodCallHandler {
+internal class CourierPlugin : FlutterPlugin {
 
     companion object {
-        private const val COURIER_ERROR_TAG = "Courier Android SDK Error"
-//        internal const val CORE_CHANNEL = "courier_flutter_core"
-//        internal const val INBOX_CHANNEL = "courier_flutter_inbox"
+        internal const val TAG = "Courier Android SDK Error"
     }
 
     enum class Channels(val channelName: String) {
         CLIENT("courier_flutter_client")
-    }
-
-    class CourierFlutterException(message: String): Exception(message) {
-        companion object {
-            val missingParameter = CourierException("Missing Parameter")
-        }
     }
 
     init {
@@ -39,7 +31,7 @@ internal class CourierPlugin : FlutterPlugin, MethodCallHandler {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 
         clientChannel = MethodChannel(flutterPluginBinding.binaryMessenger, Channels.CLIENT.channelName).apply {
-            setMethodCallHandler(this@CourierPlugin)
+            setMethodCallHandler(CourierClientMethodHandler())
         }
 
 //        // Get the core channel
@@ -52,33 +44,11 @@ internal class CourierPlugin : FlutterPlugin, MethodCallHandler {
 
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
-
-        val params = call.arguments as? HashMap<*, *>
-
-        when (call.method) {
-
-            "getBrand" -> {
-
-                val client = params?.toClient()
-                val brandId = params?.get("brandId") as? String
-
-                if (client == null || brandId == null) {
-                    val error = CourierFlutterException.missingParameter
-                    result.error(COURIER_ERROR_TAG, error.message, error)
-                    return
-                }
-
-                post {
-                    try {
-                        val brand = client.brands.getBrand(brandId)
-                        result.success(brand.toJson())
-                    } catch (e: Exception) {
-                        result.error(COURIER_ERROR_TAG, e.message, e)
-                    }
-                }
-
-            }
+//    override fun onMethodCall(call: MethodCall, result: Result) {
+//
+//        val params = call.arguments as? HashMap<*, *>
+//
+//        when (call.method) {
 
 //            "isDebugging" -> {
 //
@@ -411,13 +381,13 @@ internal class CourierPlugin : FlutterPlugin, MethodCallHandler {
 //
 //            }
 
-            else -> {
-                result.notImplemented()
-            }
-
-        }
-
-    }
+//            else -> {
+//                result.notImplemented()
+//            }
+//
+//        }
+//
+//    }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         clientChannel?.setMethodCallHandler(null)

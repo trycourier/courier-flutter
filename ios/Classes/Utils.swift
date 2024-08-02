@@ -43,6 +43,17 @@ extension UNAuthorizationStatus {
     
 }
 
+internal extension Encodable {
+    
+    func toJson() throws -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let data = try encoder.encode(self)
+        return String(data: data, encoding: .utf8) ?? nil
+    }
+    
+}
+
 internal extension [String: Any?] {
     
     func clean() -> NSMutableDictionary {
@@ -279,14 +290,18 @@ internal extension String {
 
 extension Dictionary<String, Any> {
     
-    func toClient() -> CourierClient? {
+    func toClient() throws -> CourierClient? {
         
         guard let options = self["options"] as? [String: Any] else {
-            return nil
+            throw CourierFlutterError.missingParameter(value: "options")
         }
         
-        guard let userId = options["userId"] as? String, let showLogs = options["showLogs"] as? Bool else {
-            return nil
+        guard let userId = options["userId"] as? String else {
+            throw CourierFlutterError.missingParameter(value: "userId")
+        }
+        
+        guard let showLogs = options["showLogs"] as? Bool else {
+            throw CourierFlutterError.missingParameter(value: "showLogs")
         }
         
         let jwt = options["jwt"] as? String

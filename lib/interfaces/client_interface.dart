@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_client.dart';
+import 'package:courier_flutter/client/courier_client.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
