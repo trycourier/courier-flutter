@@ -6,12 +6,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal fun HashMap<*, *>.toClient(): CourierClient? {
+internal fun HashMap<*, *>.toClient(): CourierClient {
 
-    val options = this["options"] as? HashMap<*, *> ?: return null
-
-    val userId = options["userId"] as? String ?: return null
-    val showLogs = options["showLogs"] as? Boolean ?: return null
+    val options = this["options"] as? HashMap<*, *> ?: throw MissingParameter("options")
+    val userId = options["userId"] as? String ?: throw MissingParameter("userId")
+    val showLogs = options["showLogs"] as? Boolean ?: throw MissingParameter("showLogs")
 
     val jwt = options["jwt"] as? String
     val clientKey = options["clientKey"] as? String

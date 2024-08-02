@@ -1,5 +1,6 @@
 package com.courier.courier_flutter
 
+import com.courier.android.models.CourierDevice
 import com.courier.courier_flutter.CourierPlugin.Companion.TAG
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -13,21 +14,47 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
             val params = call.arguments as? HashMap<*, *>
 
+            val client = params?.toClient() ?: throw MissingParameter("client")
+
             when (call.method) {
 
-                "getBrand" -> {
+                "client.brands.get_brand" -> {
 
-                    val client = params?.toClient()
-                    val brandId = params?.get("brandId") as? String
-
-                    if (client == null || brandId == null) {
-                        val error = CourierFlutterException.missingParameter
-                        result.error(TAG, error.message, error)
-                        return@post
-                    }
+                    val brandId = params["brandId"] as? String ?: throw MissingParameter("brandId")
 
                     val brand = client.brands.getBrand(brandId)
-                    result.success(brand.toJson())
+                    val json = brand.toJson()
+                    result.success(json)
+
+                }
+
+                "client.tokens.put_user_token" -> {
+
+                    val token = params["token"] as? String ?: throw MissingParameter("token")
+                    val provider = params["provider"] as? String ?: throw MissingParameter("provider")
+
+                    val deviceParams = params["device"] as? Map<*, *>
+                    val device = deviceParams?.toCourierDevice()
+
+                    client.tokens.putUserToken(
+                        token = token,
+                        provider = provider,
+                        device = device ?: CourierDevice.current,
+                    )
+
+                    result.success(null)
+
+                }
+
+                "client.tokens.delete_user_token" -> {
+
+                    val token = params["token"] as? String ?: throw MissingParameter("token")
+
+                    client.tokens.deleteUserToken(
+                        token = token,
+                    )
+
+                    result.success(null)
 
                 }
 
@@ -45,4 +72,21 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
     }
 
+}
+
+internal fun Map<*, *>.toCourierDevice(): CourierDevice {
+    val appId = this["app_id"] as? String
+    val adId = this["ad_id"] as? String
+    val deviceId = this["device_id"] as? String
+    val platform = this["platform"] as? String
+    val manufacturer = this["manufacturer"] as? String
+    val model = this["model"] as? String
+    return CourierDevice(
+        app_id = appId,
+        ad_id = adId,
+        device_id = deviceId,
+        platform = platform,
+        manufacturer = manufacturer,
+        model = model
+    )
 }

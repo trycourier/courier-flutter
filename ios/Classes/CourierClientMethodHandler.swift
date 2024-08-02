@@ -89,14 +89,12 @@ extension Dictionary where Key == String, Value == Any {
     
     func toCourierDevice() throws -> CourierDevice? {
         
-        guard let appId = self["app_id"] as? String,
-              let adId = self["ad_id"] as? String,
-              let deviceId = self["device_id"] as? String,
-              let platform = self["platform"] as? String,
-              let manufacturer = self["manufacturer"] as? String,
-              let model = self["model"] as? String else {
-            return nil
-        }
+        let appId = self["app_id"] as? String
+        let adId = self["ad_id"] as? String
+        let deviceId = self["device_id"] as? String
+        let platform = self["platform"] as? String
+        let manufacturer = self["manufacturer"] as? String
+        let model = self["model"] as? String
         
         return CourierDevice(
             app_id: appId,
