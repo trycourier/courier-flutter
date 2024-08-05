@@ -21,56 +21,84 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
             
             do {
                 
-                let params = call.arguments as? Dictionary<String, Any>
-                
-                guard let client = try params?.toClient() else {
-                    result(CourierFlutterError.missingParameter(value: "client").toFlutterError())
-                    return
+                guard let params = call.arguments as? Dictionary<String, Any>, let client = try params.toClient() else {
+                    throw MissingParameter(value: "client")
                 }
                 
                 switch call.method {
                     
+                    // MARK: Brand
+                    
                 case "client.brands.get_brand":
                     
-                    guard let brandId = params?["brandId"] as? String else {
-                        result(CourierFlutterError.missingParameter(value: "brandId").toFlutterError())
-                        return
-                    }
+                    let (brandId): (String) = (
+                        try params.extract("brandId")
+                    )
                     
-                    let brand = try await client.brands.getBrand(brandId: brandId)
+                    let brand = try await client.brands.getBrand(
+                        brandId: brandId
+                    )
+                    
                     let json = try brand.toJson()
+                    
                     result(json)
+                    
+                    // MARK: Token Management
                     
                 case "client.tokens.put_user_token":
                     
-                    guard let token = params?["token"] as? String else {
-                        result(CourierFlutterError.missingParameter(value: "token").toFlutterError())
-                        return
-                    }
+                    let (token, provider): (String, String) = (
+                        try params.extract("token"),
+                        try params.extract("provider")
+                    )
                     
-                    guard let provider = params?["provider"] as? String else {
-                        result(CourierFlutterError.missingParameter(value: "provider").toFlutterError())
-                        return
-                    }
-                    
-                    let deviceParams = params?["device"] as? [String: Any]
+                    let deviceParams = params["device"] as? [String: Any]
                     let device = try deviceParams?.toCourierDevice()
                     
-                    try await client.tokens.putUserToken(token: token, provider: provider)
+                    try await client.tokens.putUserToken(
+                        token: token,
+                        provider: provider
+                    )
+                    
                     result(nil)
                     
                 case "client.tokens.delete_user_token":
                     
-                    guard let token = params?["token"] as? String else {
-                        result(CourierFlutterError.missingParameter(value: "token").toFlutterError())
-                        return
+                    let (token, provider): (String, String) = (
+                        try params.extract("token"),
+                        try params.extract("provider")
+                    )
+                    
+                    try await client.tokens.deleteUserToken(
+                        token: token
+                    )
+                    
+                    result(nil)
+                    
+                    // MARK: Tracking
+                    
+                case "client.tracking.post_tracking_url":
+                    
+                    let (url, event): (String, String) = (
+                        try params.extract("url"),
+                        try params.extract("event")
+                    )
+                    
+                    guard let trackingEvent = CourierTrackingEvent(rawValue: event) else {
+                        throw MissingParameter(value: "tracking_event")
                     }
                     
-                    try await client.tokens.deleteUserToken(token: token)
+                    try await client.tracking.postTrackingUrl(
+                        url: url,
+                        event: trackingEvent
+                    )
+                    
                     result(nil)
                     
                 default:
+                    
                     result(FlutterMethodNotImplemented)
+                    
                 }
                 
             } catch {

@@ -1,8 +1,8 @@
-import 'dart:convert';
-
 import 'package:courier_flutter/client/brand_client.dart';
+import 'package:courier_flutter/client/inbox_client.dart';
+import 'package:courier_flutter/client/preference_client.dart';
 import 'package:courier_flutter/client/token_client.dart';
-import 'package:courier_flutter/models/courier_brand.dart';
+import 'package:courier_flutter/client/tracking_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -50,9 +50,9 @@ class CourierClient {
 
   late final TokenClient tokens = TokenClient(options);
   late final BrandClient brands = BrandClient(options);
-  late final InboxClient inbox = InboxClient(options: options);
-  late final PreferenceClient preferences = PreferenceClient(options: options);
-  late final TrackingClient tracking = TrackingClient(options: options);
+  late final InboxClient inbox = InboxClient(options);
+  late final PreferenceClient preferences = PreferenceClient(options);
+  late final TrackingClient tracking = TrackingClient(options);
 
   CourierClient({
     String? jwt,
@@ -69,16 +69,4 @@ class CourierClient {
           tenantId: tenantId,
           showLogs: showLogs ?? kDebugMode,
         );
-}
-
-class InboxClient {
-  InboxClient({required CourierClientOptions options});
-}
-
-class PreferenceClient {
-  PreferenceClient({required CourierClientOptions options});
-}
-
-class TrackingClient {
-  TrackingClient({required CourierClientOptions options});
 }

@@ -92,9 +92,9 @@ abstract class CourierFlutterCorePlatform extends PlatformInterface {
     throw UnimplementedError('getUserPreferences() has not been implemented.');
   }
 
-  Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
-    throw UnimplementedError('getUserPreferencesTopic() has not been implemented.');
-  }
+  // Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
+  //   throw UnimplementedError('getUserPreferencesTopic() has not been implemented.');
+  // }
 
   Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) {
     throw UnimplementedError('putUserPreferencesTopic() has not been implemented.');

@@ -163,9 +163,9 @@ class Courier {
     return CourierFlutterCorePlatform.instance.getUserPreferences(paginationCursor: paginationCursor);
   }
 
-  Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
-    return CourierFlutterCorePlatform.instance.getUserPreferencesTopic(topicId: topicId);
-  }
+  // Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
+  //   return CourierFlutterCorePlatform.instance.getUserPreferencesTopic(topicId: topicId);
+  // }
 
   Future<dynamic> putUserPreferencesTopic({ required String topicId, required CourierUserPreferencesStatus status, required bool hasCustomRouting, required List<CourierUserPreferencesChannel> customRouting }) {
     return CourierFlutterCorePlatform.instance.putUserPreferencesTopic(topicId: topicId, status: status.value, hasCustomRouting: hasCustomRouting, customRouting: customRouting.map((e) => e.value).toList());

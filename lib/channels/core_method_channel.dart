@@ -199,13 +199,13 @@ class CoreChannelCourierFlutter extends CourierFlutterCorePlatform {
     return CourierUserPreferences.fromJson(data);
   }
 
-  @override
-  Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) async {
-    final data = await coreChannel.invokeMethod('getUserPreferencesTopic', {
-      'topicId': topicId,
-    });
-    return CourierUserPreferencesTopic.fromJson(data);
-  }
+  // @override
+  // Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) async {
+  //   final data = await coreChannel.invokeMethod('getUserPreferencesTopic', {
+  //     'topicId': topicId,
+  //   });
+  //   return CourierUserPreferencesTopic.fromJson(data);
+  // }
 
   @override
   Future<dynamic> putUserPreferencesTopic({ required String topicId, required String status, required bool hasCustomRouting, required List<String> customRouting }) async {

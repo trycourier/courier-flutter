@@ -6,6 +6,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// Create Client
+
 internal fun HashMap<*, *>.toClient(): CourierClient {
 
     val options = this["options"] as? HashMap<*, *> ?: throw MissingParameter("options")
@@ -28,12 +30,22 @@ internal fun HashMap<*, *>.toClient(): CourierClient {
 
 }
 
+// Stringify
+
 internal fun Any.toJson(): String {
     return GsonBuilder().setPrettyPrinting().create().toJson(this)
 }
+
+// Threaded Callback
 
 internal fun post(block: suspend CoroutineScope.() -> Unit) {
     CoroutineScope(Dispatchers.Main).launch {
         block()
     }
+}
+
+// Handle Params
+
+internal inline fun <reified T> Map<*, *>.extract(key: String): T {
+    return this[key] as? T ?: throw MissingParameter(key)
 }

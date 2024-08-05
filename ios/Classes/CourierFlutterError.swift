@@ -5,23 +5,18 @@
 //  Created by Michael Miller on 8/2/24.
 //
 
-import Foundation
+import Flutter
 
-internal enum CourierFlutterError: Error {
+internal struct MissingParameter: Error {
     
-    case missingParameter(value: String)
+    let value: String
     
-    func toFlutterError() -> FlutterError {
-        let message: String
-        switch self {
-        case .missingParameter(let value):
-            message = "Missing parameter: \(value)"
-            return FlutterError(
-                code: CourierPlugin.COURIER_ERROR_TAG,
-                message: message,
-                details: nil
-            )
-        }
+    func toFlutter() -> FlutterError {
+        return FlutterError(
+            code: CourierPlugin.COURIER_ERROR_TAG,
+            message: "Missing parameter: \(value)",
+            details: nil
+        )
     }
     
 }

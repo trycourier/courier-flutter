@@ -1,4 +1,3 @@
-
 import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/models/courier_device.dart';
 

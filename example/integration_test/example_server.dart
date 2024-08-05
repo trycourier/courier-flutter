@@ -43,7 +43,7 @@ class ExampleServer {
     });
 
     final response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 202) {
       final json = jsonDecode(response.body);
       return json['requestId'] ?? 'Error';
     } else {

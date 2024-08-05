@@ -36,13 +36,13 @@ class _PreferencesDetailPageState extends State<PreferencesDetailPage> {
       _error = null;
     });
 
-    try {
-      _topic = await Courier.shared.getUserPreferencesTopic(topicId: widget.topicId);
-    } catch (error) {
-      setState(() {
-        _error = error.toString();
-      });
-    }
+    // try {
+    //   _topic = await Courier.shared.getUserPreferencesTopic(topicId: widget.topicId);
+    // } catch (error) {
+    //   setState(() {
+    //     _error = error.toString();
+    //   });
+    // }
 
     setState(() {
       _isLoading = false;

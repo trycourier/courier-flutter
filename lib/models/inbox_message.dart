@@ -26,14 +26,14 @@ class InboxMessage {
     this.opened,
   });
 
-  factory InboxMessage.fromJson(dynamic data) {
+  factory InboxMessage.fromJson(Map<String, dynamic> data) {
     List<dynamic>? actions = data['actions'];
     return InboxMessage(
       messageId: data['messageId'],
       title: data['title'],
       body: data['body'],
       preview: data['preview'],
-      created: data['x'],
+      created: data['created'],
       actions: actions?.map((action) => InboxAction(content: action['content'], href: action['href'], data: action['data'])).toList(),
       data: data['data'],
       archived: data['archived'],

@@ -96,17 +96,19 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
         if (sectionIndex != -1) {
 
-          sections[sectionIndex].topics.add(topic);
+          // TODO
+
+          // sections[sectionIndex].topics.add(topic);
 
         } else {
 
-          PreferenceSection newSection = PreferenceSection(
-            title: topic.sectionName,
-            id: topic.sectionId,
-            topics: [topic],
-          );
-
-          sections.add(newSection);
+          // PreferenceSection newSection = PreferenceSection(
+          //   title: topic.sectionName,
+          //   id: topic.sectionId,
+          //   topics: [topic],
+          // );
+          //
+          // sections.add(newSection);
 
         }
 

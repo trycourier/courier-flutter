@@ -89,7 +89,8 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
                 );
               },
               subtitle: Text(
-                topic.toJson(),
+                // topic.toJson(),
+                "TODO",
                 style: GoogleFonts.robotoMono(),
               ),
             );
@@ -101,20 +102,20 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
   }
 }
 
-extension TopicExtension on CourierUserPreferencesTopic {
-  String toJson() {
-    var jsonObject = {
-      'topicId': topicId,
-      'topicName': topicName,
-      'sectionName': sectionName,
-      'sectionId': sectionId,
-      'status': status.value,
-      'hasCustomRouting': hasCustomRouting,
-      'defaultStatus': defaultStatus.value,
-      'customRouting': customRouting.map((e) => e.value).join(", "),
-    };
-
-    var encoder = const JsonEncoder.withIndent('  ');
-    return encoder.convert(jsonObject);
-  }
-}
+// extension TopicExtension on CourierUserPreferencesTopic {
+//   String toJson() {
+//     var jsonObject = {
+//       'topicId': topicId,
+//       'topicName': topicName,
+//       'sectionName': sectionName,
+//       'sectionId': sectionId,
+//       'status': status.value,
+//       'hasCustomRouting': hasCustomRouting,
+//       'defaultStatus': defaultStatus.value,
+//       'customRouting': customRouting.map((e) => e.value).join(", "),
+//     };
+//
+//     var encoder = const JsonEncoder.withIndent('  ');
+//     return encoder.convert(jsonObject);
+//   }
+// }
