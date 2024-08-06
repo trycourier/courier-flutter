@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change to the root directory
-cd "$(dirname "$0")/../example"
+cd ../example || exit
 
 # Run tests
 flutter test integration_test/client_tests.dart

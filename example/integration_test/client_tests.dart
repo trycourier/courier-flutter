@@ -140,34 +140,55 @@ void main() {
       final messageId = await sendMessage(userId);
       await delay();
       final client = await ClientBuilder.build(userId: userId);
-      await client.inbox.openMessage(messageId: messageId);
+      await client.inbox.open(messageId: messageId);
     });
     test('Click Message', () async {
-      // TODO: Click tracking not working unless we have tracking ids
+      final messageId = await sendMessage(userId);
+      await delay();
+      final client = await ClientBuilder.build(userId: userId);
+      await client.inbox.click(messageId: messageId, trackingId: "example_id");
     });
     test('Read Message', () async {
       final messageId = await sendMessage(userId);
       await delay();
       final client = await ClientBuilder.build(userId: userId);
-      await client.inbox.readMessage(messageId: messageId);
+      await client.inbox.read(messageId: messageId);
     });
     test('Unread Message', () async {
       final messageId = await sendMessage(userId);
       await delay();
       final client = await ClientBuilder.build(userId: userId);
-      await client.inbox.unreadMessage(messageId: messageId);
+      await client.inbox.unread(messageId: messageId);
     });
     test('Archive Message', () async {
       final messageId = await sendMessage(userId);
       await delay();
       final client = await ClientBuilder.build(userId: userId);
-      await client.inbox.archiveMessage(messageId: messageId);
+      await client.inbox.archive(messageId: messageId);
     });
     test('Read All Messages', () async {
       await sendMessage(userId);
       await delay();
       final client = await ClientBuilder.build(userId: userId);
-      await client.inbox.readAllMessages();
+      await client.inbox.readAll();
     });
+    // test('Register Socket', () async {
+    //
+    //   var hold = true;
+    //
+    //   final client = await ClientBuilder.build(userId: userId);
+    //   await client.inbox.socket.receivedMessage();
+    //   await client.inbox.socket.connect();
+    //   await client.inbox.socket.sendSubscribe();
+    //
+    //   await sendMessage(userId);
+    //
+    //   // TODO: Handle the event callback
+    //
+    //   while (hold) {
+    //     // Hold
+    //   }
+    //
+    // });
   });
 }

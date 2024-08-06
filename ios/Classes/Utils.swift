@@ -329,7 +329,7 @@ internal extension Dictionary<String, Any> {
     
 }
 
-extension Error {
+internal extension Error {
     
     func toFlutterError() -> FlutterError {
         return FlutterError.init(
@@ -337,6 +337,105 @@ extension Error {
             message: String(describing: self),
             details: nil
         )
+    }
+    
+}
+
+internal extension InboxResponse {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "data": data?.toDictionary()
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension InboxData {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "count": count,
+            "messages": messages?.toDictionary()
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension InboxNodes {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "pageInfo": pageInfo?.toDictionary(),
+            "nodes": nodes?.map { $0.toDictionary() }
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension InboxPageInfo {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "startCursor": startCursor,
+            "hasNextPage": hasNextPage
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension CourierTrackingIds {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "archiveTrackingId": archiveTrackingId,
+            "openTrackingId": openTrackingId,
+            "clickTrackingId": clickTrackingId,
+            "deliverTrackingId": deliverTrackingId,
+            "unreadTrackingId": unreadTrackingId,
+            "readTrackingId": readTrackingId
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension GetInboxMessageData {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "message": message?.toDictionary(),
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension CourierGetInboxMessageResponse {
+    
+    @objc func toDictionary() -> NSDictionary {
+        let dictionary: [String: Any?] = [
+            "data": data?.toDictionary(),
+        ]
+        return dictionary.clean()
+    }
+    
+}
+
+internal extension NSDictionary {
+    
+    @objc func toJson() -> String? {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: self, options: .prettyPrinted)
+            return String(data: jsonData, encoding: .utf8)
+        } catch {
+            print("Error converting NSDictionary to JSON: \(error)")
+            return nil
+        }
     }
     
 }

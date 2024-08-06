@@ -8,6 +8,8 @@ class InboxClient {
 
   InboxClient(this._options);
 
+  late final InboxSocket socket = InboxSocket(_options);
+
   Future<CourierGetInboxMessagesResponse> getMessages({int? paginationLimit, String? startCursor}) async {
     final data = await _options.invokeClient('client.inbox.get_messages', {
       'paginationLimit': paginationLimit,
@@ -38,39 +40,70 @@ class InboxClient {
     return await _options.invokeClient('client.inbox.get_unread_message_count');
   }
 
-  Future openMessage({required String messageId}) async {
+  Future open({required String messageId}) async {
     await _options.invokeClient('client.inbox.open_message', {
       'messageId': messageId,
     });
   }
 
-  Future readMessage({required String messageId}) async {
+  Future read({required String messageId}) async {
     await _options.invokeClient('client.inbox.read_message', {
       'messageId': messageId,
     });
   }
 
-  Future unreadMessage({required String messageId}) async {
+  Future unread({required String messageId}) async {
     await _options.invokeClient('client.inbox.unread_message', {
       'messageId': messageId,
     });
   }
 
-  Future clickMessage({required String messageId, required String trackingId}) async {
+  Future click({required String messageId, required String trackingId}) async {
     await _options.invokeClient('client.inbox.click_message', {
       'messageId': messageId,
       'trackingId': trackingId,
     });
   }
 
-  Future archiveMessage({required String messageId}) async {
+  Future archive({required String messageId}) async {
     await _options.invokeClient('client.inbox.archive_message', {
       'messageId': messageId,
     });
   }
 
-  Future readAllMessages() async {
+  Future readAll() async {
     await _options.invokeClient('client.inbox.read_all_messages');
+  }
+}
+
+class InboxSocket {
+  final CourierClientOptions _options;
+  // Function(InboxMessage)? receivedMessage;
+
+  InboxSocket(this._options) {
+
+    _options.events.setMethodCallHandler((call) {
+      switch (call.method) {
+        case 'client.events.inbox.socket.received_message':
+          print("HERE");
+      }
+      return Future.value();
+    });
+
+  }
+
+  Future receivedMessage() async {
+    await _options.invokeClient('client.inbox.socket.received_message');
+  }
+
+  Future connect() async {
+    await _options.invokeClient('client.inbox.socket.connect');
+  }
+
+  Future sendSubscribe({int version = 5}) async {
+    await _options.invokeClient('client.inbox.socket.send_subscribe', {
+      'version': version,
+    });
   }
 
 }

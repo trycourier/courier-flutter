@@ -40,7 +40,6 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     )
                     
                     let json = try brand.toJson()
-                    
                     result(json)
                     
                     // MARK: Token Management
@@ -74,6 +73,153 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     )
                     
                     result(nil)
+                    
+                    // MARK: Preferences
+                    
+                case "client.preferences.get_user_preferences":
+                    
+                    let paginationCursor = params["paginationCursor"] as? String
+                    
+                    let res = try await client.preferences.getUserPreferences(
+                        paginationCursor: paginationCursor
+                    )
+                    
+                    let json = try res.toJson()
+                    result(json)
+                    
+                case "client.preferences.get_user_preference_topic":
+                    
+                    let topicId: String = try params.extract("topicId")
+                    
+                    let res = try await client.preferences.getUserPreferenceTopic(
+                        topicId: topicId
+                    )
+                    
+                    let json = try res.toJson()
+                    result(json)
+                    
+                case "client.preferences.put_user_preference_topic":
+                    
+                    let (topicId, status, hasCustomRouting, customRouting): (String, String, Bool, [String]) = (
+                        try params.extract("topicId"),
+                        try params.extract("status"),
+                        try params.extract("hasCustomRouting"),
+                        try params.extract("customRouting")
+                    )
+                    
+                    try await client.preferences.putUserPreferenceTopic(
+                        topicId: topicId,
+                        status: CourierUserPreferencesStatus(rawValue: status) ?? .unknown,
+                        hasCustomRouting: hasCustomRouting,
+                        customRouting: customRouting.map { CourierUserPreferencesChannel(rawValue: $0) ?? .unknown }
+                    )
+                    
+                    result(nil)
+                    
+                    // MARK: Inbox
+                    
+                case "client.inbox.get_messages":
+                    
+                    let paginationLimit = params["paginationLimit"] as? Int
+                    let startCursor = params["startCursor"] as? String
+
+                    let res = try await client.inbox.getMessages(
+                        paginationLimit: paginationLimit ?? Courier.shared.inboxPaginationLimit,
+                        startCursor: startCursor
+                    )
+
+                    let json = res.toDictionary().toJson()
+                    result(json)
+
+                case "client.inbox.get_archived_messages":
+                    
+                    let paginationLimit = params["paginationLimit"] as? Int
+                    let startCursor = params["startCursor"] as? String
+
+                    let res = try await client.inbox.getArchivedMessages(
+                        paginationLimit: paginationLimit ?? Courier.shared.inboxPaginationLimit,
+                        startCursor: startCursor
+                    )
+
+                    let json = res.toDictionary().toJson()
+                    result(json)
+
+                case "client.inbox.get_unread_message_count":
+                    
+                    let count = try await client.inbox.getUnreadMessageCount()
+                    result(count)
+
+                case "client.inbox.get_message_by_id":
+                    
+                    let messageId: String = try params.extract("messageId")
+
+                    let res = try await client.inbox.getMessage(
+                        messageId: messageId
+                    )
+
+                    let json = res.toDictionary().toJson()
+                    result(json)
+
+                case "client.inbox.click_message":
+                    
+                    let (messageId, trackingId): (String, String) = (
+                        try params.extract("messageId"),
+                        try params.extract("trackingId")
+                    )
+
+                    try await client.inbox.click(
+                        messageId: messageId,
+                        trackingId: trackingId
+                    )
+
+                    result(nil)
+
+                case "client.inbox.unread_message":
+                    
+                    let messageId: String = try params.extract("messageId")
+
+                    try await client.inbox.unread(
+                        messageId: messageId
+                    )
+
+                    result(nil)
+
+                case "client.inbox.read_message":
+                    
+                    let messageId: String = try params.extract("messageId")
+
+                    try await client.inbox.read(
+                        messageId: messageId
+                    )
+
+                    result(nil)
+
+                case "client.inbox.open_message":
+                    
+                    let messageId: String = try params.extract("messageId")
+
+                    try await client.inbox.open(
+                        messageId: messageId
+                    )
+
+                    result(nil)
+
+                case "client.inbox.archive_message":
+                    
+                    let messageId: String = try params.extract("messageId")
+
+                    try await client.inbox.archive(
+                        messageId: messageId
+                    )
+
+                    result(nil)
+
+                case "client.inbox.read_all_messages":
+                    
+                    try await client.inbox.readAll()
+                    result(nil)
+                    
+                // TODO: Socket updates
                     
                     // MARK: Tracking
                     

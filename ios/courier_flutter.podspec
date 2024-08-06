@@ -10,13 +10,13 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A new Flutter plugin project.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'http://courier.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Courier' => 'mike@courier.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'Courier_iOS', '4.0.3'
+  s.dependency 'Courier_iOS', '4.0.5'
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.

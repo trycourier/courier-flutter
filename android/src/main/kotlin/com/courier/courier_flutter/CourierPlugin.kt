@@ -3,11 +3,7 @@ package com.courier.courier_flutter
 import com.courier.android.Courier
 import com.courier.android.models.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
-import kotlin.collections.HashMap
 
 internal class CourierPlugin : FlutterPlugin {
 
@@ -16,7 +12,8 @@ internal class CourierPlugin : FlutterPlugin {
     }
 
     enum class Channels(val channelName: String) {
-        CLIENT("courier_flutter_client")
+        CLIENT("courier_flutter_client"),
+        CLIENT_EVENTS("courier_flutter_client_events"),
     }
 
     init {
@@ -24,6 +21,7 @@ internal class CourierPlugin : FlutterPlugin {
     }
 
     private var clientChannel: MethodChannel? = null
+    private var clientEventChannel: MethodChannel? = null
     private var inboxChannel: MethodChannel? = null
 
     private var inboxListeners = mutableMapOf<String, CourierInboxListener>()
@@ -31,7 +29,7 @@ internal class CourierPlugin : FlutterPlugin {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 
         clientChannel = MethodChannel(flutterPluginBinding.binaryMessenger, Channels.CLIENT.channelName).apply {
-            setMethodCallHandler(CourierClientMethodHandler())
+            setMethodCallHandler(CourierClientMethodHandler(flutterPluginBinding))
         }
 
 //        // Get the core channel

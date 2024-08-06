@@ -24,6 +24,7 @@ class CourierClientOptions {
   });
 
   final client = const MethodChannel('courier_flutter_client');
+  final events = const MethodChannel('courier_flutter_client_events');
 
   Map<String, dynamic> toJson() {
     return {
