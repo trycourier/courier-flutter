@@ -4,10 +4,9 @@ import Courier_iOS
 
 public class CourierPlugin: NSObject, FlutterPlugin {
     
-    internal static let COURIER_ERROR_TAG = "Courier iOS SDK Error"
-    
     public enum Channels: String {
         case client = "courier_flutter_client"
+        case clientEvents = "courier_flutter_client_events"
     }
     
     private var inboxListeners = [String: CourierInboxListener]()
@@ -21,7 +20,8 @@ public class CourierPlugin: NSObject, FlutterPlugin {
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: Channels.client.rawValue, binaryMessenger: registrar.messenger())
-        registrar.addMethodCallDelegate(CourierClientMethodHandler(), channel: channel)
+        let handler = CourierClientMethodHandler(registrar: registrar)
+        registrar.addMethodCallDelegate(handler, channel: channel)
     }
 
 //    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

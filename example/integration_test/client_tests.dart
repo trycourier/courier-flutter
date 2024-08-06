@@ -1,3 +1,4 @@
+import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_device.dart';
@@ -14,8 +15,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   final userId = const Uuid().v1();
-  const trackingUrl =
-      "https://af6303be-0e1e-40b5-bb80-e1d9299cccff.ct0.app/t/tzgspbr4jcmcy1qkhw96m0034bvy";
+  const trackingUrl = "https://af6303be-0e1e-40b5-bb80-e1d9299cccff.ct0.app/t/tzgspbr4jcmcy1qkhw96m0034bvy";
 
   Future<String> sendMessage(String userId) {
     return ExampleServer.sendTest(Env.authKey, userId, "inbox");
@@ -95,8 +95,7 @@ void main() {
     });
     test('Get Preference Topic', () async {
       final client = await ClientBuilder.build(userId: userId);
-      final res = await client.preferences
-          .getUserPreferenceTopic(topicId: Env.preferenceTopicId);
+      final res = await client.preferences.getUserPreferenceTopic(topicId: Env.preferenceTopicId);
       expect(res.topic.topicId, Env.preferenceTopicId);
     });
     test('Put Preference Topic', () async {
@@ -172,23 +171,33 @@ void main() {
       final client = await ClientBuilder.build(userId: userId);
       await client.inbox.readAll();
     });
-    // test('Register Socket', () async {
-    //
-    //   var hold = true;
-    //
-    //   final client = await ClientBuilder.build(userId: userId);
-    //   await client.inbox.socket.receivedMessage();
-    //   await client.inbox.socket.connect();
-    //   await client.inbox.socket.sendSubscribe();
-    //
-    //   await sendMessage(userId);
-    //
-    //   // TODO: Handle the event callback
-    //
-    //   while (hold) {
-    //     // Hold
-    //   }
-    //
-    // });
+    test('Register Socket', () async {
+
+      var hold = true;
+
+      final testClient = TestClient(
+        clientKey: Env.clientKey,
+        userId: userId,
+        showLogs: true,
+      );
+
+      testClient.inbox.socket.receivedMessage();
+      testClient.inbox.socket.connect();
+      testClient.inbox.socket.sendSubscribe();
+
+      // final client = await ClientBuilder.build(userId: userId);
+      // await client.inbox.socket.receivedMessage();
+      // await client.inbox.socket.connect();
+      // await client.inbox.socket.sendSubscribe();
+
+      await sendMessage(userId);
+
+      // TODO: Handle the event callback
+
+      while (hold) {
+        // Hold
+      }
+
+    });
   });
 }

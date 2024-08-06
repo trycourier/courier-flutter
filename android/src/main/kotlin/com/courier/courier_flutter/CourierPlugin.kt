@@ -29,7 +29,8 @@ internal class CourierPlugin : FlutterPlugin {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 
         clientChannel = MethodChannel(flutterPluginBinding.binaryMessenger, Channels.CLIENT.channelName).apply {
-            setMethodCallHandler(CourierClientMethodHandler(flutterPluginBinding))
+            val handler = CourierClientMethodHandler(flutterPluginBinding)
+            setMethodCallHandler(handler)
         }
 
 //        // Get the core channel

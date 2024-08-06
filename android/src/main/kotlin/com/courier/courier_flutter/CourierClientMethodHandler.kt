@@ -6,18 +6,20 @@ import com.courier.android.models.CourierPreferenceChannel
 import com.courier.android.models.CourierPreferenceStatus
 import com.courier.android.models.CourierTrackingEvent
 import com.courier.android.modules.inboxPaginationLimit
+import com.courier.android.socket.CourierSocket
 import com.courier.android.socket.InboxSocket
 import com.courier.courier_flutter.CourierPlugin.Companion.TAG
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import java.util.UUID
 
 internal class CourierClientMethodHandler(private val flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) : MethodCallHandler {
 
     private val eventChannel by lazy { MethodChannel(flutterPluginBinding.binaryMessenger, CourierPlugin.Channels.CLIENT_EVENTS.channelName) }
 
-    private lateinit var inboxSocket: InboxSocket
+    private var sockets = mutableMapOf<String, CourierSocket>()
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = post {
 
@@ -215,14 +217,17 @@ internal class CourierClientMethodHandler(private val flutterPluginBinding: Flut
 
                 "client.inbox.socket.received_message" -> {
 
-                    inboxSocket = client.inbox.socket
+                    val socket = client.inbox.socket
 
-                    inboxSocket.receivedMessage = { message ->
+                    socket.receivedMessage = { message ->
                         eventChannel.invokeMethod(
                             "client.events.inbox.socket.received_message",
                             message.toJson()
                         )
                     }
+
+//                    val id = UUID.randomUUID().toString()
+//                    sockets[id] = listener
 
                     result.success(null)
 

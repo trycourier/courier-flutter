@@ -293,15 +293,15 @@ internal extension Dictionary<String, Any> {
     func toClient() throws -> CourierClient? {
         
         guard let options = self["options"] as? [String: Any] else {
-            throw MissingParameter(value: "options")
+            throw CourierError.missingParameter(value: "options")
         }
         
         guard let userId = options["userId"] as? String else {
-            throw MissingParameter(value: "userId")
+            throw CourierError.missingParameter(value: "userId")
         }
         
         guard let showLogs = options["showLogs"] as? Bool else {
-            throw MissingParameter(value: "showLogs")
+            throw CourierError.missingParameter(value: "showLogs")
         }
         
         let jwt = options["jwt"] as? String
@@ -322,7 +322,7 @@ internal extension Dictionary<String, Any> {
     
     func extract<T>(_ key: String) throws -> T {
         guard let value = self[key] as? T else {
-            throw MissingParameter(value: key)
+            throw CourierError.missingParameter(value: key)
         }
         return value
     }
@@ -332,11 +332,30 @@ internal extension Dictionary<String, Any> {
 internal extension Error {
     
     func toFlutterError() -> FlutterError {
-        return FlutterError.init(
-            code: CourierPlugin.COURIER_ERROR_TAG,
-            message: String(describing: self),
+        
+        let code: String
+        let message: String
+
+        switch self {
+        case let courierError as CourierError:
+            switch courierError {
+            case .missingParameter(let value):
+                message = "Missing Parameter: \(value)"
+            case .invalidParameter(let value):
+                message = "Invalid Parameter: \(value)"
+            case .unknown:
+                message = "An unknown error occurred."
+            }
+        default:
+            message = String(describing: self)
+        }
+
+        return FlutterError(
+            code: "COURIER_IOS_SDK_ERROR",
+            message: message,
             details: nil
         )
+        
     }
     
 }

@@ -7,16 +7,8 @@
 
 import Flutter
 
-internal struct MissingParameter: Error {
-    
-    let value: String
-    
-    func toFlutter() -> FlutterError {
-        return FlutterError(
-            code: CourierPlugin.COURIER_ERROR_TAG,
-            message: "Missing parameter: \(value)",
-            details: nil
-        )
-    }
-    
+internal enum CourierError: Error {
+    case missingParameter(value: String)
+    case invalidParameter(value: String)
+    case unknown
 }
