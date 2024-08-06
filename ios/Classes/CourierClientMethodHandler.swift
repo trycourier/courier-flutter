@@ -10,20 +10,9 @@ import Courier_iOS
 
 internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
     
-    private var sockets: [String: CourierSocket] = [:]
-    
-    private let registrar: FlutterPluginRegistrar
-    private let eventsChannel: FlutterMethodChannel
-    
-    init(registrar: FlutterPluginRegistrar) {
-        self.registrar = registrar
-        self.eventsChannel =  FlutterMethodChannel(name: CourierPlugin.Channels.clientEvents.rawValue, binaryMessenger: registrar.messenger())
-        super.init()
-    }
-    
     static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: CourierPlugin.Channels.client.rawValue, binaryMessenger: registrar.messenger())
-        let handler = CourierClientMethodHandler(registrar: registrar)
+        let handler = CourierClientMethodHandler()
         registrar.addMethodCallDelegate(handler, channel: channel)
     }
     
@@ -229,72 +218,6 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                 case "client.inbox.read_all_messages":
                     
                     try await client.inbox.readAll()
-                    result(nil)
-                    
-                case "client.inbox.socket.register":
-                    
-                    let socket = client.inbox.socket
-                    
-                    let id = UUID().uuidString
-                    sockets[id] = socket
-                    
-                    result(id)
-                    
-                case "client.inbox.socket.received_message":
-                    
-                    let socketId: String = try params.extract("socketId")
-                    
-                    guard let socket = sockets[socketId] as? InboxSocket else {
-                        throw CourierError.invalidParameter(value: "socketId")
-                    }
-                    
-                    socket.receivedMessage = { message in
-                        let json = message.toDictionary()
-                        self.eventsChannel.invokeMethod(
-                            "client.events.inbox.socket.received_message",
-                            arguments: json
-                        )
-                    }
-                    
-                    result(nil)
-                    
-                case "client.inbox.socket.connect":
-                    
-                    let socketId: String = try params.extract("socketId")
-                    
-                    guard let socket = sockets[socketId] as? InboxSocket else {
-                        throw CourierError.invalidParameter(value: "socketId")
-                    }
-                    
-                    try await socket.connect()
-                    
-                    result(nil)
-                    
-                case "client.inbox.socket.disconnect":
-                    
-                    let socketId: String = try params.extract("socketId")
-                    
-                    guard let socket = sockets[socketId] as? InboxSocket else {
-                        throw CourierError.invalidParameter(value: "socketId")
-                    }
-                    
-                    socket.disconnect()
-                                        
-                    sockets.removeValue(forKey: socketId)
-                    
-                    result(nil)
-                    
-                case "client.inbox.socket.send_subscribe":
-                    
-                    let socketId: String = try params.extract("socketId")
-                    
-                    guard let socket = sockets[socketId] as? InboxSocket else {
-                        throw CourierError.invalidParameter(value: "socketId")
-                    }
-                    
-                    let version: Int = params["version"] as? Int ?? 5
-                    try await socket.sendSubscribe(version: version)
-                    
                     result(nil)
                     
                     // MARK: Tracking

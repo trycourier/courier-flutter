@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:courier_flutter/channels/core_platform_interface.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';

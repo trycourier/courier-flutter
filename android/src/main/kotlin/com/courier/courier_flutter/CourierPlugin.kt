@@ -29,7 +29,7 @@ internal class CourierPlugin : FlutterPlugin {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 
         clientChannel = MethodChannel(flutterPluginBinding.binaryMessenger, Channels.CLIENT.channelName).apply {
-            val handler = CourierClientMethodHandler(flutterPluginBinding)
+            val handler = CourierClientMethodHandler()
             setMethodCallHandler(handler)
         }
 

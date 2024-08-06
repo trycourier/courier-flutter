@@ -5,7 +5,6 @@ import 'package:courier_flutter/models/courier_inbox_messages.dart';
 
 class InboxClient {
 
-  late final InboxSocket socket = InboxSocket(_options);
   final CourierClientOptions _options;
 
   InboxClient(this._options);
@@ -73,50 +72,6 @@ class InboxClient {
 
   Future readAll() async {
     await _options.invokeClient('client.inbox.read_all_messages');
-  }
-
-}
-
-class InboxSocket {
-
-  String? _id;
-  final CourierClientOptions _options;
-  // Function(InboxMessage)? receivedMessage;
-
-  InboxSocket(this._options) {
-
-    // _options.events.setMethodCallHandler((call) {
-    //   switch (call.method) {
-    //     case 'client.events.inbox.socket.received_message':
-    //       print("HERE");
-    //   }
-    //   return Future.value();
-    // });
-
-  }
-
-  Future<String> _register() async {
-    _id ??= await _options.invokeClient('client.inbox.socket.register');
-    return _id!;
-  }
-
-  Future receivedMessage() async {
-    await _options.invokeClient('client.inbox.socket.received_message', {
-      'socketId': await _register()
-    });
-  }
-
-  Future connect() async {
-    await _options.invokeClient('client.inbox.socket.connect', {
-      'socketId': await _register()
-    });
-  }
-
-  Future sendSubscribe({int version = 5}) async {
-    await _options.invokeClient('client.inbox.socket.send_subscribe', {
-      'socketId': await _register(),
-      'version': version,
-    });
   }
 
 }

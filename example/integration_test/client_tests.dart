@@ -171,33 +171,5 @@ void main() {
       final client = await ClientBuilder.build(userId: userId);
       await client.inbox.readAll();
     });
-    test('Register Socket', () async {
-
-      var hold = true;
-
-      final testClient = TestClient(
-        clientKey: Env.clientKey,
-        userId: userId,
-        showLogs: true,
-      );
-
-      testClient.inbox.socket.receivedMessage();
-      testClient.inbox.socket.connect();
-      testClient.inbox.socket.sendSubscribe();
-
-      // final client = await ClientBuilder.build(userId: userId);
-      // await client.inbox.socket.receivedMessage();
-      // await client.inbox.socket.connect();
-      // await client.inbox.socket.sendSubscribe();
-
-      await sendMessage(userId);
-
-      // TODO: Handle the event callback
-
-      while (hold) {
-        // Hold
-      }
-
-    });
   });
 }
