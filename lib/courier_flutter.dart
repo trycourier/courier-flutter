@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:courier_flutter/channels/core_platform_interface.dart';
+import 'package:courier_flutter/channels/core_method_channel.dart';
 import 'package:courier_flutter/channels/events_platform_interface.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
@@ -73,7 +72,7 @@ class Courier {
   bool get isDebugging => _isDebugging;
 
   set isDebugging(bool isDebugging) {
-    CourierFlutterCorePlatform.instance.isDebugging(isDebugging);
+    // CourierFlutterCorePlatform.instance.isDebugging(isDebugging);
     _isDebugging = isDebugging;
   }
 
@@ -107,15 +106,20 @@ class Courier {
   /// This will persist across app sessions so that messages
   /// are associated with the correct user.
   /// Be sure to call `signOut()` when you want to remove the user credentials.
-  Future signIn({ required String accessToken, required String userId, String? clientKey, String? tenantId }) {
-    return CourierFlutterCorePlatform.instance.signIn(accessToken: accessToken, userId: userId, clientKey: clientKey, tenantId: tenantId);
+  Future signIn({ required String userId, required String accessToken, String? clientKey, String? tenantId }) async {
+    await CourierFlutterCorePlatform.instance.signIn(
+        userId: userId,
+        accessToken: accessToken,
+        clientKey: clientKey,
+        tenantId: tenantId
+    );
   }
 
-  /// Removed native level locally stored values for the user and access token
+  /// Removes native level locally stored values for the user and access token
   /// Will also delete the current apns / fcm tokens in Courier token management
   /// So your user does not receive notifications if they are not signed in
-  Future signOut() {
-    return CourierFlutterCorePlatform.instance.signOut();
+  Future<String> signOut() async {
+    return await CourierFlutterCorePlatform.instance.signOut();
   }
 
   Future<CourierInboxListener> addInboxListener({ Function? onInitialLoad, Function(dynamic error)? onError, Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged }) {
