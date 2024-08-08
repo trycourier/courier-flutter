@@ -462,6 +462,28 @@ class CourierRC extends CourierSharedChannel {
     });
   }
 
+  // Inbox
+
+  @override
+  Future<int> get inboxPaginationLimit async {
+    final result = await _channel.invokeMethod('shared.inbox.get_pagination_limit');
+    return result ?? 32;
+  }
+
+  @override
+  Future setInboxPaginationLimit({required int limit}) async {
+    await _channel.invokeMethod('shared.inbox.set_pagination_limit', {
+      'limit': limit,
+    });
+  }
+
+  @override
+  Future<List<InboxMessage>> get inboxMessages async {
+    List<dynamic> messages = await _channel.invokeMethod('shared.inbox.get_messages');
+    List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
+    return inboxMessages;
+  }
+
 }
 
 abstract class CourierSharedChannel extends PlatformInterface {
@@ -519,5 +541,15 @@ abstract class CourierSharedChannel extends PlatformInterface {
   Future<String?> getTokenForProvider({required CourierPushProvider provider}) async {
     throw UnimplementedError('getTokenForProvider() has not been implemented.');
   }
+
+  // Inbox
+
+  Future<int> get inboxPaginationLimit => throw UnimplementedError('inboxPaginationLimit has not been implemented.');
+
+  Future setInboxPaginationLimit({required int limit}) async {
+    throw UnimplementedError('setInboxPaginationLimit() has not been implemented.');
+  }
+
+  Future<List<InboxMessage>> get inboxMessages => throw UnimplementedError('inboxMessages has not been implemented.');
 
 }

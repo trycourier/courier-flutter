@@ -196,4 +196,35 @@ void main() {
 
   });
 
+  group('Inbox', () {
+
+    setUp(() async {
+      await CourierRC.shared.signOut();
+    });
+
+    test('Pagination Limit', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      await CourierRC.shared.setInboxPaginationLimit(limit: -100);
+      final limit1 = await CourierRC.shared.inboxPaginationLimit;
+      expect(limit1, 1);
+
+      await CourierRC.shared.setInboxPaginationLimit(limit: 10000);
+      final limit2 = await CourierRC.shared.inboxPaginationLimit;
+      expect(limit2, 100);
+
+    });
+
+    test('Get Inbox Messages', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messages = await CourierRC.shared.inboxMessages;
+      expect(messages, []);
+
+    });
+
+  });
+
 }

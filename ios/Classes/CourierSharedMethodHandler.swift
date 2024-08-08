@@ -183,6 +183,34 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     )
                     
                     result(token)
+                    
+                    // MARK: Inbox
+                    
+                case "shared.inbox.get_pagination_limit":
+                    
+                    let limit = Courier.shared.inboxPaginationLimit
+                    
+                    result(limit)
+                    
+                case "shared.inbox.set_pagination_limit":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let limit: Int = try params.extract("limit")
+                    
+                    Courier.shared.inboxPaginationLimit = limit
+                    
+                    result(nil)
+                    
+                case "shared.inbox.get_messages":
+                    
+                    let messages = await Courier.shared.inboxMessages
+                    
+                    let json = messages.map { $0.toDictionary() }
+                    
+                    result(json)
                 
                     
                 default:
