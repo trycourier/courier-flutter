@@ -225,6 +225,23 @@ void main() {
 
     });
 
+    test('Refresh Inbox', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      await CourierRC.shared.refreshInbox();
+
+    });
+
+    test('Fetch Next Page', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messages = await CourierRC.shared.fetchNextInboxPage();
+      expect(messages, []);
+
+    });
+
   });
 
 }

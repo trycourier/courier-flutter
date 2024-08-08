@@ -211,6 +211,20 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     let json = messages.map { $0.toDictionary() }
                     
                     result(json)
+                    
+                case "shared.inbox.refresh":
+                    
+                    await Courier.shared.refreshInbox()
+                    
+                    result(nil)
+                    
+                case "shared.inbox.fetch_next_page":
+                    
+                    let messages = try await Courier.shared.fetchNextInboxPage()
+                    
+                    let json = messages.map { $0.toDictionary() }
+                    
+                    result(json)
                 
                     
                 default:

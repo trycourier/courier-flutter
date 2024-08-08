@@ -484,6 +484,18 @@ class CourierRC extends CourierSharedChannel {
     return inboxMessages;
   }
 
+  @override
+  Future refreshInbox() async {
+    await _channel.invokeMethod('shared.inbox.refresh');
+  }
+
+  @override
+  Future<List<InboxMessage>> fetchNextInboxPage() async {
+    List<dynamic> messages = await _channel.invokeMethod('shared.inbox.fetch_next_page');
+    List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
+    return inboxMessages;
+  }
+
 }
 
 abstract class CourierSharedChannel extends PlatformInterface {
@@ -551,5 +563,13 @@ abstract class CourierSharedChannel extends PlatformInterface {
   }
 
   Future<List<InboxMessage>> get inboxMessages => throw UnimplementedError('inboxMessages has not been implemented.');
+
+  Future refreshInbox() async {
+    throw UnimplementedError('refreshInbox() has not been implemented.');
+  }
+
+  Future<List<InboxMessage>> fetchNextInboxPage() async {
+    throw UnimplementedError('fetchNextInboxPage() has not been implemented.');
+  }
 
 }
