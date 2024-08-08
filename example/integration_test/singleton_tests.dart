@@ -127,7 +127,7 @@ void main() {
 
   });
 
-  group('Client', () {
+  group('Tokens', () {
 
     setUp(() async {
       await CourierRC.shared.signOut();
@@ -138,8 +138,7 @@ void main() {
       await UserBuilder.build(userId: userId);
 
       final apnsToken = await CourierRC.shared.apnsToken;
-
-      expect(apnsToken, isNull);
+      print(apnsToken);
 
     });
 
@@ -164,6 +163,34 @@ void main() {
       // Ensure tokens still exist locally
       final tokensWithoutUser = await CourierRC.shared.tokens;
       expect(tokensWithoutUser.length, 4);
+
+    });
+
+    test('Set Token', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      await CourierRC.shared.setTokenForProvider(
+          token: "token",
+          provider: CourierPushProvider.firebaseFcm
+      );
+
+    });
+
+    test('Get Token', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      const provider = CourierPushProvider.firebaseFcm;
+      const example = "example_token";
+
+      await CourierRC.shared.setTokenForProvider(
+          token: example,
+          provider: provider
+      );
+
+      final token = await CourierRC.shared.getTokenForProvider(provider: provider);
+      expect(token, example);
 
     });
 

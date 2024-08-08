@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:courier_flutter/channels/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/courier_client.dart';
@@ -421,7 +422,12 @@ class CourierRC extends CourierSharedChannel {
   // Tokens
 
   @override
-  Future<String?> get apnsToken => _channel.invokeMethod('shared.tokens.get_apns_token');
+  Future<String?> get apnsToken async {
+    if (!Platform.isIOS) { // TODO: Add macOS support in the future
+      return null;
+    }
+    return await _channel.invokeMethod('shared.tokens.get_apns_token');
+  }
 
   @override
   Future<Map<String, String>> get tokens async {
@@ -450,7 +456,7 @@ class CourierRC extends CourierSharedChannel {
   }
 
   @override
-  Future<String?> getTokenForProvider({required String token, required CourierPushProvider provider}) async {
+  Future<String?> getTokenForProvider({required CourierPushProvider provider}) async {
     return await _channel.invokeMethod('shared.tokens.get_token', {
       'provider': provider.value,
     });
@@ -510,7 +516,7 @@ abstract class CourierSharedChannel extends PlatformInterface {
     throw UnimplementedError('getToken() has not been implemented.');
   }
 
-  Future<String?> getTokenForProvider({required String token, required CourierPushProvider provider}) async {
+  Future<String?> getTokenForProvider({required CourierPushProvider provider}) async {
     throw UnimplementedError('getTokenForProvider() has not been implemented.');
   }
 
