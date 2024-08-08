@@ -32,6 +32,18 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 
                 switch call.method {
                     
+                    // MARK: Client
+                    
+                case "shared.client.get_options":
+                    
+                    let client = Courier.shared.client
+                    
+                    let options = [
+                        "jwt": client?.options.jwt
+                    ]
+                    
+                    result(<#T##Any?#>)
+                    
                     // MARK: Authentication
                     
                 case "shared.auth.user_id":
@@ -119,6 +131,20 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     authenticationListeners.removeAll()
                     
                     result(nil)
+                    
+                    // MARK: Push
+                    
+//                case "shared.auth.remove_all_authentication_listeners":
+//                    
+//                    Courier.shared.
+//                    
+//                    for value in authenticationListeners.values {
+//                        value.remove()
+//                    }
+//                    
+//                    authenticationListeners.removeAll()
+//                    
+//                    result(nil)
                 
                     
                 default:
