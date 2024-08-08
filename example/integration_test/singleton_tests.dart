@@ -20,6 +20,60 @@ void main() {
     return Future.delayed(Duration(milliseconds: milliseconds));
   }
 
+  group('Client', () {
+
+    setUp(() async {
+      await CourierRC.shared.signOut();
+    });
+
+    test('Null', () async {
+
+      final client = await CourierRC.shared.client;
+
+      expect(client?.options.jwt, isNull);
+      expect(client?.options.userId, isNull);
+
+    });
+
+    test('Options', () async {
+
+      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
+
+      await CourierRC.shared.signIn(
+        userId: userId,
+        accessToken: jwt,
+        clientKey: Env.clientKey,
+        showLogs: true,
+      );
+
+      final client = await CourierRC.shared.client;
+
+      expect(client?.options.jwt, jwt);
+      expect(client?.options.userId, userId);
+
+    });
+
+    test('Use API', () async {
+
+      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
+
+      await CourierRC.shared.signIn(
+        userId: userId,
+        accessToken: jwt,
+        clientKey: Env.clientKey,
+        showLogs: true,
+      );
+
+      final client = await CourierRC.shared.client;
+
+      final res = await client?.brands.getBrand(brandId: Env.brandId);
+
+      expect(res?.data?.brand, isNotNull);
+
+    });
+
+  });
+
   group('Authentication', () {
 
     setUp(() async {

@@ -1,5 +1,5 @@
 //
-//  CourierEventsChannel.swift
+//  CourierFlutterChannel.swift
 //  courier_flutter
 //
 //  Created by Michael Miller on 8/8/24.
@@ -7,13 +7,13 @@
 
 import Flutter
 
-internal enum CourierChannel: String {
+internal enum CourierFlutterChannel: String {
     case shared = "courier_flutter_shared"
     case client = "courier_flutter_client"
     case events = "courier_flutter_events"
 }
 
-internal extension CourierChannel {
+internal extension CourierFlutterChannel {
     
     var channel: FlutterMethodChannel? {
         get {

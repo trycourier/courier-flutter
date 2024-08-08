@@ -7,6 +7,6 @@ class CourierAuthenticationListener {
 
   CourierAuthenticationListener({ required this.listenerId, required this.onUserStateChanged });
 
-  Future remove() async => await CourierRC.shared.removeAuthenticationListener(id: listenerId);
+  Future remove() async => await CourierRC.shared.removeAuthenticationListener(listenerId: listenerId);
 
 }

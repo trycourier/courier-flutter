@@ -10,7 +10,7 @@ import Courier_iOS
 internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
     
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
-        return FlutterMethodChannel(name: CourierChannel.shared.rawValue, binaryMessenger: registrar.messenger())
+        return FlutterMethodChannel(name: CourierFlutterChannel.shared.rawValue, binaryMessenger: registrar.messenger())
     }
     
     static func register(with registrar: any FlutterPluginRegistrar) {
@@ -36,13 +36,21 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                 case "shared.client.get_options":
                     
-                    let client = Courier.shared.client
+                    guard let options = Courier.shared.client?.options else {
+                        result(nil)
+                        return
+                    }
                     
-                    let options = [
-                        "jwt": client?.options.jwt
+                    let dict: [String : Any?] = [
+                        "jwt": options.jwt,
+                        "clientKey": options.clientKey,
+                        "userId": options.userId,
+                        "connectionId": options.connectionId,
+                        "tenantId": options.tenantId,
+                        "showLogs": options.showLogs,
                     ]
                     
-                    result(<#T##Any?#>)
+                    result(dict)
                     
                     // MARK: Authentication
                     
@@ -92,7 +100,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     let listener = Courier.shared.addAuthenticationListener { userId in
                         
                         // Call the event function
-                        CourierChannel.events.channel?.invokeMethod("events.shared.auth.state_changed", arguments: [
+                        CourierFlutterChannel.events.channel?.invokeMethod("events.shared.auth.state_changed", arguments: [
                             "userId": userId
                         ])
                         

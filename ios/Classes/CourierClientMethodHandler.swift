@@ -11,13 +11,13 @@ import Courier_iOS
 internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
     
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
-        return FlutterMethodChannel(name: CourierChannel.client.rawValue, binaryMessenger: registrar.messenger())
+        return FlutterMethodChannel(name: CourierFlutterChannel.client.rawValue, binaryMessenger: registrar.messenger())
     }
     
     static func register(with registrar: any FlutterPluginRegistrar) {
         registrar.addMethodCallDelegate(
-            CourierSharedMethodHandler(),
-            channel: CourierSharedMethodHandler.getChannel(with: registrar)
+            CourierClientMethodHandler(),
+            channel: CourierClientMethodHandler.getChannel(with: registrar)
         )
     }
     

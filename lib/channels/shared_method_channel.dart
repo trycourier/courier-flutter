@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:courier_flutter/channels/courier_flutter_channels.dart';
+import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_authentication_listener.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
@@ -350,6 +351,23 @@ class CourierRC extends CourierSharedChannel {
 
   }
 
+  // Client
+
+  @override
+  Future<CourierClient?> get client async {
+    final options = await _channel.invokeMethod('shared.client.get_options');
+    return options == null ? null : CourierClient(
+      jwt: options['jwt'],
+      clientKey: options['clientKey'],
+      userId: options['userId'],
+      tenantId: options['tenantId'],
+      connectionId: options['connectionId'],
+      showLogs: options['showLogs'],
+    );
+  }
+
+  // Authentication
+
   @override
   Future<String?> get userId => _channel.invokeMethod('shared.auth.user_id');
 
@@ -386,11 +404,11 @@ class CourierRC extends CourierSharedChannel {
   }
 
   @override
-  Future removeAuthenticationListener({ required String id }) async {
+  Future removeAuthenticationListener({ required String listenerId }) async {
     await _channel.invokeMethod('shared.auth.remove_authentication_listener', {
-      'listenerId': id,
+      'listenerId': listenerId,
     });
-    _authenticationListeners.remove(id);
+    _authenticationListeners.remove(listenerId);
   }
 
   @override
@@ -405,6 +423,10 @@ abstract class CourierSharedChannel extends PlatformInterface {
 
   final _channel = CourierFlutterChannels.shared;
   CourierSharedChannel({required super.token});
+
+  // Client
+
+  Future<CourierClient?> get client => throw UnimplementedError('client has not been implemented.');
 
   // Authentication
 
@@ -424,7 +446,7 @@ abstract class CourierSharedChannel extends PlatformInterface {
     throw UnimplementedError('addAuthenticationListener() has not been implemented.');
   }
 
-  Future removeAuthenticationListener({ required String id }) async {
+  Future removeAuthenticationListener({ required String listenerId }) async {
     throw UnimplementedError('removeAuthenticationListener() has not been implemented.');
   }
 
