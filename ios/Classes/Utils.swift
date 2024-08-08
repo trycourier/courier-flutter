@@ -8,26 +8,6 @@
 import Foundation
 import Courier_iOS
 
-extension UIWindow {
-    
-    var messanger: FlutterBinaryMessenger? {
-        get {
-            let flutterViewController = rootViewController as? FlutterViewController
-            let binaryMessenger = flutterViewController as? FlutterBinaryMessenger
-            return binaryMessenger
-        }
-    }
-    
-}
-
-extension FlutterBinaryMessenger {
-    
-    func channel(id: String) -> FlutterMethodChannel {
-        return FlutterMethodChannel(name: id, binaryMessenger: self)
-    }
-    
-}
-
 extension UNAuthorizationStatus {
     
     var name: String {
@@ -455,6 +435,29 @@ internal extension NSDictionary {
             print("Error converting NSDictionary to JSON: \(error)")
             return nil
         }
+    }
+    
+}
+
+internal extension UIApplication {
+    
+    func makeChannel(id: String) -> FlutterMethodChannel? {
+        
+        // Get window
+        guard let window = windows.first(where: { $0.isKeyWindow }) else {
+            return nil
+        }
+        
+        // Get messenger
+        let flutterViewController = window.rootViewController as? FlutterViewController
+        let binaryMessenger = flutterViewController as? FlutterBinaryMessenger
+        guard let messenger = binaryMessenger else {
+            return nil
+        }
+        
+        // Create the channel
+        return FlutterMethodChannel(name: id, binaryMessenger: messenger)
+        
     }
     
 }

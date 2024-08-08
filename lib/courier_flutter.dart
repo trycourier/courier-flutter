@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:courier_flutter/channels/core_method_channel.dart';
 import 'package:courier_flutter/channels/events_platform_interface.dart';
+import 'package:courier_flutter/channels/shared_method_channel.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/courier_provider.dart';
@@ -90,16 +90,16 @@ class Courier {
   }
 
   /// Returns the currently stored ids in the native SDK
-  Future<String?> get userId => CourierFlutterCorePlatform.instance.userId();
-  Future<String?> get tenantId => CourierFlutterCorePlatform.instance.tenantId();
+  Future<String?> get userId => Courier2.shared.userId();
+  Future<String?> get tenantId => Courier2.shared.tenantId();
 
   /// Returns the current token for a provider
-  Future<String?> getToken({ required String provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider);
-  Future<String?> getTokenForProvider({ required CourierPushProvider provider }) => CourierFlutterCorePlatform.instance.getToken(provider: provider.value);
+  Future<String?> getToken({ required String provider }) => Courier2.shared.getToken(provider: provider);
+  Future<String?> getTokenForProvider({ required CourierPushProvider provider }) => Courier2.shared.getToken(provider: provider.value);
 
   /// Sets the current token for a provider
-  Future setToken({ required String provider, required String token }) => CourierFlutterCorePlatform.instance.setToken(provider: provider, token: token);
-  Future setTokenForProvider({ required CourierPushProvider provider, required String token }) => CourierFlutterCorePlatform.instance.setToken(provider: provider.value, token: token);
+  Future setToken({ required String provider, required String token }) => Courier2.shared.setToken(provider: provider, token: token);
+  Future setTokenForProvider({ required CourierPushProvider provider, required String token }) => Courier2.shared.setToken(provider: provider.value, token: token);
 
   /// Stores the current user credentials in native level storage.
   /// You likely want to be calling this where you normally manage your user's state.
@@ -107,64 +107,64 @@ class Courier {
   /// are associated with the correct user.
   /// Be sure to call `signOut()` when you want to remove the user credentials.
   Future signIn({ required String userId, required String accessToken, String? clientKey, String? tenantId }) async {
-    await CourierFlutterCorePlatform.instance.signIn(
+    await Courier2.shared.signIn(
         userId: userId,
         accessToken: accessToken,
         clientKey: clientKey,
-        tenantId: tenantId
+        tenantId: tenantId,
     );
   }
 
   /// Removes native level locally stored values for the user and access token
   /// Will also delete the current apns / fcm tokens in Courier token management
   /// So your user does not receive notifications if they are not signed in
-  Future<String> signOut() async {
-    return await CourierFlutterCorePlatform.instance.signOut();
+  Future signOut() async {
+    await Courier2.shared.signOut();
   }
 
   Future<CourierInboxListener> addInboxListener({ Function? onInitialLoad, Function(dynamic error)? onError, Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged }) {
-    return CourierFlutterCorePlatform.instance.addInboxListener(onInitialLoad, onError, onMessagesChanged);
+    return Courier2.shared.addInboxListener(onInitialLoad, onError, onMessagesChanged);
   }
 
   Future<String> removeInboxListener({ required String id }) {
-    return CourierFlutterCorePlatform.instance.removeInboxListener(id: id);
+    return Courier2.shared.removeInboxListener(id: id);
   }
 
   Future<int> setInboxPaginationLimit({ required int limit }) {
-    return CourierFlutterCorePlatform.instance.setInboxPaginationLimit(limit: limit);
+    return Courier2.shared.setInboxPaginationLimit(limit: limit);
   }
 
   Future refreshInbox() {
-    return CourierFlutterCorePlatform.instance.refreshInbox();
+    return Courier2.shared.refreshInbox();
   }
 
   Future<List<InboxMessage>> fetchNextPageOfMessages() {
-    return CourierFlutterCorePlatform.instance.fetchNextPageOfMessages();
+    return Courier2.shared.fetchNextPageOfMessages();
   }
 
   Future clickMessage({ required String id }) {
-    return CourierFlutterCorePlatform.instance.clickMessage(id: id);
+    return Courier2.shared.clickMessage(id: id);
   }
 
   Future readMessage({ required String id }) {
-    return CourierFlutterCorePlatform.instance.readMessage(id: id);
+    return Courier2.shared.readMessage(id: id);
   }
 
   Future unreadMessage({ required String id }) {
-    return CourierFlutterCorePlatform.instance.unreadMessage(id: id);
+    return Courier2.shared.unreadMessage(id: id);
   }
 
   Future readAllInboxMessages() {
-    return CourierFlutterCorePlatform.instance.readAllInboxMessages();
+    return Courier2.shared.readAllInboxMessages();
   }
 
   Future<CourierBrand?> getBrand({ required String id }) async {
-    final brand = await CourierFlutterCorePlatform.instance.getBrand(id: id);
+    final brand = await Courier2.shared.getBrand(id: id);
     return brand != null ? CourierBrand.fromJson(brand) : null;
   }
 
   Future<CourierUserPreferences> getUserPreferences({ String? paginationCursor }) {
-    return CourierFlutterCorePlatform.instance.getUserPreferences(paginationCursor: paginationCursor);
+    return Courier2.shared.getUserPreferences(paginationCursor: paginationCursor);
   }
 
   // Future<CourierUserPreferencesTopic> getUserPreferencesTopic({ required String topicId }) {
@@ -172,7 +172,7 @@ class Courier {
   // }
 
   Future<dynamic> putUserPreferencesTopic({ required String topicId, required CourierUserPreferencesStatus status, required bool hasCustomRouting, required List<CourierUserPreferencesChannel> customRouting }) {
-    return CourierFlutterCorePlatform.instance.putUserPreferencesTopic(topicId: topicId, status: status.value, hasCustomRouting: hasCustomRouting, customRouting: customRouting.map((e) => e.value).toList());
+    return Courier2.shared.putUserPreferencesTopic(topicId: topicId, status: status.value, hasCustomRouting: hasCustomRouting, customRouting: customRouting.map((e) => e.value).toList());
   }
 
   /// Requests notification permission from your user (the popup dialog)

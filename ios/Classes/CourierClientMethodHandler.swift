@@ -10,10 +10,8 @@ import Courier_iOS
 
 internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
     
-    static let name = "courier_flutter_client"
-    
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
-        return FlutterMethodChannel(name: CourierSharedMethodHandler.name, binaryMessenger: registrar.messenger())
+        return FlutterMethodChannel(name: CourierChannel.client.rawValue, binaryMessenger: registrar.messenger())
     }
     
     static func register(with registrar: any FlutterPluginRegistrar) {
@@ -277,9 +275,9 @@ extension Dictionary where Key == String, Value == Any {
         let model = self["model"] as? String
         
         return CourierDevice(
-            app_id: appId,
-            ad_id: adId,
-            device_id: deviceId,
+            appId: appId,
+            adId: adId,
+            deviceId: deviceId,
             platform: platform,
             manufacturer: manufacturer,
             model: model

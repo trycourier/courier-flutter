@@ -1,3 +1,4 @@
+import 'package:courier_flutter/channels/shared_method_channel.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,30 +23,68 @@ void main() {
   group('Authentication', () {
 
     setUp(() async {
-      await Courier.shared.signOut();
+      await CourierRC.shared.signOut();
     });
 
     test('Sign Out', () async {
-      await Courier.shared.signOut();
-      final currentUserId = await Courier.shared.userId;
-      final currentTenantId = await Courier.shared.tenantId;
+
+      await CourierRC.shared.signOut();
+
+      final currentUserId = await CourierRC.shared.userId;
+      final currentTenantId = await CourierRC.shared.tenantId;
+      final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
+
       expect(currentUserId, isNull);
       expect(currentTenantId, isNull);
+      expect(isUserSignedIn, false);
+
     });
 
     test('Sign In', () async {
 
       final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
-      await Courier.shared.signIn(
-          userId: userId,
-          accessToken: jwt,
-          clientKey: Env.clientKey,
+
+      await CourierRC.shared.signIn(
+        userId: userId,
+        accessToken: jwt,
+        clientKey: Env.clientKey,
+        showLogs: true,
       );
 
-      final currentUserId = await Courier.shared.userId;
-      final currentTenantId = await Courier.shared.tenantId;
-      expect(currentUserId, isNull);
+      final currentUserId = await CourierRC.shared.userId;
+      final currentTenantId = await CourierRC.shared.tenantId;
+      final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
+      expect(currentUserId, userId);
       expect(currentTenantId, isNull);
+      expect(isUserSignedIn, true);
+
+    });
+
+    test('Authentication Listener', () async {
+
+      var hold = true;
+
+      final listener = await CourierRC.shared.addAuthenticationListener((userId) {
+        hold = userId == null;
+      });
+
+      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
+
+      await CourierRC.shared.signIn(
+        userId: userId,
+        accessToken: jwt,
+        clientKey: Env.clientKey,
+        showLogs: true,
+      );
+
+      final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
+      expect(isUserSignedIn, true);
+
+      while (hold) {
+        // Hold
+      }
+
+      await listener.remove();
 
     });
 

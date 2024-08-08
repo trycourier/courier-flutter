@@ -1,3 +1,4 @@
+import 'package:courier_flutter/channels/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/brand_client.dart';
 import 'package:courier_flutter/client/inbox_client.dart';
 import 'package:courier_flutter/client/preference_client.dart';
@@ -23,8 +24,6 @@ class CourierClientOptions {
     required this.showLogs,
   });
 
-  final client = const MethodChannel('courier_flutter_client');
-
   Map<String, dynamic> toJson() {
     return {
       'jwt': jwt,
@@ -41,7 +40,7 @@ class CourierClientOptions {
       'options': toJson(),
       if (arguments is Map<String, dynamic>) ...arguments,
     };
-    return client.invokeMethod(method, invokingArguments);
+    return CourierFlutterChannels.client.invokeMethod(method, invokingArguments);
   }
 }
 

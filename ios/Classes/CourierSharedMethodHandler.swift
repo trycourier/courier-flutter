@@ -9,10 +9,8 @@ import Courier_iOS
 
 internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
     
-    static let name = "courier_flutter_shared"
-    
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
-        return FlutterMethodChannel(name: CourierSharedMethodHandler.name, binaryMessenger: registrar.messenger())
+        return FlutterMethodChannel(name: CourierChannel.shared.rawValue, binaryMessenger: registrar.messenger())
     }
     
     static func register(with registrar: any FlutterPluginRegistrar) {
@@ -22,6 +20,8 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
         )
     }
     
+    // MARK: Listeners
+    private var authenticationListeners = [String: CourierAuthenticationListener]()
     private var inboxListeners = [String: CourierInboxListener]()
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -30,15 +30,27 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
             
             do {
                 
-                guard let params = call.arguments as? Dictionary<String, Any> else {
-                    throw CourierError.missingParameter(value: "params")
-                }
-                
                 switch call.method {
                     
                     // MARK: Authentication
                     
+                case "shared.auth.user_id":
+                    
+                    result(Courier.shared.userId)
+                    
+                case "shared.auth.tenant_id":
+                    
+                    result(Courier.shared.tenantId)
+                    
+                case "shared.auth.is_user_signed_in":
+                    
+                    result(Courier.shared.isUserSignedIn)
+                    
                 case "shared.auth.sign_in":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
                     
                     let userId: String = try params.extract("userId")
                     let tenantId = params["tenantId"] as? String
@@ -62,43 +74,41 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                     result(nil)
                     
-                    // MARK: Inbox
+                case "shared.auth.add_authentication_listener":
                     
-//                case "shared.inbox.add_inbox_listener":
-//                    
-//                    let channel = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.messanger?.channel(id: CourierFlutterPlugin.INBOX_CHANNEL)
-//
-//                    // Register the listener
-//                    let listener = Courier.shared.addInboxListener(
-//                        onInitialLoad: {
-//                            
-//                            channel?.invokeMethod("onInitialLoad", arguments: nil)
-//                            
-//                        },
-//                        onError: { error in
-//                            
-//                            channel?.invokeMethod("onError", arguments: String(describing: error))
-//                            
-//                        },
-//                        onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
-//                            
-//                            let json: [String: Any] = [
-//                                "messages": messages.map { $0.toDictionary() },
-//                                "unreadMessageCount": unreadMessageCount,
-//                                "totalMessageCount": totalMessageCount,
-//                                "canPaginate": canPaginate
-//                            ]
-//                            
-//                            channel?.invokeMethod("onMessagesChanged", arguments: json)
-//                            
-//                        }
-//                    )
-//                    
-//                    // Create an id and add the listener to the dictionary
-//                    let id = UUID().uuidString
-//                    inboxListeners[id] = listener
-//                    
-//                    result(id)
+                    // Create the listener
+                    let listener = Courier.shared.addAuthenticationListener { userId in
+                        
+                        // Call the event function
+                        CourierChannel.events.channel?.invokeMethod("events.shared.auth.state_changed", arguments: [
+                            "userId": userId
+                        ])
+                        
+                    }
+                    
+                    // Hold reference to the auth listeners
+                    let id = UUID().uuidString
+                    authenticationListeners[id] = listener
+                    
+                    // Return the id of the listener
+                    result(id)
+                    
+                case "shared.auth.remove_authentication_listener":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let listenerId: String = try params.extract("listenerId")
+                    
+                    // Get and remove the listener
+                    guard let listener = authenticationListeners[listenerId] else {
+                        throw CourierError.invalidParameter(value: "listenerId")
+                    }
+                    
+                    listener.remove()
+                    
+                    result(nil)
                 
                     
                 default:
