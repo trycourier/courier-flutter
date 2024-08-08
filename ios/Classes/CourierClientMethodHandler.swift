@@ -262,27 +262,3 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
     }
     
 }
-
-extension Dictionary where Key == String, Value == Any {
-    
-    func toCourierDevice() throws -> CourierDevice? {
-        
-        let appId = self["app_id"] as? String
-        let adId = self["ad_id"] as? String
-        let deviceId = self["device_id"] as? String
-        let platform = self["platform"] as? String
-        let manufacturer = self["manufacturer"] as? String
-        let model = self["model"] as? String
-        
-        return CourierDevice(
-            appId: appId,
-            adId: adId,
-            deviceId: deviceId,
-            platform: platform,
-            manufacturer: manufacturer,
-            model: model
-        )
-        
-    }
-    
-}

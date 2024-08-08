@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:courier_flutter/channels/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_authentication_listener.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
@@ -417,6 +418,44 @@ class CourierRC extends CourierSharedChannel {
     _authenticationListeners.clear();
   }
 
+  // Tokens
+
+  @override
+  Future<String?> get apnsToken => _channel.invokeMethod('shared.tokens.get_apns_token');
+
+  @override
+  Future<Map<String, String>> get tokens async {
+    final result = await _channel.invokeMethod('shared.tokens.get_all_tokens');
+    return result?.cast<String, String>() ?? {};
+  }
+
+  @override
+  Future setToken({required String token, required String provider}) async {
+    await _channel.invokeMethod('shared.tokens.set_token', {
+      'token': token,
+      'provider': provider,
+    });
+  }
+
+  @override
+  Future setTokenForProvider({required String token, required CourierPushProvider provider}) async {
+    await setToken(token: token, provider: provider.value);
+  }
+
+  @override
+  Future<String?> getToken({required String provider}) async {
+    return await _channel.invokeMethod('shared.tokens.get_token', {
+      'provider': provider,
+    });
+  }
+
+  @override
+  Future<String?> getTokenForProvider({required String token, required CourierPushProvider provider}) async {
+    return await _channel.invokeMethod('shared.tokens.get_token', {
+      'provider': provider.value,
+    });
+  }
+
 }
 
 abstract class CourierSharedChannel extends PlatformInterface {
@@ -455,5 +494,24 @@ abstract class CourierSharedChannel extends PlatformInterface {
   }
 
   // Tokens
+
+  Future<String?> get apnsToken => throw UnimplementedError('apnsToken has not been implemented.');
+  Future<Map<String, String>> get tokens => throw UnimplementedError('tokens has not been implemented.');
+
+  Future setToken({required String token, required String provider}) async {
+    throw UnimplementedError('setToken() has not been implemented.');
+  }
+
+  Future setTokenForProvider({required String token, required CourierPushProvider provider}) async {
+    throw UnimplementedError('setTokenForProvider() has not been implemented.');
+  }
+
+  Future<String?> getToken({required String provider}) async {
+    throw UnimplementedError('getToken() has not been implemented.');
+  }
+
+  Future<String?> getTokenForProvider({required String token, required CourierPushProvider provider}) async {
+    throw UnimplementedError('getTokenForProvider() has not been implemented.');
+  }
 
 }

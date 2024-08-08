@@ -1,11 +1,13 @@
 import 'package:courier_flutter/channels/shared_method_channel.dart';
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:uuid/uuid.dart';
 
 import 'example_server.dart';
+import 'user_builder.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -37,32 +39,17 @@ void main() {
 
     test('Options', () async {
 
-      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
-
-      await CourierRC.shared.signIn(
-        userId: userId,
-        accessToken: jwt,
-        clientKey: Env.clientKey,
-        showLogs: true,
-      );
+      await UserBuilder.build(userId: userId);
 
       final client = await CourierRC.shared.client;
 
-      expect(client?.options.jwt, jwt);
       expect(client?.options.userId, userId);
 
     });
 
     test('Use API', () async {
 
-      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
-
-      await CourierRC.shared.signIn(
-        userId: userId,
-        accessToken: jwt,
-        clientKey: Env.clientKey,
-        showLogs: true,
-      );
+      await UserBuilder.build(userId: userId);
 
       final client = await CourierRC.shared.client;
 
@@ -96,14 +83,7 @@ void main() {
 
     test('Sign In', () async {
 
-      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
-
-      await CourierRC.shared.signIn(
-        userId: userId,
-        accessToken: jwt,
-        clientKey: Env.clientKey,
-        showLogs: true,
-      );
+      await UserBuilder.build(userId: userId);
 
       final currentUserId = await CourierRC.shared.userId;
       final currentTenantId = await CourierRC.shared.tenantId;
@@ -122,14 +102,7 @@ void main() {
         hold = userId == null;
       });
 
-      final jwt = await ExampleServer.generateJwt(Env.authKey, userId);
-
-      await CourierRC.shared.signIn(
-        userId: userId,
-        accessToken: jwt,
-        clientKey: Env.clientKey,
-        showLogs: true,
-      );
+      await UserBuilder.build(userId: userId);
 
       final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
       expect(isUserSignedIn, true);
@@ -149,6 +122,48 @@ void main() {
       await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
 
       await CourierRC.shared.removeAllAuthenticationListeners();
+
+    });
+
+  });
+
+  group('Client', () {
+
+    setUp(() async {
+      await CourierRC.shared.signOut();
+    });
+
+    test('APNS Token', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final apnsToken = await CourierRC.shared.apnsToken;
+
+      expect(apnsToken, isNull);
+
+    });
+
+    test('Get All Tokens', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      // Save tokens courier remote and local
+      await Future.wait([
+        CourierRC.shared.setToken(token: "token1", provider: "provider0"),
+        CourierRC.shared.setTokenForProvider(token: "token2", provider: CourierPushProvider.apn),
+        CourierRC.shared.setTokenForProvider(token: "token3", provider: CourierPushProvider.firebaseFcm),
+        CourierRC.shared.setTokenForProvider(token: "token4", provider: CourierPushProvider.expo),
+      ]);
+
+      final tokensWithUser = await CourierRC.shared.tokens;
+      expect(tokensWithUser.length, 4);
+
+      // Remove current user
+      await CourierRC.shared.signOut();
+
+      // Ensure tokens still exist locally
+      final tokensWithoutUser = await CourierRC.shared.tokens;
+      expect(tokensWithoutUser.length, 4);
 
     });
 

@@ -142,17 +142,47 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                     // MARK: Push
                     
-//                case "shared.auth.remove_all_authentication_listeners":
-//                    
-//                    Courier.shared.
-//                    
-//                    for value in authenticationListeners.values {
-//                        value.remove()
-//                    }
-//                    
-//                    authenticationListeners.removeAll()
-//                    
-//                    result(nil)
+                case "shared.tokens.get_apns_token":
+                    
+                    let token = await Courier.shared.apnsToken
+                    
+                    result(token?.string)
+                    
+                case "shared.tokens.get_all_tokens":
+                    
+                    let tokens = await Courier.shared.tokens
+                    
+                    result(tokens)
+                    
+                case "shared.tokens.set_token":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let token: String = try params.extract("token")
+                    let provider: String = try params.extract("provider")
+                    
+                    try await Courier.shared.setToken(
+                        for: provider,
+                        token: token
+                    )
+                    
+                    result(nil)
+                    
+                case "shared.tokens.get_token":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let provider: String = try params.extract("provider")
+                    
+                    let token = await Courier.shared.getToken(
+                        for: provider
+                    )
+                    
+                    result(token)
                 
                     
                 default:
