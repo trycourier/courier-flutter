@@ -88,6 +88,16 @@ void main() {
 
     });
 
+    test('Remove All Authentication Listeners', () async {
+
+      await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
+      await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
+      await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
+
+      await CourierRC.shared.removeAllAuthenticationListeners();
+
+    });
+
   });
 
 }

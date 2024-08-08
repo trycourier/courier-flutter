@@ -393,12 +393,20 @@ class CourierRC extends CourierSharedChannel {
     _authenticationListeners.remove(id);
   }
 
+  @override
+  Future removeAllAuthenticationListeners() async {
+    await _channel.invokeMethod('shared.auth.remove_all_authentication_listeners');
+    _authenticationListeners.clear();
+  }
+
 }
 
 abstract class CourierSharedChannel extends PlatformInterface {
 
   final _channel = CourierFlutterChannels.shared;
   CourierSharedChannel({required super.token});
+
+  // Authentication
 
   Future<String?> get userId => throw UnimplementedError('userId has not been implemented.');
   Future<String?> get tenantId => throw UnimplementedError('tenantId has not been implemented.');
@@ -419,5 +427,11 @@ abstract class CourierSharedChannel extends PlatformInterface {
   Future removeAuthenticationListener({ required String id }) async {
     throw UnimplementedError('removeAuthenticationListener() has not been implemented.');
   }
+
+  Future removeAllAuthenticationListeners() async {
+    throw UnimplementedError('removeAllAuthenticationListeners() has not been implemented.');
+  }
+
+  // Tokens
 
 }

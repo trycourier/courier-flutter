@@ -109,6 +109,16 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     listener.remove()
                     
                     result(nil)
+                    
+                case "shared.auth.remove_all_authentication_listeners":
+                    
+                    for value in authenticationListeners.values {
+                        value.remove()
+                    }
+                    
+                    authenticationListeners.removeAll()
+                    
+                    result(nil)
                 
                     
                 default:
