@@ -1,5 +1,5 @@
 import 'package:courier_flutter/courier_preference_channel.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';

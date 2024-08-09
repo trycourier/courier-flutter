@@ -225,6 +225,133 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     let json = messages.map { $0.toDictionary() }
                     
                     result(json)
+                    
+                case "shared.inbox.add_listener":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let listenerId: String = try params.extract("listenerId")
+                    
+                    // Create the listener
+                    let listener = Courier.shared.addInboxListener(
+                        onInitialLoad: {
+                            CourierFlutterChannel.events.channel?.invokeMethod("events.shared.inbox.listener_loading", arguments: nil)
+                        },
+                        onError: { error in
+                            CourierFlutterChannel.events.channel?.invokeMethod("events.shared.inbox.listener_error", arguments: [
+                                "error": error.localizedDescription
+                            ])
+                        },
+                        onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
+                            CourierFlutterChannel.events.channel?.invokeMethod("events.shared.inbox.listener_messages_changed", arguments: [
+                                "messages": messages.map { $0.toDictionary() },
+                                "unreadMessageCount": unreadMessageCount,
+                                "totalMessageCount": totalMessageCount,
+                                "canPaginate": canPaginate,
+                            ])
+                        }
+                    )
+                    
+                    // Hold reference to the auth listeners
+                    inboxListeners[listenerId] = listener
+                    
+                    // Return the id of the listener
+                    result(listenerId)
+                    
+                case "shared.inbox.remove_listener":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let listenerId: String = try params.extract("listenerId")
+                    
+                    // Get and remove the listener
+                    guard let listener = inboxListeners[listenerId] else {
+                        throw CourierError.invalidParameter(value: "listenerId")
+                    }
+                    
+                    listener.remove()
+                    
+                    result(nil)
+                    
+                case "shared.inbox.remove_all_listeners":
+                    
+                    for value in inboxListeners.values {
+                        value.remove()
+                    }
+                    
+                    authenticationListeners.removeAll()
+                    
+                    result(nil)
+                    
+                case "shared.inbox.open_message":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let messageId: String = try params.extract("messageId")
+                    
+                    try await Courier.shared.openMessage(messageId)
+                    
+                    result(nil)
+                    
+                case "shared.inbox.read_message":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let messageId: String = try params.extract("messageId")
+                    
+                    try await Courier.shared.readMessage(messageId)
+                    
+                    result(nil)
+                    
+                case "shared.inbox.unread_message":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let messageId: String = try params.extract("messageId")
+                    
+                    try await Courier.shared.unreadMessage(messageId)
+                    
+                    result(nil)
+                    
+                case "shared.inbox.click_message":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let messageId: String = try params.extract("messageId")
+                    
+                    try await Courier.shared.clickMessage(messageId)
+                    
+                    result(nil)
+                    
+                case "shared.inbox.archive_message":
+                    
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierError.missingParameter(value: "params")
+                    }
+                    
+                    let messageId: String = try params.extract("messageId")
+                    
+                    try await Courier.shared.archiveMessage(messageId)
+                    
+                    result(nil)
+                    
+                case "shared.inbox.read_all_messages":
+                    
+                    try await Courier.shared.readAllInboxMessages()
+                    
+                    result(nil)
                 
                     
                 default:

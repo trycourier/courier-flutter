@@ -18,6 +18,7 @@ class CourierPushListener {
     return listener;
   }
 
-  Future remove() => Courier.shared.removeInboxListener(id: listenerId);
+  // TODO
+  // Future remove() => Courier.shared.removeInboxListener(id: listenerId);
 
 }

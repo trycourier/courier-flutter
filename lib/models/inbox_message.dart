@@ -1,4 +1,6 @@
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/models/inbox_action.dart';
 import 'package:intl/intl.dart';
 
 class InboxMessage {
@@ -87,7 +89,9 @@ class InboxMessage {
 }
 
 extension InboxMessageExtensions on InboxMessage {
-  Future markAsClicked() => Courier.shared.clickMessage(id: messageId);
-  Future markAsRead() => Courier.shared.readMessage(id: messageId);
-  Future markAsUnread() => Courier.shared.unreadMessage(id: messageId);
+  Future markAsOpened() => CourierRC.shared.openMessage(messageId: messageId);
+  Future markAsClicked() => CourierRC.shared.clickMessage(messageId: messageId);
+  Future markAsRead() => CourierRC.shared.readMessage(messageId: messageId);
+  Future markAsUnread() => CourierRC.shared.unreadMessage(messageId: messageId);
+  Future markAsArchived() => CourierRC.shared.archiveMessage(messageId: messageId);
 }

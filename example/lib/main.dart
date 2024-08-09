@@ -1,3 +1,5 @@
+import 'package:courier_flutter/courier_flutter_v2.dart';
+
 import 'env.dart';
 import 'example_server.dart';
 import 'firebase_options.dart';
@@ -66,7 +68,7 @@ class _MyAppState extends State<MyApp> {
 
   Future _refreshJwt() async {
 
-    final currentUserId = await Courier.shared.userId;
+    final currentUserId = await CourierRC.shared.userId;
 
     if (currentUserId != null) {
 
@@ -79,7 +81,7 @@ class _MyAppState extends State<MyApp> {
         );
 
         // Sign in with new token
-        await Courier.shared.signIn(
+        await CourierRC.shared.signIn(
             accessToken: token,
             userId: currentUserId
         );
@@ -87,7 +89,7 @@ class _MyAppState extends State<MyApp> {
       } catch (error) {
 
         print(error);
-        await Courier.shared.signOut();
+        await CourierRC.shared.signOut();
 
       }
 
@@ -99,19 +101,20 @@ class _MyAppState extends State<MyApp> {
 
     await _refreshJwt();
 
-    _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+    _inboxListener = await CourierRC.shared.addInboxListener(onInitialLoad: null, onError: null, onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
       setState(() => _unreadMessageCount = unreadMessageCount);
     });
 
-    _pushListener = Courier.shared.addPushListener(
-      onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
-      onPushDelivered: (push) => showAlert(context, 'Push Delivered', push.toString()),
-    );
+    // TODO
+    // _pushListener = CourierRC.shared.addPushListener(
+    //   onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
+    //   onPushDelivered: (push) => showAlert(context, 'Push Delivered', push.toString()),
+    // );
 
     try {
       final token = await FirebaseMessaging.instance.getToken();
       if (token != null) {
-        Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
+        CourierRC.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
       }
     } catch (e) {
       print(e);
@@ -119,7 +122,7 @@ class _MyAppState extends State<MyApp> {
 
     // Listener to firebase token change
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
+      CourierRC.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
     }).onError((error) {
       print(error);
     });
@@ -180,7 +183,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     super.dispose();
-    _pushListener.remove();
+    // TODO
+    // _pushListener.remove();
     _inboxListener.remove();
   }
 }

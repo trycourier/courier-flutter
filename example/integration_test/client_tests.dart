@@ -99,7 +99,7 @@ void main() {
     });
     test('Put Preference Topic', () async {
       final client = await ClientBuilder.build(userId: userId);
-      await client.preferences.putUserPreferenceTopic(
+      await client.preferences.putUserPreferencesTopic(
         topicId: Env.preferenceTopicId,
         status: CourierUserPreferencesStatus.optedIn,
         hasCustomRouting: true,

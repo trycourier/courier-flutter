@@ -1,4 +1,4 @@
-import 'package:courier_flutter/channels/shared_method_channel.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'example_server.dart';
 

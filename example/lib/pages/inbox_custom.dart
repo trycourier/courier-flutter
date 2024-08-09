@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -33,7 +35,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
 
   Future _start() async {
 
-    _inboxListener = await Courier.shared.addInboxListener(
+    _inboxListener = await CourierRC.shared.addInboxListener(
       onInitialLoad: () {
         setState(() {
           _isLoading = true;
@@ -57,7 +59,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
   }
 
   Future<void> _refresh() async {
-    await Courier.shared.refreshInbox();
+    await CourierRC.shared.refreshInbox();
   }
 
   Future<void> _onMessageClick(InboxMessage message) async {

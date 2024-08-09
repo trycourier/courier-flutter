@@ -14,9 +14,9 @@ public class CourierPlugin: NSObject, FlutterPlugin {
         CourierClientMethodHandler.register(with: registrar)
     }
 
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        
-        let params = call.arguments as? Dictionary<String, Any>
+//    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+//        
+//        let params = call.arguments as? Dictionary<String, Any>
           
 //        switch call.method {
 //            
@@ -297,6 +297,6 @@ public class CourierPlugin: NSObject, FlutterPlugin {
 //            
 //        }
           
-    }
+//    }
     
 }

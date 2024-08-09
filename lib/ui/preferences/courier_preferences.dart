@@ -1,8 +1,8 @@
-import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
@@ -77,17 +77,20 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
   Future<void> _getPreferences() async {
 
-    final userId = await Courier.shared.userId;
+    final userId = await CourierRC.shared.userId;
 
     final brand = await _refreshBrand();
 
     try {
 
-      final preferences = await Courier.shared.getUserPreferences();
+      final client = await CourierRC.shared.client;
+      final res = await client?.preferences.getUserPreferences();
+
+      final topics = res?.items ?? [];
 
       List<PreferenceSection> sections = [];
 
-      for (var topic in preferences.items) {
+      for (var topic in topics) {
 
         String sectionId = topic.sectionId;
 
@@ -96,19 +99,17 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
         if (sectionIndex != -1) {
 
-          // TODO
-
-          // sections[sectionIndex].topics.add(topic);
+          sections[sectionIndex].topics.add(topic);
 
         } else {
 
-          // PreferenceSection newSection = PreferenceSection(
-          //   title: topic.sectionName,
-          //   id: topic.sectionId,
-          //   topics: [topic],
-          // );
-          //
-          // sections.add(newSection);
+          PreferenceSection newSection = PreferenceSection(
+            title: topic.sectionName,
+            id: topic.sectionId,
+            topics: [topic],
+          );
+
+          sections.add(newSection);
 
         }
 
@@ -153,7 +154,9 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
       }
 
       // Get / set the brand
-      CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
+      final client = await CourierRC.shared.client;
+      final res = await client?.brands.getBrand(brandId: brandId);
+      final brand = res?.data?.brand;
       widget._lightTheme.brand = brand;
       widget._darkTheme.brand = brand;
       return brand;
@@ -174,7 +177,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
   Future<void> _retry() async {
 
-    final userId = await Courier.shared.userId;
+    final userId = await CourierRC.shared.userId;
 
     setState(() {
       _userId = userId;
@@ -294,18 +297,21 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       try {
 
-        await Courier.shared.putUserPreferencesTopic(
+        final client = await CourierRC.shared.client;
+        await client?.preferences.putUserPreferencesTopic(
             topicId: topic.topicId,
             status: newStatus,
             hasCustomRouting: topic.hasCustomRouting,
             customRouting: topic.customRouting
         );
 
-        Courier.log("Topic updated: ${topic.topicId}");
+        // TODO
+        // Courier.log("Topic updated: ${topic.topicId}");
 
       } catch (error) {
 
-        Courier.log(error.toString());
+        // TODO
+        // Courier.log(error.toString());
 
         if (widget.onError != null) {
           widget.onError!(error.toString());
@@ -361,18 +367,21 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       try {
 
-        await Courier.shared.putUserPreferencesTopic(
+        final client = await CourierRC.shared.client;
+        await client?.preferences.putUserPreferencesTopic(
             topicId: topic.topicId,
             status: newStatus,
             hasCustomRouting: hasCustomRouting,
             customRouting: customRouting
         );
 
-        Courier.log("Topic updated: ${topic.topicId}");
+        // TODO
+        // Courier.log("Topic updated: ${topic.topicId}");
 
       } catch (error) {
 
-        Courier.log(error.toString());
+        // TODO
+        // Courier.log(error.toString());
 
         if (widget.onError != null) {
           widget.onError!(error.toString());

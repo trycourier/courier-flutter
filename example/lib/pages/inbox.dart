@@ -1,4 +1,6 @@
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/env.dart';
@@ -91,7 +93,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
           IconButton(
             tooltip: 'Read All Messages',
             icon: const Icon(Icons.mark_email_read), // Example icon for the button
-            onPressed: () => Courier.shared.readAllInboxMessages(),
+            onPressed: () => CourierRC.shared.readAllInboxMessages(),
           ),
         ],
         bottom: TabBar(

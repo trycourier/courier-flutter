@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
@@ -34,22 +35,23 @@ class _PushPageState extends State<PushPage> {
   }
 
   void _start() {
-    _pushListener = Courier.shared.addPushListener(
-      onPushClicked: (push) {
-        print(push);
-      },
-      onPushDelivered: (push) {
-        print(push);
-      },
-    );
-
-    Courier.shared.iOSForegroundNotificationPresentationOptions = [
-      iOSNotificationPresentationOption.banner,
-      iOSNotificationPresentationOption.sound,
-      iOSNotificationPresentationOption.list,
-      iOSNotificationPresentationOption.badge,
-    ];
-    print(Courier.shared.iOSForegroundNotificationPresentationOptions);
+    // TODO
+    // _pushListener = CourierRC.shared.addPushListener(
+    //   onPushClicked: (push) {
+    //     print(push);
+    //   },
+    //   onPushDelivered: (push) {
+    //     print(push);
+    //   },
+    // );
+    //
+    // Courier.shared.iOSForegroundNotificationPresentationOptions = [
+    //   iOSNotificationPresentationOption.banner,
+    //   iOSNotificationPresentationOption.sound,
+    //   iOSNotificationPresentationOption.list,
+    //   iOSNotificationPresentationOption.badge,
+    // ];
+    // print(Courier.shared.iOSForegroundNotificationPresentationOptions);
 
     _getTokens();
   }
@@ -59,8 +61,8 @@ class _PushPageState extends State<PushPage> {
       _isLoading = true;
     });
 
-    final fcm = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
-    final apns = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.apn);
+    final fcm = await CourierRC.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
+    final apns = await CourierRC.shared.getTokenForProvider(provider: CourierPushProvider.apn);
 
     setState(() {
       _isLoading = false;
@@ -70,8 +72,9 @@ class _PushPageState extends State<PushPage> {
   }
 
   Future _requestPermissions() async {
-    final status = await Courier.shared.requestNotificationPermission();
-    print(status);
+    // TODO
+    // final status = await CourierRC.shared.requestNotificationPermission();
+    // print(status);
   }
 
   Widget _buildToken(BuildContext context, String title, String value) {
@@ -169,6 +172,7 @@ class _PushPageState extends State<PushPage> {
   @override
   void dispose() {
     super.dispose();
-    _pushListener.remove();
+    // TODO
+    // _pushListener.remove();
   }
 }

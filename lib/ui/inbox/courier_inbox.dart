@@ -1,6 +1,9 @@
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/inbox_action.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
@@ -71,7 +74,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   void _scrollListener() {
     // Trigger the pagination
     if (_scrollController.offset >= _scrollController.position.maxScrollExtent - _triggerPoint) {
-      Courier.shared.fetchNextPageOfMessages();
+      CourierRC.shared.fetchNextInboxPage();
     }
   }
 
@@ -89,9 +92,9 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     final brand = await _refreshBrand();
 
     // Attach inbox message listener
-    _inboxListener = await Courier.shared.addInboxListener(
+    _inboxListener = await CourierRC.shared.addInboxListener(
       onInitialLoad: () async {
-        final userId = await Courier.shared.userId;
+        final userId = await CourierRC.shared.userId;
         setState(() {
           _userId = userId;
           _brand = brand;
@@ -100,7 +103,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         });
       },
       onError: (error) async {
-        final userId = await Courier.shared.userId;
+        final userId = await CourierRC.shared.userId;
         setState(() {
           _userId = userId;
           _brand = brand;
@@ -109,7 +112,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         });
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
-        final userId = await Courier.shared.userId;
+        final userId = await CourierRC.shared.userId;
         setState(() {
           _userId = userId;
           _brand = brand;
@@ -139,14 +142,16 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       }
 
       // Get / set the brand
-      CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
+      final client = await CourierRC.shared.client;
+      final res = await client?.brands.getBrand(brandId: brandId);
+      final brand = res?.data?.brand;
       widget._lightTheme.brand = brand;
       widget._darkTheme.brand = brand;
       return brand;
 
     } catch (error) {
 
-      Courier.log(error.toString());
+      // CourierRC.log(error.toString());
 
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;
@@ -158,7 +163,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   Future<void> _refresh() async {
     await _refreshBrand();
-    await Courier.shared.refreshInbox();
+    await CourierRC.shared.refreshInbox();
   }
 
   Future<void> _retry() async {
@@ -167,7 +172,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       _error = null;
     });
     await _refreshBrand();
-    await Courier.shared.refreshInbox();
+    await CourierRC.shared.refreshInbox();
   }
 
   int get _itemCount => _messages.length + (_canPaginate ? 1 : 0);

@@ -1,7 +1,8 @@
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -56,7 +57,8 @@ class _PreferencesDetailPageState extends State<PreferencesDetailPage> {
     });
 
     try {
-      await Courier.shared.putUserPreferencesTopic(
+      final client = await CourierRC.shared.client;
+      await client?.preferences.putUserPreferencesTopic(
         topicId: widget.topicId,
         status: _selectedStatus ?? _topic.status,
         hasCustomRouting: _hasCustomRouting ?? _topic.hasCustomRouting,

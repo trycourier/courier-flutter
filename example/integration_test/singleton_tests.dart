@@ -1,5 +1,4 @@
-import 'package:courier_flutter/channels/shared_method_channel.dart';
-import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -239,6 +238,102 @@ void main() {
 
       final messages = await CourierRC.shared.fetchNextInboxPage();
       expect(messages, []);
+
+    });
+
+    // test('Add Inbox Listener', () async {
+    //
+    //   await UserBuilder.build(userId: userId);
+    //
+    //   var hold = true;
+    //
+    //   final listener = await CourierRC.shared.addInboxListener(
+    //     onInitialLoad: () {
+    //       print("Loading");
+    //     },
+    //     onError: (error) {
+    //       print(error);
+    //     },
+    //     onMessagesChanged: (messages, unreadCount, totalCount, canPaginate) {
+    //       print("onMessagesChanged");
+    //       hold = messages.isEmpty;
+    //     }
+    //   );
+    //
+    //   await delay();
+    //
+    //   // TODO: Message count not working on second message
+    //
+    //   await sendMessage(userId);
+    //
+    //   while (hold) {
+    //     // Hold
+    //   }
+    //
+    //   final messages = await CourierRC.shared.inboxMessages;
+    //   expect(messages.length, 1);
+    //
+    //   await listener.remove();
+    //
+    // });
+
+    test('Open Message', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messageId = await sendMessage(userId);
+
+      await CourierRC.shared.openMessage(messageId: messageId);
+
+    });
+
+    test('Read Message', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messageId = await sendMessage(userId);
+
+      await CourierRC.shared.readMessage(messageId: messageId);
+
+    });
+
+    test('Unread Message', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messageId = await sendMessage(userId);
+
+      await CourierRC.shared.unreadMessage(messageId: messageId);
+
+    });
+
+    test('Click Message', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messageId = await sendMessage(userId);
+
+      await CourierRC.shared.clickMessage(messageId: messageId);
+
+    });
+
+    test('Archive Message', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messageId = await sendMessage(userId);
+
+      await CourierRC.shared.archiveMessage(messageId: messageId);
+
+    });
+
+    test('Read All Messages', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      await sendMessage(userId);
+
+      await CourierRC.shared.readAllInboxMessages();
 
     });
 

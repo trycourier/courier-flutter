@@ -1,4 +1,4 @@
-import 'package:courier_flutter/channels/shared_method_channel.dart';
+import 'package:courier_flutter/courier_flutter_v2.dart';
 
 class CourierAuthenticationListener {
 

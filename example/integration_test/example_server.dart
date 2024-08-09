@@ -30,7 +30,9 @@ class ExampleServer {
     };
     final body = jsonEncode({
       'message': {
-        'to': {'user_id': userId},
+        'to': {
+          'user_id': userId
+        },
         'content': {
           'title': 'Test',
           'body': 'Body',
