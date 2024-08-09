@@ -16,7 +16,7 @@ class PushPage extends StatefulWidget {
 }
 
 class _PushPageState extends State<PushPage> {
-  late CourierPushListener _pushListener;
+  late CourierPushListener? _pushListener;
 
   String? _apnsToken;
   String? _fcmToken;
@@ -30,24 +30,23 @@ class _PushPageState extends State<PushPage> {
   }
 
   Future<void> _start() async {
-    // TODO
-    // _pushListener = CourierRC.shared.addPushListener(
-    //   onPushClicked: (push) {
-    //     print(push);
-    //   },
-    //   onPushDelivered: (push) {
-    //     print(push);
-    //   },
-    // );
-    //
-    final options = await Courier.shared.setIOSForegroundPresentationOptions(options: [
+    _pushListener = await Courier.shared.addPushListener(
+      onPushDelivered: (push) {
+        print(push);
+      },
+      onPushClicked: (push) {
+        print(push);
+      },
+    );
+
+    final options = await Courier.setIOSForegroundPresentationOptions(options: [
       iOSNotificationPresentationOption.banner,
       iOSNotificationPresentationOption.sound,
       iOSNotificationPresentationOption.list,
       iOSNotificationPresentationOption.badge,
     ]);
     print(options);
-    print(Courier.shared.iOSForegroundNotificationPresentationOptions);
+    print(Courier.iOSForegroundNotificationPresentationOptions);
 
     _getTokens();
   }
@@ -68,9 +67,8 @@ class _PushPageState extends State<PushPage> {
   }
 
   Future _requestPermissions() async {
-    // TODO
-    // final status = await CourierRC.shared.requestNotificationPermission();
-    // print(status);
+    final status = await Courier.requestNotificationPermission();
+    print(status);
   }
 
   Widget _buildToken(BuildContext context, String title, String value) {
@@ -167,8 +165,7 @@ class _PushPageState extends State<PushPage> {
 
   @override
   void dispose() {
+    _pushListener?.remove();
     super.dispose();
-    // TODO
-    // _pushListener.remove();
   }
 }

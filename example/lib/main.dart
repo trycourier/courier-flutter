@@ -109,11 +109,10 @@ class _MyAppState extends State<MyApp> {
       }
     );
 
-    // TODO
-    // _pushListener = CourierRC.shared.addPushListener(
-    //   onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
-    //   onPushDelivered: (push) => showAlert(context, 'Push Delivered', push.toString()),
-    // );
+    _pushListener = await Courier.shared.addPushListener(
+      onPushDelivered: (push) => showAlert(context, 'Push Delivered', push.toString()),
+      onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
+    );
 
     try {
       final token = await FirebaseMessaging.instance.getToken();
@@ -184,12 +183,17 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  void _removeListeners() {
+    _pushListener.remove();
+    _inboxListener.remove().catchError((error) {
+      Courier.log('Failed to remove inbox listener: $error');
+    });
+  }
+
   @override
   void dispose() {
+    _removeListeners();
     super.dispose();
-    // TODO
-    // _pushListener.remove();
-    _inboxListener.remove();
   }
 }
 

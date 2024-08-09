@@ -7,6 +7,7 @@ import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_authentication_listener.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -25,6 +26,7 @@ class Courier extends CourierChannelManager {
 
   // Local Values
   final Map<String, CourierAuthenticationListener> _authenticationListeners = {};
+  final Map<String, CourierPushListener> _pushListeners = {};
   final Map<String, CourierInboxListener> _inboxListeners = {};
 
   Courier._() : super(token: _token) {
@@ -32,26 +34,38 @@ class Courier extends CourierChannelManager {
     // Attach events listeners
     CourierFlutterChannels.events.setMethodCallHandler((call) async {
       switch (call.method) {
-        case 'events.shared.auth.state_changed': {
+        case 'auth.state_changed': {
           String? userId = call.arguments['userId'];
           _authenticationListeners.forEach((key, listener) {
             listener.onUserStateChanged(userId);
           });
           break;
         }
-        case 'events.shared.inbox.listener_loading': {
+        case 'push.clicked': {
+          _pushListeners.forEach((key, listener) {
+            listener.onPushClicked?.call(call.arguments);
+          });
+          break;
+        }
+        case 'push.delivered': {
+          _pushListeners.forEach((key, listener) {
+            listener.onPushDelivered?.call(call.arguments);
+          });
+          break;
+        }
+        case 'inbox.listener_loading': {
           _inboxListeners.forEach((key, listener) {
             listener.onInitialLoad?.call();
           });
           break;
         }
-        case 'events.shared.inbox.listener_error': {
+        case 'inbox.listener_error': {
           _inboxListeners.forEach((key, listener) {
             listener.onError?.call(call.arguments['error']);
           });
           break;
         }
-        case 'events.shared.inbox.listener_messages_changed': {
+        case 'inbox.listener_messages_changed': {
 
           List<dynamic>? messages = call.arguments['messages'];
           List<InboxMessage>? inboxMessages = messages?.map((message) {
@@ -89,17 +103,16 @@ class Courier extends CourierChannelManager {
     }
   }
 
-  // Push
+  // System (static)
 
   /// Allows you to set how you would like the iOS SDK to handle
   /// showing a push notification when it is received while the app is in the foreground.
   /// This will not have an affect on any other platform
   /// If you do not not want a system push to appear, pass []
-  List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions = iOSNotificationPresentationOption.values;
-  List<iOSNotificationPresentationOption> get iOSForegroundNotificationPresentationOptions => _iOSForegroundNotificationPresentationOptions;
+  static List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions = iOSNotificationPresentationOption.values;
+  static List<iOSNotificationPresentationOption> get iOSForegroundNotificationPresentationOptions => _iOSForegroundNotificationPresentationOptions;
 
-  @override
-  Future<List<iOSNotificationPresentationOption>> setIOSForegroundPresentationOptions({required List<iOSNotificationPresentationOption> options}) async {
+  static Future<List<iOSNotificationPresentationOption>> setIOSForegroundPresentationOptions({required List<iOSNotificationPresentationOption> options}) async {
 
     // Skip other platforms. Do not show error
     if (!Platform.isIOS) return [];
@@ -116,6 +129,34 @@ class Courier extends CourierChannelManager {
       return _iOSForegroundNotificationPresentationOptions;
     }
 
+  }
+
+  static Future<String> requestNotificationPermission() async {
+    try {
+      return await CourierFlutterChannels.system.invokeMethod('notifications.request_permission');
+    } catch (error) {
+      return 'unknown';
+    }
+  }
+
+  static Future<String> getNotificationPermissionStatus() async {
+    try {
+      return await CourierFlutterChannels.system.invokeMethod('notifications.get_permission_status');
+    } catch (error) {
+      return 'unknown';
+    }
+  }
+
+  static Future openSettingsApp() async {
+    await CourierFlutterChannels.system.invokeMethod('app.open_settings');
+  }
+
+  static Future getClickedNotification() async {
+    try {
+      return await CourierFlutterChannels.system.invokeMethod('notifications.get_clicked_notification');
+    } catch (error) {
+      return;
+    }
   }
 
   // Client
@@ -165,9 +206,12 @@ class Courier extends CourierChannelManager {
 
   @override
   Future<CourierAuthenticationListener> addAuthenticationListener(Function(String? userId) onUserStateChanged) async {
-    final listenerId = await CourierFlutterChannels.shared.invokeMethod('auth.add_authentication_listener');
+    final listenerId = const Uuid().v4();
     final listener = CourierAuthenticationListener(listenerId: listenerId, onUserStateChanged: onUserStateChanged);
     _authenticationListeners[listenerId] = listener;
+    await CourierFlutterChannels.shared.invokeMethod('auth.add_authentication_listener', {
+      'listenerId': listenerId
+    });
     return listener;
   }
 
@@ -185,7 +229,7 @@ class Courier extends CourierChannelManager {
     _authenticationListeners.clear();
   }
 
-  // Tokens
+  // Push & Tokens
 
   @override
   Future<String?> get apnsToken async {
@@ -226,6 +270,25 @@ class Courier extends CourierChannelManager {
     return await CourierFlutterChannels.shared.invokeMethod('tokens.get_token', {
       'provider': provider.value,
     });
+  }
+
+  @override
+  Future<CourierPushListener> addPushListener({required Function(dynamic message)? onPushDelivered, Function(dynamic message)? onPushClicked}) async {
+    final listenerId = const Uuid().v4();
+    final listener = CourierPushListener(listenerId: listenerId, onPushDelivered: onPushDelivered, onPushClicked: onPushClicked);
+    _pushListeners[listener.listenerId] = listener;
+    await Courier.getClickedNotification();
+    return listener;
+  }
+
+  @override
+  void removePushListener({required String listenerId}) {
+    _pushListeners.remove(listenerId);
+  }
+
+  @override
+  void removeAllPushListeners() {
+    _authenticationListeners.clear();
   }
 
   // Inbox
@@ -349,12 +412,6 @@ abstract class CourierChannelManager extends PlatformInterface {
   
   CourierChannelManager({required super.token});
 
-  // Push
-
-  Future<List<iOSNotificationPresentationOption>> setIOSForegroundPresentationOptions({required List<iOSNotificationPresentationOption> options}) async {
-    throw UnimplementedError('setIosForegroundPresentationOptions() has not been implemented.');
-  }
-
   // Client
 
   Future<CourierClient?> get client => throw UnimplementedError('client has not been implemented.');
@@ -385,7 +442,7 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('removeAllAuthenticationListeners() has not been implemented.');
   }
 
-  // Tokens
+  // Push & Tokens
 
   Future<String?> get apnsToken => throw UnimplementedError('apnsToken has not been implemented.');
   Future<Map<String, String>> get tokens => throw UnimplementedError('tokens has not been implemented.');
@@ -404,6 +461,18 @@ abstract class CourierChannelManager extends PlatformInterface {
 
   Future<String?> getTokenForProvider({required CourierPushProvider provider}) async {
     throw UnimplementedError('getTokenForProvider() has not been implemented.');
+  }
+
+  Future<CourierPushListener> addPushListener({required Function(dynamic message)? onPushDelivered, Function(dynamic message)? onPushClicked}) async {
+    throw UnimplementedError('addPushListener() has not been implemented.');
+  }
+
+  void removePushListener({required String listenerId}) {
+    throw UnimplementedError('removePushListener() has not been implemented.');
+  }
+
+  void removeAllPushListeners() async {
+    throw UnimplementedError('removeAllPushListeners() has not been implemented.');
   }
 
   // Inbox

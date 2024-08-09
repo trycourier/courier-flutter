@@ -248,8 +248,7 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   void dispose() {
+    _pushListener?.remove();
     super.dispose();
-    // TODO
-    // _pushListener?.remove();
   }
 }

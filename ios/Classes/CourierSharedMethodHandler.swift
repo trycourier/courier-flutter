@@ -103,7 +103,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     let listener = Courier.shared.addAuthenticationListener { userId in
                         
                         // Call the event function
-                        CourierFlutterChannel.events.channel?.invokeMethod("events.shared.auth.state_changed", arguments: [
+                        CourierFlutterChannel.events.channel?.invokeMethod("auth.state_changed", arguments: [
                             "userId": userId
                         ])
                         
@@ -242,11 +242,11 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     // Create the listener
                     let listener = Courier.shared.addInboxListener(
                         onInitialLoad: {
-                            channel?.invokeMethod("events.shared.inbox.listener_loading", arguments: nil)
+                            channel?.invokeMethod("inbox.listener_loading", arguments: nil)
                         },
                         onError: { error in
                             let courierError = CourierError(from: error)
-                            channel?.invokeMethod("events.shared.inbox.listener_error", arguments: [
+                            channel?.invokeMethod("inbox.listener_error", arguments: [
                                 "error": courierError.message
                             ])
                         },
@@ -257,7 +257,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                                 "totalMessageCount": totalMessageCount,
                                 "canPaginate": canPaginate
                             ]
-                            channel?.invokeMethod("events.shared.inbox.listener_messages_changed", arguments: json)
+                            channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
                         }
                     )
                     

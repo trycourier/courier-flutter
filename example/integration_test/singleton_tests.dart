@@ -30,7 +30,7 @@ void main() {
     test('iOS Foreground Presentation Options', () async {
 
       const options = iOSNotificationPresentationOption.values;
-      final newOptions = await Courier.shared.setIOSForegroundPresentationOptions(options: options);
+      final newOptions = await Courier.setIOSForegroundPresentationOptions(options: options);
       expect(options, newOptions);
 
     });
