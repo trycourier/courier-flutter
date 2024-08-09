@@ -92,45 +92,39 @@ class CourierInboxState extends State<CourierInbox>
     // Attach inbox message listener
     _inboxListener = await CourierRC.shared.addInboxListener(
       onInitialLoad: () async {
-        if (!mounted) {
-          return;
+        if (mounted) {
+          final userId = await CourierRC.shared.userId;
+          setState(() {
+            _userId = userId;
+            _brand = brand;
+            _isLoading = true;
+            _error = null;
+          });
         }
-
-        final userId = await CourierRC.shared.userId;
-        setState(() {
-          _userId = userId;
-          _brand = brand;
-          _isLoading = true;
-          _error = null;
-        });
       },
       onError: (error) async {
-        if (!mounted) {
-          return;
+        if (mounted) {
+          final userId = await CourierRC.shared.userId;
+          setState(() {
+            _userId = userId;
+            _brand = brand;
+            _isLoading = false;
+            _error = error;
+          });
         }
-
-        final userId = await CourierRC.shared.userId;
-        setState(() {
-          _userId = userId;
-          _brand = brand;
-          _isLoading = false;
-          _error = error;
-        });
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
-        if (!mounted) {
-          return;
+        if (mounted) {
+          final userId = await CourierRC.shared.userId;
+          setState(() {
+            _userId = userId;
+            _brand = brand;
+            _messages = messages;
+            _isLoading = false;
+            _error = null;
+            _canPaginate = canPaginate;
+          });
         }
-
-        final userId = await CourierRC.shared.userId;
-        setState(() {
-          _userId = userId;
-          _brand = brand;
-          _messages = messages;
-          _isLoading = false;
-          _error = null;
-          _canPaginate = canPaginate;
-        });
       },
     );
   }
@@ -298,9 +292,9 @@ class CourierInboxState extends State<CourierInbox>
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
     // Remove the listeners
-    _inboxListener?.remove();
+    await _inboxListener?.remove();
     _scrollController.removeListener(_scrollListener);
 
     // Dispose the default controller

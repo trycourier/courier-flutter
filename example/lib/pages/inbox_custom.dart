@@ -21,6 +21,8 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   @override
   bool get wantKeepAlive => true;
 
+  late final ScrollController _scrollController = ScrollController();
+
   CourierInboxListener? _inboxListener;
 
   bool _isLoading = true;
@@ -36,24 +38,29 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   Future _start() async {
     _inboxListener = await CourierRC.shared.addInboxListener(
       onInitialLoad: () {
-        setState(() {
-          _isLoading = true;
-          _error = null;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = true;
+            _error = null;
+          });
+        }
       },
       onError: (error) {
-        setState(() {
-          _isLoading = false;
-          _error = error;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _error = error;
+          });
+        }
       },
-      onMessagesChanged:
-          (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-        setState(() {
-          _messages = messages;
-          _isLoading = false;
-          _error = null;
-        });
+      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+        if (mounted) {
+          setState(() {
+            _messages = messages;
+            _isLoading = false;
+            _error = null;
+          });
+        }
       },
     );
   }
@@ -67,9 +74,9 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   }
 
   @override
-  void dispose() {
+  void dispose() async {
+    await _inboxListener?.remove();
     super.dispose();
-    _inboxListener?.remove();
   }
 
   Widget _buildContent() {
@@ -100,6 +107,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     return RefreshIndicator(
       onRefresh: _refresh,
       child: Scrollbar(
+        controller: _scrollController,
         child: ListView.separated(
           separatorBuilder: (context, index) => const Divider(),
           itemCount: _messages.length,
@@ -127,6 +135,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     super.build(context);
     return _buildContent();
   }
+
 }
 
 extension InboxExtension on InboxMessage {
