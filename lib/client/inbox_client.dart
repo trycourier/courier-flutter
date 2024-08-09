@@ -10,7 +10,7 @@ class InboxClient {
   InboxClient(this._options);
 
   Future<CourierGetInboxMessagesResponse> getMessages({int? paginationLimit, String? startCursor}) async {
-    final data = await _options.invokeClient('client.inbox.get_messages', {
+    final data = await _options.invokeClient('inbox.get_messages', {
       'paginationLimit': paginationLimit,
       'startCursor': startCursor,
     });
@@ -19,7 +19,7 @@ class InboxClient {
   }
 
   Future<CourierGetInboxMessagesResponse> getArchivedMessages({int? paginationLimit, String? startCursor}) async {
-    final data = await _options.invokeClient('client.inbox.get_archived_messages', {
+    final data = await _options.invokeClient('inbox.get_archived_messages', {
       'paginationLimit': paginationLimit,
       'startCursor': startCursor,
     });
@@ -28,7 +28,7 @@ class InboxClient {
   }
 
   Future<CourierGetInboxMessageResponse> getMessageById({required String messageId}) async {
-    final data = await _options.invokeClient('client.inbox.get_message_by_id', {
+    final data = await _options.invokeClient('inbox.get_message_by_id', {
       'messageId': messageId,
     });
     final Map<String, dynamic> map = json.decode(data);
@@ -36,42 +36,42 @@ class InboxClient {
   }
 
   Future<int> getUnreadMessageCount() async {
-    return await _options.invokeClient('client.inbox.get_unread_message_count');
+    return await _options.invokeClient('inbox.get_unread_message_count');
   }
 
   Future open({required String messageId}) async {
-    await _options.invokeClient('client.inbox.open_message', {
+    await _options.invokeClient('inbox.open_message', {
       'messageId': messageId,
     });
   }
 
   Future read({required String messageId}) async {
-    await _options.invokeClient('client.inbox.read_message', {
+    await _options.invokeClient('inbox.read_message', {
       'messageId': messageId,
     });
   }
 
   Future unread({required String messageId}) async {
-    await _options.invokeClient('client.inbox.unread_message', {
+    await _options.invokeClient('inbox.unread_message', {
       'messageId': messageId,
     });
   }
 
   Future click({required String messageId, required String trackingId}) async {
-    await _options.invokeClient('client.inbox.click_message', {
+    await _options.invokeClient('inbox.click_message', {
       'messageId': messageId,
       'trackingId': trackingId,
     });
   }
 
   Future archive({required String messageId}) async {
-    await _options.invokeClient('client.inbox.archive_message', {
+    await _options.invokeClient('inbox.archive_message', {
       'messageId': messageId,
     });
   }
 
   Future readAll() async {
-    await _options.invokeClient('client.inbox.read_all_messages');
+    await _options.invokeClient('inbox.read_all_messages');
   }
 
 }

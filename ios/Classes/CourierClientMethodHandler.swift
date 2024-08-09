@@ -35,7 +35,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     
                     // MARK: Brand
                     
-                case "client.brands.get_brand":
+                case "brands.get_brand":
                     
                     let (brandId): (String) = (
                         try params.extract("brandId")
@@ -50,7 +50,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     
                     // MARK: Token Management
                     
-                case "client.tokens.put_user_token":
+                case "tokens.put_user_token":
                     
                     let (token, provider): (String, String) = (
                         try params.extract("token"),
@@ -68,7 +68,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     
                     result(nil)
                     
-                case "client.tokens.delete_user_token":
+                case "tokens.delete_user_token":
                     
                     let (token): (String) = (
                         try params.extract("token")
@@ -82,7 +82,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     
                     // MARK: Preferences
                     
-                case "client.preferences.get_user_preferences":
+                case "preferences.get_user_preferences":
                     
                     let paginationCursor = params["paginationCursor"] as? String
                     
@@ -93,7 +93,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     let json = try res.toJson()
                     result(json)
                     
-                case "client.preferences.get_user_preference_topic":
+                case "preferences.get_user_preference_topic":
                     
                     let topicId: String = try params.extract("topicId")
                     
@@ -104,7 +104,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     let json = try res.toJson()
                     result(json)
                     
-                case "client.preferences.put_user_preferences_topic":
+                case "preferences.put_user_preferences_topic":
                     
                     let (topicId, status, hasCustomRouting, customRouting): (String, String, Bool, [String]) = (
                         try params.extract("topicId"),
@@ -124,7 +124,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     
                     // MARK: Inbox
                     
-                case "client.inbox.get_messages":
+                case "inbox.get_messages":
                     
                     let paginationLimit = params["paginationLimit"] as? Int
                     let startCursor = params["startCursor"] as? String
@@ -137,7 +137,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     let json = res.toDictionary().toJson()
                     result(json)
 
-                case "client.inbox.get_archived_messages":
+                case "inbox.get_archived_messages":
                     
                     let paginationLimit = params["paginationLimit"] as? Int
                     let startCursor = params["startCursor"] as? String
@@ -150,12 +150,12 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     let json = res.toDictionary().toJson()
                     result(json)
 
-                case "client.inbox.get_unread_message_count":
+                case "inbox.get_unread_message_count":
                     
                     let count = try await client.inbox.getUnreadMessageCount()
                     result(count)
 
-                case "client.inbox.get_message_by_id":
+                case "inbox.get_message_by_id":
                     
                     let messageId: String = try params.extract("messageId")
 
@@ -166,7 +166,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     let json = res.toDictionary().toJson()
                     result(json)
 
-                case "client.inbox.click_message":
+                case "inbox.click_message":
                     
                     let (messageId, trackingId): (String, String) = (
                         try params.extract("messageId"),
@@ -180,7 +180,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
 
                     result(nil)
 
-                case "client.inbox.unread_message":
+                case "inbox.unread_message":
                     
                     let messageId: String = try params.extract("messageId")
 
@@ -190,7 +190,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
 
                     result(nil)
 
-                case "client.inbox.read_message":
+                case "inbox.read_message":
                     
                     let messageId: String = try params.extract("messageId")
 
@@ -200,7 +200,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
 
                     result(nil)
 
-                case "client.inbox.open_message":
+                case "inbox.open_message":
                     
                     let messageId: String = try params.extract("messageId")
 
@@ -210,7 +210,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
 
                     result(nil)
 
-                case "client.inbox.archive_message":
+                case "inbox.archive_message":
                     
                     let messageId: String = try params.extract("messageId")
 
@@ -220,14 +220,14 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
 
                     result(nil)
 
-                case "client.inbox.read_all_messages":
+                case "inbox.read_all_messages":
                     
                     try await client.inbox.readAll()
                     result(nil)
                     
                     // MARK: Tracking
                     
-                case "client.tracking.post_tracking_url":
+                case "tracking.post_tracking_url":
                     
                     let (url, event): (String, String) = (
                         try params.extract("url"),

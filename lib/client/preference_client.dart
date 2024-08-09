@@ -11,7 +11,7 @@ class PreferenceClient {
   PreferenceClient(this._options);
 
   Future<CourierUserPreferences> getUserPreferences({String? paginationCursor}) async {
-    final data = await _options.invokeClient('client.preferences.get_user_preferences', {
+    final data = await _options.invokeClient('preferences.get_user_preferences', {
       'paginationCursor': paginationCursor,
     });
     final Map<String, dynamic> map = json.decode(data);
@@ -19,7 +19,7 @@ class PreferenceClient {
   }
 
   Future<GetCourierUserPreferencesTopic> getUserPreferenceTopic({required String topicId}) async {
-    final data = await _options.invokeClient('client.preferences.get_user_preference_topic', {
+    final data = await _options.invokeClient('preferences.get_user_preference_topic', {
       'topicId': topicId,
     });
     final Map<String, dynamic> map = json.decode(data);
@@ -27,7 +27,7 @@ class PreferenceClient {
   }
 
   Future putUserPreferencesTopic({required String topicId, required CourierUserPreferencesStatus status, required bool hasCustomRouting, required List<CourierUserPreferencesChannel> customRouting}) async {
-    await _options.invokeClient('client.preferences.put_user_preferences_topic', {
+    await _options.invokeClient('preferences.put_user_preferences_topic', {
       'topicId': topicId,
       'status': status.value,
       'hasCustomRouting': hasCustomRouting,

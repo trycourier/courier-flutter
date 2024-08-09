@@ -21,6 +21,22 @@ void main() {
     return Future.delayed(Duration(milliseconds: milliseconds));
   }
 
+  group('Push', () {
+
+    setUp(() async {
+      await Courier.shared.signOut();
+    });
+
+    test('iOS Foreground Presentation Options', () async {
+
+      const options = iOSNotificationPresentationOption.values;
+      final newOptions = await Courier.shared.setIOSForegroundPresentationOptions(options: options);
+      expect(options, newOptions);
+
+    });
+
+  });
+
   group('Client', () {
 
     setUp(() async {

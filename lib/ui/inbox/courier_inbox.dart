@@ -41,13 +41,11 @@ class CourierInbox extends StatefulWidget {
   CourierInboxState createState() => CourierInboxState();
 }
 
-class CourierInboxState extends State<CourierInbox>
-    with AutomaticKeepAliveClientMixin {
+class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => widget.keepAlive;
 
-  late final ScrollController _scrollController =
-      widget.scrollController ?? ScrollController();
+  late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
   CourierInboxListener? _inboxListener;
 
   bool _isLoading = true;
@@ -291,10 +289,21 @@ class CourierInboxState extends State<CourierInbox>
     );
   }
 
+  void _removeInboxListener() {
+    if (_inboxListener != null) {
+      _inboxListener!.remove().then((_) {
+        _inboxListener = null;
+      }).catchError((error) {
+        Courier.log('Failed to remove inbox listener: $error');
+      });
+    }
+  }
+
   @override
-  Future<void> dispose() async {
+  void dispose() {
+
     // Remove the listeners
-    await _inboxListener?.remove();
+    _removeInboxListener();
     _scrollController.removeListener(_scrollListener);
 
     // Dispose the default controller
@@ -303,5 +312,6 @@ class CourierInboxState extends State<CourierInbox>
     }
 
     super.dispose();
+
   }
 }

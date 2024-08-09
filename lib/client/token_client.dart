@@ -7,7 +7,7 @@ class TokenClient {
   TokenClient(this._options);
 
   Future putUserToken({required String token, required String provider, CourierDevice? device}) async {
-    await _options.invokeClient('client.tokens.put_user_token', {
+    await _options.invokeClient('tokens.put_user_token', {
       'token': token,
       'provider': provider,
       'device': device?.toJson(),
@@ -15,7 +15,7 @@ class TokenClient {
   }
 
   Future deleteUserToken({required String token}) async {
-    await _options.invokeClient('client.tokens.delete_user_token', {
+    await _options.invokeClient('tokens.delete_user_token', {
       'token': token,
     });
   }

@@ -7,7 +7,7 @@ class TrackingClient {
   TrackingClient(this._options);
 
   Future postTrackingUrl({required String url, required CourierTrackingEvent event}) async {
-    await _options.invokeClient('client.tracking.post_tracking_url', {
+    await _options.invokeClient('tracking.post_tracking_url', {
       'url': url,
       'event': event.value,
     });

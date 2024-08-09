@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:courier_flutter/channels/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_provider.dart';
+import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
 import 'package:courier_flutter/models/courier_authentication_listener.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
@@ -11,7 +12,11 @@ import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:uuid/uuid.dart';
 
-class Courier extends CourierSharedChannel {
+export 'models/inbox_message.dart';
+export 'models/inbox_action.dart';
+export 'ios_foreground_notification_presentation_options.dart';
+
+class Courier extends CourierChannelManager {
 
   // Instance Creation
   static final Object _token = Object();
@@ -71,6 +76,8 @@ class Courier extends CourierSharedChannel {
 
   }
 
+  // Debugging
+
   /// Allows you to show or hide Courier Native SDK debugging logs
   /// You likely want this to match your development environment debugging mode
   bool _isDebugging = kDebugMode;
@@ -82,11 +89,40 @@ class Courier extends CourierSharedChannel {
     }
   }
 
+  // Push
+
+  /// Allows you to set how you would like the iOS SDK to handle
+  /// showing a push notification when it is received while the app is in the foreground.
+  /// This will not have an affect on any other platform
+  /// If you do not not want a system push to appear, pass []
+  List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions = iOSNotificationPresentationOption.values;
+  List<iOSNotificationPresentationOption> get iOSForegroundNotificationPresentationOptions => _iOSForegroundNotificationPresentationOptions;
+
+  @override
+  Future<List<iOSNotificationPresentationOption>> setIOSForegroundPresentationOptions({required List<iOSNotificationPresentationOption> options}) async {
+
+    // Skip other platforms. Do not show error
+    if (!Platform.isIOS) return [];
+
+    try {
+      List<dynamic> newOptions = await CourierFlutterChannels.system.invokeMethod('ios.set_foreground_presentation_options', {
+        'options': options.map((option) => option.value).toList(),
+      });
+      _iOSForegroundNotificationPresentationOptions = newOptions.map((option) => iOSNotificationPresentationOption.fromString(option)).toList();
+      return _iOSForegroundNotificationPresentationOptions;
+    } catch (error) {
+      Courier.log(error.toString());
+      _iOSForegroundNotificationPresentationOptions = [];
+      return _iOSForegroundNotificationPresentationOptions;
+    }
+
+  }
+
   // Client
 
   @override
   Future<CourierClient?> get client async {
-    final options = await _channel.invokeMethod('shared.client.get_options');
+    final options = await CourierFlutterChannels.shared.invokeMethod('client.get_options');
     return options == null ? null : CourierClient(
       jwt: options['jwt'],
       clientKey: options['clientKey'],
@@ -100,25 +136,25 @@ class Courier extends CourierSharedChannel {
   // Authentication
 
   @override
-  Future<String?> get userId => _channel.invokeMethod('shared.auth.user_id');
+  Future<String?> get userId => CourierFlutterChannels.shared.invokeMethod('auth.user_id');
 
   @override
-  Future<String?> get tenantId => _channel.invokeMethod('shared.auth.tenant_id');
+  Future<String?> get tenantId => CourierFlutterChannels.shared.invokeMethod('auth.tenant_id');
 
   @override
   Future<bool> get isUserSignedIn async {
-    return await _channel.invokeMethod('shared.auth.is_user_signed_in') ?? false;
+    return await CourierFlutterChannels.shared.invokeMethod('auth.is_user_signed_in') ?? false;
   }
 
   @override
   Future signOut() async {
-    await _channel.invokeMethod('shared.auth.sign_out');
+    await CourierFlutterChannels.shared.invokeMethod('auth.sign_out');
   }
 
   @override
   Future signIn({required String userId, required String accessToken, String? clientKey, String? tenantId, bool? showLogs}) async {
     _isDebugging = showLogs ?? kDebugMode;
-    await _channel.invokeMethod('shared.auth.sign_in', {
+    await CourierFlutterChannels.shared.invokeMethod('auth.sign_in', {
       'userId': userId,
       'tenantId': tenantId,
       'accessToken': accessToken,
@@ -129,7 +165,7 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future<CourierAuthenticationListener> addAuthenticationListener(Function(String? userId) onUserStateChanged) async {
-    final listenerId = await _channel.invokeMethod('shared.auth.add_authentication_listener');
+    final listenerId = await CourierFlutterChannels.shared.invokeMethod('auth.add_authentication_listener');
     final listener = CourierAuthenticationListener(listenerId: listenerId, onUserStateChanged: onUserStateChanged);
     _authenticationListeners[listenerId] = listener;
     return listener;
@@ -137,7 +173,7 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future removeAuthenticationListener({ required String listenerId }) async {
-    await _channel.invokeMethod('shared.auth.remove_authentication_listener', {
+    await CourierFlutterChannels.shared.invokeMethod('auth.remove_authentication_listener', {
       'listenerId': listenerId,
     });
     _authenticationListeners.remove(listenerId);
@@ -145,7 +181,7 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future removeAllAuthenticationListeners() async {
-    await _channel.invokeMethod('shared.auth.remove_all_authentication_listeners');
+    await CourierFlutterChannels.shared.invokeMethod('auth.remove_all_authentication_listeners');
     _authenticationListeners.clear();
   }
 
@@ -156,18 +192,18 @@ class Courier extends CourierSharedChannel {
     if (!Platform.isIOS) { // TODO: Add macOS support in the future
       return null;
     }
-    return await _channel.invokeMethod('shared.tokens.get_apns_token');
+    return await CourierFlutterChannels.shared.invokeMethod('tokens.get_apns_token');
   }
 
   @override
   Future<Map<String, String>> get tokens async {
-    final result = await _channel.invokeMethod('shared.tokens.get_all_tokens');
+    final result = await CourierFlutterChannels.shared.invokeMethod('tokens.get_all_tokens');
     return result?.cast<String, String>() ?? {};
   }
 
   @override
   Future setToken({required String token, required String provider}) async {
-    await _channel.invokeMethod('shared.tokens.set_token', {
+    await CourierFlutterChannels.shared.invokeMethod('tokens.set_token', {
       'token': token,
       'provider': provider,
     });
@@ -180,14 +216,14 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future<String?> getToken({required String provider}) async {
-    return await _channel.invokeMethod('shared.tokens.get_token', {
+    return await CourierFlutterChannels.shared.invokeMethod('tokens.get_token', {
       'provider': provider,
     });
   }
 
   @override
   Future<String?> getTokenForProvider({required CourierPushProvider provider}) async {
-    return await _channel.invokeMethod('shared.tokens.get_token', {
+    return await CourierFlutterChannels.shared.invokeMethod('tokens.get_token', {
       'provider': provider.value,
     });
   }
@@ -196,32 +232,32 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future<int> get inboxPaginationLimit async {
-    final result = await _channel.invokeMethod('shared.inbox.get_pagination_limit');
+    final result = await CourierFlutterChannels.shared.invokeMethod('inbox.get_pagination_limit');
     return result ?? 32;
   }
 
   @override
   Future setInboxPaginationLimit({required int limit}) async {
-    await _channel.invokeMethod('shared.inbox.set_pagination_limit', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.set_pagination_limit', {
       'limit': limit,
     });
   }
 
   @override
   Future<List<InboxMessage>> get inboxMessages async {
-    List<dynamic> messages = await _channel.invokeMethod('shared.inbox.get_messages');
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_messages');
     List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
     return inboxMessages;
   }
 
   @override
   Future refreshInbox() async {
-    await _channel.invokeMethod('shared.inbox.refresh');
+    await CourierFlutterChannels.shared.invokeMethod('inbox.refresh');
   }
 
   @override
   Future<List<InboxMessage>> fetchNextInboxPage() async {
-    List<dynamic> messages = await _channel.invokeMethod('shared.inbox.fetch_next_page');
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page');
     return messages.map((message) {
       final Map<String, dynamic> map = json.decode(message);
       return InboxMessage.fromJson(map);
@@ -245,7 +281,7 @@ class Courier extends CourierSharedChannel {
     _inboxListeners[listenerId] = listener;
 
     // Register native listener
-    await _channel.invokeMethod('shared.inbox.add_listener', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.add_listener', {
       'listenerId': listenerId
     });
 
@@ -255,7 +291,7 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future removeInboxListener({required String listenerId}) async {
-    await _channel.invokeMethod('shared.inbox.remove_listener', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.remove_listener', {
       'listenerId': listenerId
     });
     _authenticationListeners.remove(listenerId);
@@ -263,56 +299,61 @@ class Courier extends CourierSharedChannel {
 
   @override
   Future removeAllInboxListeners() async {
-    await _channel.invokeMethod('shared.inbox.remove_all_inbox_listeners');
+    await CourierFlutterChannels.shared.invokeMethod('inbox.remove_all_inbox_listeners');
     _inboxListeners.clear();
   }
 
   @override
   Future openMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.inbox.open_message', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.open_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future readMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.inbox.read_message', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.read_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future unreadMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.inbox.unread_message', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.unread_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future clickMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.inbox.click_message', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.click_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future archiveMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.inbox.archive_message', {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.archive_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future readAllInboxMessages() async {
-    await _channel.invokeMethod('shared.inbox.read_all_messages');
+    await CourierFlutterChannels.shared.invokeMethod('inbox.read_all_messages');
   }
 
 }
 
-abstract class CourierSharedChannel extends PlatformInterface {
+abstract class CourierChannelManager extends PlatformInterface {
+  
+  CourierChannelManager({required super.token});
 
-  final _channel = CourierFlutterChannels.shared;
-  CourierSharedChannel({required super.token});
+  // Push
+
+  Future<List<iOSNotificationPresentationOption>> setIOSForegroundPresentationOptions({required List<iOSNotificationPresentationOption> options}) async {
+    throw UnimplementedError('setIosForegroundPresentationOptions() has not been implemented.');
+  }
 
   // Client
 

@@ -27,8 +27,11 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     }
     
     // MARK: Props
-    
-    private var methodChannel: FlutterMethodChannel? = nil
+    private var channel: FlutterMethodChannel? {
+        get {
+            return CourierFlutterChannel.shared.channel
+        }
+    }
     private var lastClickedPushNotification: [AnyHashable : Any?]? = nil
     private var foregroundPresentationOptions: UNNotificationPresentationOptions = []
     
@@ -46,8 +49,52 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     
     open override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
+        if let fvc = window?.rootViewController as? FlutterViewController, let bm = fvc as? FlutterBinaryMessenger {
+            
+            let methodChannel = FlutterMethodChannel(name: "courier_flutter_system", binaryMessenger: bm)
+            
+            methodChannel.setMethodCallHandler({ [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+                
+                switch call.method {
+                    
+                case "ios.set_foreground_presentation_options":
+                    
+                    if let params = call.arguments as? Dictionary<String, Any>, let options = params["options"] as? [String] {
+                        
+                        // Clear out and add presentation optionset
+                        self?.foregroundPresentationOptions = []
+                        options.forEach { option in
+                            switch option {
+                            case "sound": self?.foregroundPresentationOptions.insert(.sound)
+                            case "badge": self?.foregroundPresentationOptions.insert(.badge)
+                            case "list": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.list) } else { self?.foregroundPresentationOptions.insert(.alert) }
+                            case "banner": if #available(iOS 14.0, *) { self?.foregroundPresentationOptions.insert(.banner) } else { self?.foregroundPresentationOptions.insert(.alert) }
+                            default: break
+                            }
+                        }
+                        
+                        result(options)
+                        return
+                        
+                    }
+                    
+                    result(nil)
+                    
+                default:
+                    
+                    result(FlutterMethodNotImplemented)
+                    
+                }
+            })
+            
+        }
+            
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+    }
+        
         // Register and instance of a flutter engine
-        if let flutterViewController = window?.rootViewController as? FlutterViewController, let binaryMessenger = flutterViewController as? FlutterBinaryMessenger {
+//        if let flutterViewController = window?.rootViewController as? FlutterViewController, let binaryMessenger = flutterViewController as? FlutterBinaryMessenger {
 
             // Create a method channel to listen to platform events
 //            methodChannel = FlutterMethodChannel(name: CourierFlutterPlugin.EVENTS_CHANNEL, binaryMessenger: binaryMessenger)
@@ -116,11 +163,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
 //
 //            })
 
-        }
-        
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-        
-    }
+//        }
     
     // MARK: Messaging
     
@@ -132,7 +175,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
 //        Courier.shared.trackNotification(message: message, event: .delivered)
 
         let pushNotification = Courier.formatPushNotification(content: content)
-        methodChannel?.invokeMethod("pushNotificationDelivered", arguments: pushNotification)
+        channel?.invokeMethod("pushNotificationDelivered", arguments: pushNotification)
         
         completionHandler(foregroundPresentationOptions)
         
@@ -147,7 +190,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         
         let pushNotification = Courier.formatPushNotification(content: content)
         lastClickedPushNotification = pushNotification
-        methodChannel?.invokeMethod("pushNotificationClicked", arguments: pushNotification)
+        channel?.invokeMethod("pushNotificationClicked", arguments: pushNotification)
         
         completionHandler()
         

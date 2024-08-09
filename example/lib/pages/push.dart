@@ -29,7 +29,7 @@ class _PushPageState extends State<PushPage> {
     _start();
   }
 
-  void _start() {
+  Future<void> _start() async {
     // TODO
     // _pushListener = CourierRC.shared.addPushListener(
     //   onPushClicked: (push) {
@@ -40,13 +40,14 @@ class _PushPageState extends State<PushPage> {
     //   },
     // );
     //
-    // Courier.shared.iOSForegroundNotificationPresentationOptions = [
-    //   iOSNotificationPresentationOption.banner,
-    //   iOSNotificationPresentationOption.sound,
-    //   iOSNotificationPresentationOption.list,
-    //   iOSNotificationPresentationOption.badge,
-    // ];
-    // print(Courier.shared.iOSForegroundNotificationPresentationOptions);
+    final options = await Courier.shared.setIOSForegroundPresentationOptions(options: [
+      iOSNotificationPresentationOption.banner,
+      iOSNotificationPresentationOption.sound,
+      iOSNotificationPresentationOption.list,
+      iOSNotificationPresentationOption.badge,
+    ]);
+    print(options);
+    print(Courier.shared.iOSForegroundNotificationPresentationOptions);
 
     _getTokens();
   }
@@ -158,7 +159,7 @@ class _PushPageState extends State<PushPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inbox'),
+        title: const Text('Push'),
       ),
       body: _buildContent(context),
     );

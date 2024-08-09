@@ -9,7 +9,7 @@ class BrandClient {
   BrandClient(this._options);
 
   Future<CourierBrandResponse> getBrand({required String brandId}) async {
-    final data = await _options.invokeClient('client.brands.get_brand', {
+    final data = await _options.invokeClient('brands.get_brand', {
       'brandId': brandId,
     });
     final Map<String, dynamic> map = json.decode(data);

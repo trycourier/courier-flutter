@@ -49,10 +49,10 @@ class CourierPreferences extends StatefulWidget {
       _darkTheme = darkTheme ?? CourierPreferencesTheme();
 
   @override
-  CourierInboxState createState() => CourierInboxState();
+  CourierPreferencesState createState() => CourierPreferencesState();
 }
 
-class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliveClientMixin {
+class CourierPreferencesState extends State<CourierPreferences> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => widget.keepAlive;
 
@@ -85,6 +85,8 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       final client = await Courier.shared.client;
       final res = await client?.preferences.getUserPreferences();
+
+      if (!mounted) return;
 
       final topics = res?.items ?? [];
 
@@ -124,6 +126,8 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
       });
 
     } catch (error) {
+
+      if (!mounted) return;
 
       setState(() {
         _userId = userId;
@@ -392,6 +396,9 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
   }
 
   void _updateTopic(String topicId, CourierUserPreferencesTopic newTopic) {
+
+    if (!mounted) return;
+
     for (int sectionIndex = 0; sectionIndex < _sections.length; sectionIndex++) {
       final section = _sections[sectionIndex];
       final topicIndex = section.topics.indexWhere((topic) => topic.topicId == topicId);

@@ -11,4 +11,8 @@ enum iOSNotificationPresentationOption {
     required this.value,
   });
 
+  static iOSNotificationPresentationOption fromString(String value) {
+    return iOSNotificationPresentationOption.values.firstWhere((option) => option.value == value);
+  }
+
 }

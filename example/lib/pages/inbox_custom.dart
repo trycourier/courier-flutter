@@ -72,9 +72,19 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     message.isRead ? await message.markAsUnread() : await message.markAsRead();
   }
 
+  void _removeInboxListener() {
+    if (_inboxListener != null) {
+      _inboxListener!.remove().then((_) {
+        _inboxListener = null;
+      }).catchError((error) {
+        Courier.log('Failed to remove inbox listener: $error');
+      });
+    }
+  }
+
   @override
   void dispose() async {
-    await _inboxListener?.remove();
+    _removeInboxListener();
     super.dispose();
   }
 
