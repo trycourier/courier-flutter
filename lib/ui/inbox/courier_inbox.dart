@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'courier_inbox_list_item.dart';
 
 class CourierInbox extends StatefulWidget {
-
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
 
@@ -42,11 +41,13 @@ class CourierInbox extends StatefulWidget {
   CourierInboxState createState() => CourierInboxState();
 }
 
-class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClientMixin {
+class CourierInboxState extends State<CourierInbox>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => widget.keepAlive;
 
-  late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
+  late final ScrollController _scrollController =
+      widget.scrollController ?? ScrollController();
   CourierInboxListener? _inboxListener;
 
   bool _isLoading = true;
@@ -62,27 +63,25 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   @override
   void initState() {
     super.initState();
-
-    // Ensure widget is mounted
-    if (mounted) {
-      _start();
-    }
-
+    _start();
   }
 
   void _scrollListener() {
     // Trigger the pagination
-    if (_scrollController.offset >= _scrollController.position.maxScrollExtent - _triggerPoint) {
+    if (_scrollController.offset >=
+        _scrollController.position.maxScrollExtent - _triggerPoint) {
       CourierRC.shared.fetchNextInboxPage();
     }
   }
 
   Future _start() async {
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    }
 
     // Attach scroll listener
     _scrollController.addListener(_scrollListener);
@@ -93,6 +92,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     // Attach inbox message listener
     _inboxListener = await CourierRC.shared.addInboxListener(
       onInitialLoad: () async {
+        if (!mounted) {
+          return;
+        }
+
         final userId = await CourierRC.shared.userId;
         setState(() {
           _userId = userId;
@@ -102,6 +105,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         });
       },
       onError: (error) async {
+        if (!mounted) {
+          return;
+        }
+
         final userId = await CourierRC.shared.userId;
         setState(() {
           _userId = userId;
@@ -111,6 +118,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         });
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
+        if (!mounted) {
+          return;
+        }
+
         final userId = await CourierRC.shared.userId;
         setState(() {
           _userId = userId;
@@ -125,14 +136,15 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   }
 
   Future<CourierBrand?> _refreshBrand() async {
-
     if (!mounted) return null;
 
     try {
-
       // Get the theme
-      Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
-      final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+      Brightness currentBrightness =
+          PlatformDispatcher.instance.platformBrightness;
+      final brandId = currentBrightness == Brightness.dark
+          ? widget._darkTheme.brandId
+          : widget._lightTheme.brandId;
 
       if (brandId == null) {
         widget._lightTheme.brand = null;
@@ -147,17 +159,13 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       widget._lightTheme.brand = brand;
       widget._darkTheme.brand = brand;
       return brand;
-
     } catch (error) {
-
       CourierRC.log(error.toString());
 
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;
       return null;
-
     }
-
   }
 
   Future<void> _refresh() async {
@@ -230,7 +238,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
               child: ListView.separated(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _scrollController,
-                separatorBuilder: (context, index) => getTheme(isDarkMode).separator ?? const SizedBox(),
+                separatorBuilder: (context, index) =>
+                    getTheme(isDarkMode).separator ?? const SizedBox(),
                 itemCount: _itemCount,
                 itemBuilder: (BuildContext context, int index) {
                   if (index <= _messages.length - 1) {
@@ -240,21 +249,27 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
                       message: message,
                       onMessageClick: (message) {
                         message.markAsClicked();
-                        widget.onMessageClick != null ? widget.onMessageClick!(message, index) : null;
+                        widget.onMessageClick != null
+                            ? widget.onMessageClick!(message, index)
+                            : null;
                       },
-                      onActionClick: (action) => widget.onActionClick != null ? widget.onActionClick!(action, message, index) : null,
+                      onActionClick: (action) => widget.onActionClick != null
+                          ? widget.onActionClick!(action, message, index)
+                          : null,
                     );
                   } else {
                     return Container(
                       alignment: Alignment.center,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 24, bottom: _triggerPoint),
+                        padding:
+                            EdgeInsets.only(top: 24, bottom: _triggerPoint),
                         child: SizedBox(
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation<Color>(getTheme(isDarkMode).getLoadingColor(context)),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                getTheme(isDarkMode).getLoadingColor(context)),
                           ),
                         ),
                       ),
@@ -265,7 +280,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             ),
           ),
         ),
-        CourierFooter(shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
+        CourierFooter(
+            shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
       ],
     );
   }
@@ -283,7 +299,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   @override
   void dispose() {
-
     // Remove the listeners
     _inboxListener?.remove();
     _scrollController.removeListener(_scrollListener);
@@ -294,6 +309,5 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     }
 
     super.dispose();
-
   }
 }

@@ -101,9 +101,15 @@ class _MyAppState extends State<MyApp> {
 
     await _refreshJwt();
 
-    _inboxListener = await CourierRC.shared.addInboxListener(onInitialLoad: null, onError: null, onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-      setState(() => _unreadMessageCount = unreadMessageCount);
-    });
+    _inboxListener = await CourierRC.shared.addInboxListener(
+      onInitialLoad: null,
+      onError: (error) {
+        setState(() => _unreadMessageCount = 0);
+      },
+      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+        setState(() => _unreadMessageCount = unreadMessageCount);
+      }
+    );
 
     // TODO
     // _pushListener = CourierRC.shared.addPushListener(
