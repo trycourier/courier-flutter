@@ -62,16 +62,16 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     
                     try await client.tokens.putUserToken(
                         token: token,
-                        provider: provider
+                        provider: provider,
+                        device: device ?? CourierDevice()
                     )
                     
                     result(nil)
                     
                 case "client.tokens.delete_user_token":
                     
-                    let (token, provider): (String, String) = (
-                        try params.extract("token"),
-                        try params.extract("provider")
+                    let (token): (String) = (
+                        try params.extract("token")
                     )
                     
                     try await client.tokens.deleteUserToken(

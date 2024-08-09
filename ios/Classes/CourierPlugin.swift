@@ -10,9 +10,86 @@ public class CourierPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
+        
+//        let channel = FlutterMethodChannel(name: "courier_flutter_shared", binaryMessenger: registrar.messenger())
+//        let instance = CourierPlugin()
+////        instance.channel = channel
+//        registrar.addMethodCallDelegate(instance, channel: channel)
+        
         CourierSharedMethodHandler.register(with: registrar)
         CourierClientMethodHandler.register(with: registrar)
     }
+    
+    private var inboxListeners = [String: CourierInboxListener]()
+    
+//    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+//        
+//        Task {
+//            
+//            do {
+//                
+//                if call.method == "shared.auth.sign_in" {
+//                    
+//                    guard let params = call.arguments as? Dictionary<String, Any> else {
+//                        throw CourierError.missingParameter(value: "params")
+//                    }
+//                    
+//                    let userId: String = try params.extract("userId")
+//                    let tenantId = params["tenantId"] as? String
+//                    let accessToken: String = try params.extract("accessToken")
+//                    let clientKey = params["clientKey"] as? String
+//                    let showLogs: Bool = try params.extract("showLogs")
+//                    
+//                    await Courier.shared.signIn(
+//                        userId: userId,
+//                        tenantId: tenantId,
+//                        accessToken: accessToken,
+//                        clientKey: clientKey,
+//                        showLogs: showLogs
+//                    )
+//                    
+//                    result(nil)
+//                    
+//                } else if (call.method == "shared.inbox.add_listener") {
+//                    
+//                    guard let params = call.arguments as? Dictionary<String, Any> else {
+//                        throw CourierError.missingParameter(value: "params")
+//                    }
+//                    
+//                    let listenerId: String = try params.extract("listenerId")
+//                    
+//                    // Create the listener
+//                    let listener = Courier.shared.addInboxListener(
+//                        onInitialLoad: {
+//                            CourierFlutterChannel.inbox.channel?.invokeMethod("loading", arguments: nil)
+//                        },
+//                        onError: { error in
+//                            CourierFlutterChannel.inbox.channel?.invokeMethod("error", arguments: nil)
+//                        },
+//                        onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
+//                            CourierFlutterChannel.inbox.channel?.invokeMethod("message", arguments: nil)
+//                        }
+//                    )
+//                    
+//                    // Hold reference to the auth listeners
+//                    inboxListeners[listenerId] = listener
+//                    
+//                    // Return the id of the listener
+//                    result(listenerId)
+//                    
+//                }
+//                    
+//            } catch {
+//                    
+//                result(error.toFlutterError())
+//                
+//            }
+//                
+//        }
+//            
+//    }
+        
+}
 
 //    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
 //        
@@ -298,5 +375,3 @@ public class CourierPlugin: NSObject, FlutterPlugin {
 //        }
           
 //    }
-    
-}

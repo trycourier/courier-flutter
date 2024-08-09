@@ -11,6 +11,7 @@ internal enum CourierFlutterChannel: String {
     case shared = "courier_flutter_shared"
     case client = "courier_flutter_client"
     case events = "courier_flutter_events"
+    case inbox = "courier_flutter_inbox_events"
 }
 
 internal extension CourierFlutterChannel {

@@ -65,22 +65,35 @@ class InboxMessage {
   }
 
   String get time {
-    final dateFormatter = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZZZZZ');
-
     if (created != null) {
-      final date = dateFormatter.parse(created!);
-      final timeDifference = DateTime.now().difference(date);
+      // Define the date format and specify that it should be parsed in UTC to avoid timezone issues
+      final dateFormatter = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
 
-      final timeSince = timeDifference.inSeconds;
+      try {
+        // Parse the created date in UTC and then convert it to the local time zone
+        final date = dateFormatter.parseUtc(created!).toLocal();
+        final timeDifference = DateTime.now().difference(date);
 
-      if (timeSince < 60) {
-        return 'now';
-      } else if (timeSince < 3600) {
-        return '${timeSince ~/ 60} minutes ago';
-      } else if (timeSince < 86400) {
-        return '${timeSince ~/ 3600} hours ago';
-      } else {
-        return '${timeSince ~/ 86400} days ago';
+        final timeSince = timeDifference.inSeconds;
+
+        if (timeSince < 0) {
+          return 'in the future';
+        } else if (timeSince < 30) {
+          return 'now';
+        } else if (timeSince < 60) {
+          return '$timeSince seconds ago';
+        } else if (timeSince < 120) {
+          return '1 minute ago';
+        } else if (timeSince < 3600) {
+          return '${timeSince ~/ 60} minutes ago';
+        } else if (timeSince < 86400) {
+          return '${timeSince ~/ 3600} hours ago';
+        } else {
+          return '${timeSince ~/ 86400} days ago';
+        }
+      } catch (e) {
+        // If parsing fails, return a default value
+        return 'unknown time';
       }
     }
 

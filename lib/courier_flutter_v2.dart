@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -365,19 +366,22 @@ class CourierRC extends CourierSharedChannel {
         }
         case 'events.shared.inbox.listener_messages_changed': {
 
-          // Map the messages
           List<dynamic>? messages = call.arguments['messages'];
-          List<InboxMessage>? inboxMessages = messages?.map((message) => InboxMessage.fromJson(message)).toList();
+          List<InboxMessage>? inboxMessages = messages?.map((message) {
+            final Map<String, dynamic> map = json.decode(message);
+            return InboxMessage.fromJson(map);
+          }).toList();
 
           // Call the callback
           _inboxListeners.forEach((key, listener) {
             listener.onMessagesChanged?.call(
               inboxMessages ??= [],
-              call.arguments['unreadMessageCount'],
-              call.arguments['totalMessageCount'],
-              call.arguments['canPaginate'],
+              call.arguments['unreadMessageCount'] ??= 0,
+              call.arguments['totalMessageCount'] ??= 0,
+              call.arguments['canPaginate'] ??= false,
             );
           });
+
           break;
         }
       }
@@ -534,10 +538,12 @@ class CourierRC extends CourierSharedChannel {
     final listenerId = const Uuid().v4();
 
     // Create flutter listener
-    final listener = CourierInboxListener(listenerId: listenerId);
-    listener.onInitialLoad = onInitialLoad;
-    listener.onError = onError;
-    listener.onMessagesChanged = onMessagesChanged;
+    final listener = CourierInboxListener(
+        listenerId: listenerId,
+        onInitialLoad: onInitialLoad,
+        onError: onError,
+        onMessagesChanged: onMessagesChanged
+    );
 
     // Hold reference
     _inboxListeners[listenerId] = listener;
@@ -561,48 +567,48 @@ class CourierRC extends CourierSharedChannel {
 
   @override
   Future removeAllInboxListeners() async {
-    await _channel.invokeMethod('shared.auth.remove_all_inbox_listeners');
+    await _channel.invokeMethod('shared.inbox.remove_all_inbox_listeners');
     _inboxListeners.clear();
   }
 
   @override
   Future openMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.auth.open_message', {
+    await _channel.invokeMethod('shared.inbox.open_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future readMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.auth.read_message', {
+    await _channel.invokeMethod('shared.inbox.read_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future unreadMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.auth.unread_message', {
+    await _channel.invokeMethod('shared.inbox.unread_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future clickMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.auth.click_message', {
+    await _channel.invokeMethod('shared.inbox.click_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future archiveMessage({required String messageId}) async {
-    await _channel.invokeMethod('shared.auth.archive_message', {
+    await _channel.invokeMethod('shared.inbox.archive_message', {
       'messageId': messageId,
     });
   }
 
   @override
   Future readAllInboxMessages() async {
-    await _channel.invokeMethod('shared.auth.read_all_messages');
+    await _channel.invokeMethod('shared.inbox.read_all_messages');
   }
 
 }

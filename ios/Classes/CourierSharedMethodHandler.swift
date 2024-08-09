@@ -234,23 +234,26 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                     let listenerId: String = try params.extract("listenerId")
                     
+                    let channel = CourierFlutterChannel.events.channel
+                    
                     // Create the listener
                     let listener = Courier.shared.addInboxListener(
                         onInitialLoad: {
-                            CourierFlutterChannel.events.channel?.invokeMethod("events.shared.inbox.listener_loading", arguments: nil)
+                            channel?.invokeMethod("events.shared.inbox.listener_loading", arguments: nil)
                         },
                         onError: { error in
-                            CourierFlutterChannel.events.channel?.invokeMethod("events.shared.inbox.listener_error", arguments: [
+                            channel?.invokeMethod("events.shared.inbox.listener_error", arguments: [
                                 "error": error.localizedDescription
                             ])
                         },
                         onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
-                            CourierFlutterChannel.events.channel?.invokeMethod("events.shared.inbox.listener_messages_changed", arguments: [
-                                "messages": messages.map { $0.toDictionary() },
+                            let json: [String: Any] = [
+                                "messages": messages.map { $0.toDictionary().toJson() },
                                 "unreadMessageCount": unreadMessageCount,
                                 "totalMessageCount": totalMessageCount,
-                                "canPaginate": canPaginate,
-                            ])
+                                "canPaginate": canPaginate
+                            ]
+                            channel?.invokeMethod("events.shared.inbox.listener_messages_changed", arguments: json)
                         }
                     )
                     

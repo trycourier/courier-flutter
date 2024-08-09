@@ -241,41 +241,27 @@ void main() {
 
     });
 
-    // test('Add Inbox Listener', () async {
-    //
-    //   await UserBuilder.build(userId: userId);
-    //
-    //   var hold = true;
-    //
-    //   final listener = await CourierRC.shared.addInboxListener(
-    //     onInitialLoad: () {
-    //       print("Loading");
-    //     },
-    //     onError: (error) {
-    //       print(error);
-    //     },
-    //     onMessagesChanged: (messages, unreadCount, totalCount, canPaginate) {
-    //       print("onMessagesChanged");
-    //       hold = messages.isEmpty;
-    //     }
-    //   );
-    //
-    //   await delay();
-    //
-    //   // TODO: Message count not working on second message
-    //
-    //   await sendMessage(userId);
-    //
-    //   while (hold) {
-    //     // Hold
-    //   }
-    //
-    //   final messages = await CourierRC.shared.inboxMessages;
-    //   expect(messages.length, 1);
-    //
-    //   await listener.remove();
-    //
-    // });
+    test('Add Inbox Listener', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      var hold = true;
+
+      final listener = await CourierRC.shared.addInboxListener(
+        onInitialLoad: null,
+        onError: null,
+        onMessagesChanged: (messages, unreadCount, totalCount, canPaginate) {
+          hold = false;
+        }
+      );
+
+      while (hold) {
+        // Hold
+      }
+
+      await listener.remove();
+
+    });
 
     test('Open Message', () async {
 
