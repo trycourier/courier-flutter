@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +35,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   }
 
   Future _start() async {
-    _inboxListener = await CourierRC.shared.addInboxListener(
+    _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () {
         if (mounted) {
           setState(() {
@@ -66,7 +65,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   }
 
   Future<void> _refresh() async {
-    await CourierRC.shared.refreshInbox();
+    await Courier.shared.refreshInbox();
   }
 
   Future<void> _onMessageClick(InboxMessage message) async {

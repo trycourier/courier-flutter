@@ -1,5 +1,4 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
@@ -37,13 +36,19 @@ class _PreferencesDetailPageState extends State<PreferencesDetailPage> {
       _error = null;
     });
 
-    // try {
-    //   _topic = await Courier.shared.getUserPreferencesTopic(topicId: widget.topicId);
-    // } catch (error) {
-    //   setState(() {
-    //     _error = error.toString();
-    //   });
-    // }
+    try {
+      final client = await Courier.shared.client;
+      final res = await client?.preferences.getUserPreferenceTopic(topicId: widget.topicId);
+      final topic = res?.topic;
+      if (topic == null) {
+        throw 'Topic is null';
+      }
+      _topic = topic;
+    } catch (error) {
+      setState(() {
+        _error = error.toString();
+      });
+    }
 
     setState(() {
       _isLoading = false;
@@ -57,7 +62,7 @@ class _PreferencesDetailPageState extends State<PreferencesDetailPage> {
     });
 
     try {
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
       await client?.preferences.putUserPreferencesTopic(
         topicId: widget.topicId,
         status: _selectedStatus ?? _topic.status,

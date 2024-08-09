@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 
 class CourierAuthenticationListener {
 
@@ -7,6 +7,6 @@ class CourierAuthenticationListener {
 
   CourierAuthenticationListener({ required this.listenerId, required this.onUserStateChanged });
 
-  Future remove() async => await CourierRC.shared.removeAuthenticationListener(listenerId: listenerId);
+  Future remove() async => await Courier.shared.removeAuthenticationListener(listenerId: listenerId);
 
 }

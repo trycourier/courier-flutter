@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,12 +24,12 @@ void main() {
   group('Client', () {
 
     setUp(() async {
-      await CourierRC.shared.signOut();
+      await Courier.shared.signOut();
     });
 
     test('Null', () async {
 
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
 
       expect(client?.options.jwt, isNull);
       expect(client?.options.userId, isNull);
@@ -40,7 +40,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
 
       expect(client?.options.userId, userId);
 
@@ -50,7 +50,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
 
       final res = await client?.brands.getBrand(brandId: Env.brandId);
 
@@ -63,16 +63,16 @@ void main() {
   group('Authentication', () {
 
     setUp(() async {
-      await CourierRC.shared.signOut();
+      await Courier.shared.signOut();
     });
 
     test('Sign Out', () async {
 
-      await CourierRC.shared.signOut();
+      await Courier.shared.signOut();
 
-      final currentUserId = await CourierRC.shared.userId;
-      final currentTenantId = await CourierRC.shared.tenantId;
-      final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
+      final currentUserId = await Courier.shared.userId;
+      final currentTenantId = await Courier.shared.tenantId;
+      final isUserSignedIn = await Courier.shared.isUserSignedIn;
 
       expect(currentUserId, isNull);
       expect(currentTenantId, isNull);
@@ -84,9 +84,9 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final currentUserId = await CourierRC.shared.userId;
-      final currentTenantId = await CourierRC.shared.tenantId;
-      final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
+      final currentUserId = await Courier.shared.userId;
+      final currentTenantId = await Courier.shared.tenantId;
+      final isUserSignedIn = await Courier.shared.isUserSignedIn;
       expect(currentUserId, userId);
       expect(currentTenantId, isNull);
       expect(isUserSignedIn, true);
@@ -97,13 +97,13 @@ void main() {
 
       var hold = true;
 
-      final listener = await CourierRC.shared.addAuthenticationListener((userId) {
+      final listener = await Courier.shared.addAuthenticationListener((userId) {
         hold = userId == null;
       });
 
       await UserBuilder.build(userId: userId);
 
-      final isUserSignedIn = await CourierRC.shared.isUserSignedIn;
+      final isUserSignedIn = await Courier.shared.isUserSignedIn;
       expect(isUserSignedIn, true);
 
       while (hold) {
@@ -116,11 +116,11 @@ void main() {
 
     test('Remove All Authentication Listeners', () async {
 
-      await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
-      await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
-      await CourierRC.shared.addAuthenticationListener((userId) => print(userId));
+      await Courier.shared.addAuthenticationListener((userId) => print(userId));
+      await Courier.shared.addAuthenticationListener((userId) => print(userId));
+      await Courier.shared.addAuthenticationListener((userId) => print(userId));
 
-      await CourierRC.shared.removeAllAuthenticationListeners();
+      await Courier.shared.removeAllAuthenticationListeners();
 
     });
 
@@ -129,14 +129,14 @@ void main() {
   group('Tokens', () {
 
     setUp(() async {
-      await CourierRC.shared.signOut();
+      await Courier.shared.signOut();
     });
 
     test('APNS Token', () async {
 
       await UserBuilder.build(userId: userId);
 
-      final apnsToken = await CourierRC.shared.apnsToken;
+      final apnsToken = await Courier.shared.apnsToken;
       print(apnsToken);
 
     });
@@ -147,20 +147,20 @@ void main() {
 
       // Save tokens courier remote and local
       await Future.wait([
-        CourierRC.shared.setToken(token: "token1", provider: "provider0"),
-        CourierRC.shared.setTokenForProvider(token: "token2", provider: CourierPushProvider.apn),
-        CourierRC.shared.setTokenForProvider(token: "token3", provider: CourierPushProvider.firebaseFcm),
-        CourierRC.shared.setTokenForProvider(token: "token4", provider: CourierPushProvider.expo),
+        Courier.shared.setToken(token: "token1", provider: "provider0"),
+        Courier.shared.setTokenForProvider(token: "token2", provider: CourierPushProvider.apn),
+        Courier.shared.setTokenForProvider(token: "token3", provider: CourierPushProvider.firebaseFcm),
+        Courier.shared.setTokenForProvider(token: "token4", provider: CourierPushProvider.expo),
       ]);
 
-      final tokensWithUser = await CourierRC.shared.tokens;
+      final tokensWithUser = await Courier.shared.tokens;
       expect(tokensWithUser.length, 4);
 
       // Remove current user
-      await CourierRC.shared.signOut();
+      await Courier.shared.signOut();
 
       // Ensure tokens still exist locally
-      final tokensWithoutUser = await CourierRC.shared.tokens;
+      final tokensWithoutUser = await Courier.shared.tokens;
       expect(tokensWithoutUser.length, 4);
 
     });
@@ -169,7 +169,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      await CourierRC.shared.setTokenForProvider(
+      await Courier.shared.setTokenForProvider(
           token: "token",
           provider: CourierPushProvider.firebaseFcm
       );
@@ -183,12 +183,12 @@ void main() {
       const provider = CourierPushProvider.firebaseFcm;
       const example = "example_token";
 
-      await CourierRC.shared.setTokenForProvider(
+      await Courier.shared.setTokenForProvider(
           token: example,
           provider: provider
       );
 
-      final token = await CourierRC.shared.getTokenForProvider(provider: provider);
+      final token = await Courier.shared.getTokenForProvider(provider: provider);
       expect(token, example);
 
     });
@@ -198,19 +198,19 @@ void main() {
   group('Inbox', () {
 
     setUp(() async {
-      await CourierRC.shared.signOut();
+      await Courier.shared.signOut();
     });
 
     test('Pagination Limit', () async {
 
       await UserBuilder.build(userId: userId);
 
-      await CourierRC.shared.setInboxPaginationLimit(limit: -100);
-      final limit1 = await CourierRC.shared.inboxPaginationLimit;
+      await Courier.shared.setInboxPaginationLimit(limit: -100);
+      final limit1 = await Courier.shared.inboxPaginationLimit;
       expect(limit1, 1);
 
-      await CourierRC.shared.setInboxPaginationLimit(limit: 10000);
-      final limit2 = await CourierRC.shared.inboxPaginationLimit;
+      await Courier.shared.setInboxPaginationLimit(limit: 10000);
+      final limit2 = await Courier.shared.inboxPaginationLimit;
       expect(limit2, 100);
 
     });
@@ -219,7 +219,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final messages = await CourierRC.shared.inboxMessages;
+      final messages = await Courier.shared.inboxMessages;
       expect(messages, []);
 
     });
@@ -228,7 +228,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      await CourierRC.shared.refreshInbox();
+      await Courier.shared.refreshInbox();
 
     });
 
@@ -236,7 +236,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final messages = await CourierRC.shared.fetchNextInboxPage();
+      final messages = await Courier.shared.fetchNextInboxPage();
       expect(messages, []);
 
     });
@@ -247,7 +247,7 @@ void main() {
 
       var hold = true;
 
-      final listener = await CourierRC.shared.addInboxListener(
+      final listener = await Courier.shared.addInboxListener(
         onInitialLoad: null,
         onError: null,
         onMessagesChanged: (messages, unreadCount, totalCount, canPaginate) {
@@ -269,7 +269,7 @@ void main() {
 
       final messageId = await sendMessage(userId);
 
-      await CourierRC.shared.openMessage(messageId: messageId);
+      await Courier.shared.openMessage(messageId: messageId);
 
     });
 
@@ -279,7 +279,7 @@ void main() {
 
       final messageId = await sendMessage(userId);
 
-      await CourierRC.shared.readMessage(messageId: messageId);
+      await Courier.shared.readMessage(messageId: messageId);
 
     });
 
@@ -289,7 +289,7 @@ void main() {
 
       final messageId = await sendMessage(userId);
 
-      await CourierRC.shared.unreadMessage(messageId: messageId);
+      await Courier.shared.unreadMessage(messageId: messageId);
 
     });
 
@@ -299,7 +299,7 @@ void main() {
 
       final messageId = await sendMessage(userId);
 
-      await CourierRC.shared.clickMessage(messageId: messageId);
+      await Courier.shared.clickMessage(messageId: messageId);
 
     });
 
@@ -309,7 +309,7 @@ void main() {
 
       final messageId = await sendMessage(userId);
 
-      await CourierRC.shared.archiveMessage(messageId: messageId);
+      await Courier.shared.archiveMessage(messageId: messageId);
 
     });
 
@@ -319,7 +319,7 @@ void main() {
 
       await sendMessage(userId);
 
-      await CourierRC.shared.readAllInboxMessages();
+      await Courier.shared.readAllInboxMessages();
 
     });
 

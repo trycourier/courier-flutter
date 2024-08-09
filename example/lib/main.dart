@@ -1,5 +1,3 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
-
 import 'env.dart';
 import 'example_server.dart';
 import 'firebase_options.dart';
@@ -68,7 +66,7 @@ class _MyAppState extends State<MyApp> {
 
   Future _refreshJwt() async {
 
-    final currentUserId = await CourierRC.shared.userId;
+    final currentUserId = await Courier.shared.userId;
 
     if (currentUserId != null) {
 
@@ -81,7 +79,7 @@ class _MyAppState extends State<MyApp> {
         );
 
         // Sign in with new token
-        await CourierRC.shared.signIn(
+        await Courier.shared.signIn(
             accessToken: token,
             userId: currentUserId
         );
@@ -89,7 +87,7 @@ class _MyAppState extends State<MyApp> {
       } catch (error) {
 
         print(error);
-        await CourierRC.shared.signOut();
+        await Courier.shared.signOut();
 
       }
 
@@ -101,7 +99,7 @@ class _MyAppState extends State<MyApp> {
 
     await _refreshJwt();
 
-    _inboxListener = await CourierRC.shared.addInboxListener(
+    _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: null,
       onError: (error) {
         setState(() => _unreadMessageCount = 0);
@@ -120,7 +118,7 @@ class _MyAppState extends State<MyApp> {
     try {
       final token = await FirebaseMessaging.instance.getToken();
       if (token != null) {
-        CourierRC.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
+        Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: token);
       }
     } catch (e) {
       print(e);
@@ -128,7 +126,7 @@ class _MyAppState extends State<MyApp> {
 
     // Listener to firebase token change
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      CourierRC.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
+      Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: fcmToken);
     }).onError((error) {
       print(error);
     });

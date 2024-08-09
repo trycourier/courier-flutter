@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 
 class CourierInboxListener {
@@ -14,5 +14,5 @@ class CourierInboxListener {
     this.onMessagesChanged,
   });
 
-  Future remove() => CourierRC.shared.removeInboxListener(listenerId: listenerId);
+  Future remove() => Courier.shared.removeInboxListener(listenerId: listenerId);
 }

@@ -1,19 +1,10 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
-import 'package:courier_flutter/courier_preference_channel.dart';
-import 'package:courier_flutter/courier_preference_status.dart';
-import 'package:courier_flutter/courier_provider.dart';
-import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
-import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/theme.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../example_server.dart';
 
@@ -43,10 +34,10 @@ class _AuthPageState extends State<AuthPage> {
         _isLoading = true;
       });
 
-      final userId = await CourierRC.shared.userId;
+      final userId = await Courier.shared.userId;
       print(userId);
 
-      final tenantId = await CourierRC.shared.tenantId;
+      final tenantId = await Courier.shared.tenantId;
       print(tenantId);
 
       setState(() {
@@ -139,14 +130,14 @@ class _AuthPageState extends State<AuthPage> {
 
       final token = await ExampleServer.generateJwt(authKey: Env.authKey, userId: newUserId);
 
-      await CourierRC.shared.signIn(
+      await Courier.shared.signIn(
         accessToken: token,
         userId: newUserId,
         tenantId: newTenantId?.isEmpty == true ? null : newTenantId,
       );
 
-      final userId = await CourierRC.shared.userId;
-      final tenantId = await CourierRC.shared.tenantId;
+      final userId = await Courier.shared.userId;
+      final tenantId = await Courier.shared.tenantId;
       setState(() {
         _currentUserId = userId;
         _currentTenantId = tenantId;
@@ -166,9 +157,9 @@ class _AuthPageState extends State<AuthPage> {
         _isLoading = true;
       });
 
-      await CourierRC.shared.signOut();
-      final userId = await CourierRC.shared.userId;
-      final tenantId = await CourierRC.shared.tenantId;
+      await Courier.shared.signOut();
+      final userId = await Courier.shared.userId;
+      final tenantId = await Courier.shared.tenantId;
       setState(() {
         _currentUserId = userId;
         _currentTenantId = tenantId;

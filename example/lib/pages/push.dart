@@ -1,17 +1,12 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/courier_provider.dart';
-import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
-import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
-
-import 'package:google_fonts/google_fonts.dart';
 
 class PushPage extends StatefulWidget {
   const PushPage({super.key});
@@ -61,8 +56,8 @@ class _PushPageState extends State<PushPage> {
       _isLoading = true;
     });
 
-    final fcm = await CourierRC.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
-    final apns = await CourierRC.shared.getTokenForProvider(provider: CourierPushProvider.apn);
+    final fcm = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
+    final apns = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.apn);
 
     setState(() {
       _isLoading = false;

@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_action.dart';
@@ -70,7 +70,7 @@ class CourierInboxState extends State<CourierInbox>
     // Trigger the pagination
     if (_scrollController.offset >=
         _scrollController.position.maxScrollExtent - _triggerPoint) {
-      CourierRC.shared.fetchNextInboxPage();
+      Courier.shared.fetchNextInboxPage();
     }
   }
 
@@ -90,10 +90,10 @@ class CourierInboxState extends State<CourierInbox>
     final brand = await _refreshBrand();
 
     // Attach inbox message listener
-    _inboxListener = await CourierRC.shared.addInboxListener(
+    _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () async {
         if (mounted) {
-          final userId = await CourierRC.shared.userId;
+          final userId = await Courier.shared.userId;
           setState(() {
             _userId = userId;
             _brand = brand;
@@ -104,7 +104,7 @@ class CourierInboxState extends State<CourierInbox>
       },
       onError: (error) async {
         if (mounted) {
-          final userId = await CourierRC.shared.userId;
+          final userId = await Courier.shared.userId;
           setState(() {
             _userId = userId;
             _brand = brand;
@@ -115,7 +115,7 @@ class CourierInboxState extends State<CourierInbox>
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
         if (mounted) {
-          final userId = await CourierRC.shared.userId;
+          final userId = await Courier.shared.userId;
           setState(() {
             _userId = userId;
             _brand = brand;
@@ -147,14 +147,14 @@ class CourierInboxState extends State<CourierInbox>
       }
 
       // Get / set the brand
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
       final res = await client?.brands.getBrand(brandId: brandId);
       final brand = res?.data?.brand;
       widget._lightTheme.brand = brand;
       widget._darkTheme.brand = brand;
       return brand;
     } catch (error) {
-      CourierRC.log(error.toString());
+      Courier.log(error.toString());
 
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;
@@ -164,7 +164,7 @@ class CourierInboxState extends State<CourierInbox>
 
   Future<void> _refresh() async {
     await _refreshBrand();
-    await CourierRC.shared.refreshInbox();
+    await Courier.shared.refreshInbox();
   }
 
   Future<void> _retry() async {
@@ -173,7 +173,7 @@ class CourierInboxState extends State<CourierInbox>
       _error = null;
     });
     await _refreshBrand();
-    await CourierRC.shared.refreshInbox();
+    await Courier.shared.refreshInbox();
   }
 
   int get _itemCount => _messages.length + (_canPaginate ? 1 : 0);

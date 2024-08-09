@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter_sample/pages/pref_detail.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +36,7 @@ class _CustomPrefsPageState extends State<CustomPrefsPage>
     _refreshIndicatorKey.currentState?.show();
 
     try {
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
       final preferences = await client?.preferences.getUserPreferences();
       setState(() {
         _error = null;

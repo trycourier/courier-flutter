@@ -1,4 +1,4 @@
-import 'package:courier_flutter/courier_flutter_v2.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
@@ -77,13 +77,13 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
   Future<void> _getPreferences() async {
 
-    final userId = await CourierRC.shared.userId;
+    final userId = await Courier.shared.userId;
 
     final brand = await _refreshBrand();
 
     try {
 
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
       final res = await client?.preferences.getUserPreferences();
 
       final topics = res?.items ?? [];
@@ -154,7 +154,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
       }
 
       // Get / set the brand
-      final client = await CourierRC.shared.client;
+      final client = await Courier.shared.client;
       final res = await client?.brands.getBrand(brandId: brandId);
       final brand = res?.data?.brand;
       widget._lightTheme.brand = brand;
@@ -177,7 +177,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
   Future<void> _retry() async {
 
-    final userId = await CourierRC.shared.userId;
+    final userId = await Courier.shared.userId;
 
     setState(() {
       _userId = userId;
@@ -297,7 +297,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       try {
 
-        final client = await CourierRC.shared.client;
+        final client = await Courier.shared.client;
         await client?.preferences.putUserPreferencesTopic(
             topicId: topic.topicId,
             status: newStatus,
@@ -305,11 +305,11 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
             customRouting: topic.customRouting
         );
 
-        CourierRC.log("Topic updated: ${topic.topicId}");
+        Courier.log("Topic updated: ${topic.topicId}");
 
       } catch (error) {
 
-        CourierRC.log(error.toString());
+        Courier.log(error.toString());
 
         if (widget.onError != null) {
           widget.onError!(error.toString());
@@ -365,7 +365,7 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       try {
 
-        final client = await CourierRC.shared.client;
+        final client = await Courier.shared.client;
         await client?.preferences.putUserPreferencesTopic(
             topicId: topic.topicId,
             status: newStatus,
@@ -373,11 +373,11 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
             customRouting: customRouting
         );
 
-        CourierRC.log("Topic updated: ${topic.topicId}");
+        Courier.log("Topic updated: ${topic.topicId}");
 
       } catch (error) {
 
-        CourierRC.log(error.toString());
+        Courier.log(error.toString());
 
         if (widget.onError != null) {
           widget.onError!(error.toString());
