@@ -7,7 +7,7 @@
 
 import Flutter
 
-internal enum CourierError: Error {
+internal enum CourierFlutterError: Error {
     case missingParameter(value: String)
     case invalidParameter(value: String)
     case unknown

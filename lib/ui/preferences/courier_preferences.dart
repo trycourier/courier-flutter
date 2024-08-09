@@ -305,13 +305,11 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
             customRouting: topic.customRouting
         );
 
-        // TODO
-        // Courier.log("Topic updated: ${topic.topicId}");
+        CourierRC.log("Topic updated: ${topic.topicId}");
 
       } catch (error) {
 
-        // TODO
-        // Courier.log(error.toString());
+        CourierRC.log(error.toString());
 
         if (widget.onError != null) {
           widget.onError!(error.toString());
@@ -375,13 +373,11 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
             customRouting: customRouting
         );
 
-        // TODO
-        // Courier.log("Topic updated: ${topic.topicId}");
+        CourierRC.log("Topic updated: ${topic.topicId}");
 
       } catch (error) {
 
-        // TODO
-        // Courier.log(error.toString());
+        CourierRC.log(error.toString());
 
         if (widget.onError != null) {
           widget.onError!(error.toString());

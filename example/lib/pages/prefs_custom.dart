@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter_sample/pages/pref_detail.dart';
@@ -13,9 +15,10 @@ class CustomPrefsPage extends StatefulWidget {
   State<CustomPrefsPage> createState() => _CustomPrefsPageState();
 }
 
-class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAliveClientMixin {
-
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+class _CustomPrefsPageState extends State<CustomPrefsPage>
+    with AutomaticKeepAliveClientMixin {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -30,7 +33,6 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
   }
 
   Future<void> _start() async {
-
     _refreshIndicatorKey.currentState?.show();
 
     try {
@@ -46,7 +48,6 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
         _preferences = null;
       });
     }
-
   }
 
   Future<void> _refresh() async {
@@ -59,7 +60,10 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
 
     if (_error != null) {
       return Center(
-        child: Text(_error!),
+        child: Text(
+          _error!,
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
@@ -87,8 +91,7 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
                 );
               },
               subtitle: Text(
-                // topic.toJson(),
-                "TODO",
+                topic.toListItem(),
                 style: GoogleFonts.robotoMono(),
               ),
             );
@@ -96,24 +99,23 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
         ),
       ),
     );
-
   }
 }
 
-// extension TopicExtension on CourierUserPreferencesTopic {
-//   String toJson() {
-//     var jsonObject = {
-//       'topicId': topicId,
-//       'topicName': topicName,
-//       'sectionName': sectionName,
-//       'sectionId': sectionId,
-//       'status': status.value,
-//       'hasCustomRouting': hasCustomRouting,
-//       'defaultStatus': defaultStatus.value,
-//       'customRouting': customRouting.map((e) => e.value).join(", "),
-//     };
-//
-//     var encoder = const JsonEncoder.withIndent('  ');
-//     return encoder.convert(jsonObject);
-//   }
-// }
+extension TopicExtension on CourierUserPreferencesTopic {
+  String toListItem() {
+    var jsonObject = {
+      'topicId': topicId,
+      'topicName': topicName,
+      'sectionName': sectionName,
+      'sectionId': sectionId,
+      'status': status.value,
+      'hasCustomRouting': hasCustomRouting,
+      'defaultStatus': defaultStatus.value,
+      'customRouting': customRouting.map((e) => e.value).join(", "),
+    };
+
+    var encoder = const JsonEncoder.withIndent('  ');
+    return encoder.convert(jsonObject);
+  }
+}

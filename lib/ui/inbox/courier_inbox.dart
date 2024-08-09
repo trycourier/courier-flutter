@@ -1,4 +1,3 @@
-import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_flutter_v2.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
@@ -151,8 +150,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     } catch (error) {
 
-      // TODO
-      // CourierRC.log(error.toString());
+      CourierRC.log(error.toString());
 
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;

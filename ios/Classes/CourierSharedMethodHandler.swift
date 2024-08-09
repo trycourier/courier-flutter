@@ -69,7 +69,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.auth.sign_in":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let userId: String = try params.extract("userId")
@@ -116,14 +116,14 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.auth.remove_authentication_listener":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let listenerId: String = try params.extract("listenerId")
                     
                     // Get and remove the listener
                     guard let listener = authenticationListeners[listenerId] else {
-                        throw CourierError.invalidParameter(value: "listenerId")
+                        throw CourierFlutterError.invalidParameter(value: "listenerId")
                     }
                     
                     listener.remove()
@@ -157,7 +157,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.tokens.set_token":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let token: String = try params.extract("token")
@@ -173,7 +173,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.tokens.get_token":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let provider: String = try params.extract("provider")
@@ -195,7 +195,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.set_pagination_limit":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let limit: Int = try params.extract("limit")
@@ -222,14 +222,14 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                     let messages = try await Courier.shared.fetchNextInboxPage()
                     
-                    let json = messages.map { $0.toDictionary() }
+                    let json = messages.map { $0.toDictionary().toJson() }
                     
                     result(json)
                     
                 case "shared.inbox.add_listener":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let listenerId: String = try params.extract("listenerId")
@@ -242,8 +242,9 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                             channel?.invokeMethod("events.shared.inbox.listener_loading", arguments: nil)
                         },
                         onError: { error in
+                            let courierError = CourierError(from: error)
                             channel?.invokeMethod("events.shared.inbox.listener_error", arguments: [
-                                "error": error.localizedDescription
+                                "error": courierError.message
                             ])
                         },
                         onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
@@ -266,14 +267,14 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.remove_listener":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let listenerId: String = try params.extract("listenerId")
                     
                     // Get and remove the listener
                     guard let listener = inboxListeners[listenerId] else {
-                        throw CourierError.invalidParameter(value: "listenerId")
+                        throw CourierFlutterError.invalidParameter(value: "listenerId")
                     }
                     
                     listener.remove()
@@ -293,7 +294,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.open_message":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let messageId: String = try params.extract("messageId")
@@ -305,7 +306,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.read_message":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let messageId: String = try params.extract("messageId")
@@ -317,7 +318,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.unread_message":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let messageId: String = try params.extract("messageId")
@@ -329,7 +330,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.click_message":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let messageId: String = try params.extract("messageId")
@@ -341,7 +342,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                 case "shared.inbox.archive_message":
                     
                     guard let params = call.arguments as? Dictionary<String, Any> else {
-                        throw CourierError.missingParameter(value: "params")
+                        throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let messageId: String = try params.extract("messageId")

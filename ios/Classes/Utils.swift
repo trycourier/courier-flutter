@@ -273,15 +273,15 @@ internal extension Dictionary<String, Any> {
     func toClient() throws -> CourierClient? {
         
         guard let options = self["options"] as? [String: Any] else {
-            throw CourierError.missingParameter(value: "options")
+            throw CourierFlutterError.missingParameter(value: "options")
         }
         
         guard let userId = options["userId"] as? String else {
-            throw CourierError.missingParameter(value: "userId")
+            throw CourierFlutterError.missingParameter(value: "userId")
         }
         
         guard let showLogs = options["showLogs"] as? Bool else {
-            throw CourierError.missingParameter(value: "showLogs")
+            throw CourierFlutterError.missingParameter(value: "showLogs")
         }
         
         let jwt = options["jwt"] as? String
@@ -302,7 +302,7 @@ internal extension Dictionary<String, Any> {
     
     func extract<T>(_ key: String) throws -> T {
         guard let value = self[key] as? T else {
-            throw CourierError.missingParameter(value: key)
+            throw CourierFlutterError.missingParameter(value: key)
         }
         return value
     }
@@ -317,7 +317,7 @@ internal extension Error {
         let message: String
 
         switch self {
-        case let courierError as CourierError:
+        case let courierError as CourierFlutterError:
             switch courierError {
             case .missingParameter(let value):
                 message = "Missing Parameter: \(value)"

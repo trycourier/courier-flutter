@@ -28,7 +28,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
             do {
                 
                 guard let params = call.arguments as? Dictionary<String, Any>, let client = try params.toClient() else {
-                    throw CourierError.missingParameter(value: "client")
+                    throw CourierFlutterError.missingParameter(value: "client")
                 }
                 
                 switch call.method {
@@ -235,7 +235,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     )
                     
                     guard let trackingEvent = CourierTrackingEvent(rawValue: event) else {
-                        throw CourierError.missingParameter(value: "tracking_event")
+                        throw CourierFlutterError.missingParameter(value: "tracking_event")
                     }
                     
                     try await client.tracking.postTrackingUrl(

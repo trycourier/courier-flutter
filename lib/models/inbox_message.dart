@@ -76,9 +76,7 @@ class InboxMessage {
 
         final timeSince = timeDifference.inSeconds;
 
-        if (timeSince < 0) {
-          return 'in the future';
-        } else if (timeSince < 30) {
+        if (timeSince < 1) {
           return 'now';
         } else if (timeSince < 60) {
           return '$timeSince seconds ago';

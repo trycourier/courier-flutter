@@ -360,7 +360,7 @@ class CourierRC extends CourierSharedChannel {
         }
         case 'events.shared.inbox.listener_error': {
           _inboxListeners.forEach((key, listener) {
-            listener.onError?.call(call.arguments);
+            listener.onError?.call(call.arguments['error']);
           });
           break;
         }
@@ -387,6 +387,17 @@ class CourierRC extends CourierSharedChannel {
       }
     });
 
+  }
+
+  /// Allows you to show or hide Courier Native SDK debugging logs
+  /// You likely want this to match your development environment debugging mode
+  bool _isDebugging = kDebugMode;
+
+  // Show a log to the console
+  static void log(String message) {
+    if (CourierRC.shared._isDebugging) {
+      print(message);
+    }
   }
 
   // Client
@@ -424,12 +435,13 @@ class CourierRC extends CourierSharedChannel {
 
   @override
   Future signIn({required String userId, required String accessToken, String? clientKey, String? tenantId, bool? showLogs}) async {
+    _isDebugging = showLogs ?? kDebugMode;
     await _channel.invokeMethod('shared.auth.sign_in', {
       'userId': userId,
       'tenantId': tenantId,
       'accessToken': accessToken,
       'clientKey': clientKey,
-      'showLogs': showLogs ?? kDebugMode,
+      'showLogs': _isDebugging,
     });
   }
 
@@ -528,12 +540,14 @@ class CourierRC extends CourierSharedChannel {
   @override
   Future<List<InboxMessage>> fetchNextInboxPage() async {
     List<dynamic> messages = await _channel.invokeMethod('shared.inbox.fetch_next_page');
-    List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
-    return inboxMessages;
+    return messages.map((message) {
+      final Map<String, dynamic> map = json.decode(message);
+      return InboxMessage.fromJson(map);
+    }).toList();
   }
 
   @override
-  Future<CourierInboxListener> addInboxListener({required Function? onInitialLoad, required Function(dynamic error)? onError, required Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged}) async {
+  Future<CourierInboxListener> addInboxListener({required Function? onInitialLoad, required Function(String error)? onError, required Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged}) async {
 
     final listenerId = const Uuid().v4();
 
@@ -687,7 +701,7 @@ abstract class CourierSharedChannel extends PlatformInterface {
     throw UnimplementedError('fetchNextInboxPage() has not been implemented.');
   }
 
-  Future<CourierInboxListener> addInboxListener({required Function? onInitialLoad, required Function(dynamic error)? onError, required Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged}) async {
+  Future<CourierInboxListener> addInboxListener({required Function? onInitialLoad, required Function(String error)? onError, required Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged}) async {
     throw UnimplementedError('addInboxListener() has not been implemented.');
   }
 

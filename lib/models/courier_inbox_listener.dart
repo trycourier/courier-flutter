@@ -4,7 +4,7 @@ import 'package:courier_flutter/models/inbox_message.dart';
 class CourierInboxListener {
   String listenerId;
   Function? onInitialLoad;
-  Function(dynamic error)? onError;
+  Function(String error)? onError;
   Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged;
 
   CourierInboxListener({

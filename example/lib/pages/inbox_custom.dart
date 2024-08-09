@@ -16,8 +16,8 @@ class CustomInboxPage extends StatefulWidget {
   State<CustomInboxPage> createState() => _CustomInboxPageState();
 }
 
-class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAliveClientMixin {
-
+class _CustomInboxPageState extends State<CustomInboxPage>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -34,7 +34,6 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
   }
 
   Future _start() async {
-
     _inboxListener = await CourierRC.shared.addInboxListener(
       onInitialLoad: () {
         setState(() {
@@ -48,7 +47,8 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
           _error = error;
         });
       },
-      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+      onMessagesChanged:
+          (messages, unreadMessageCount, totalMessageCount, canPaginate) {
         setState(() {
           _messages = messages;
           _isLoading = false;
@@ -81,13 +81,19 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
 
     if (_error != null) {
       return Center(
-        child: Text(_error!),
+        child: Text(
+          _error!,
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
     if (_messages.isEmpty) {
       return const Center(
-        child: Text('No message found'),
+        child: Text(
+          'No message found',
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
@@ -124,7 +130,6 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
 }
 
 extension InboxExtension on InboxMessage {
-
   String toJson() {
     var jsonObject = {
       'messageId': messageId,
@@ -132,14 +137,16 @@ extension InboxExtension on InboxMessage {
       'body': body,
       'data': data,
       'created': created,
-      'actions': actions?.map((action) => {
-        'title': action.content,
-        'data': action.data,
-      }).toList() ?? [],
+      'actions': actions
+              ?.map((action) => {
+                    'title': action.content,
+                    'data': action.data,
+                  })
+              .toList() ??
+          [],
     };
 
     var encoder = const JsonEncoder.withIndent('  ');
     return encoder.convert(jsonObject);
   }
-
 }
