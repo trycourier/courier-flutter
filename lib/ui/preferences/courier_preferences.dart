@@ -86,9 +86,13 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       final client = await Courier.shared.client;
       final res = await client?.preferences.getUserPreferences();
 
+      if (res == null) {
+        throw "Unable to get preferences";
+      }
+
       if (!mounted) return;
 
-      final topics = res?.items ?? [];
+      final topics = res.items ?? [];
 
       List<PreferenceSection> sections = [];
 

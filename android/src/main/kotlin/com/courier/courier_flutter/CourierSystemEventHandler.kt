@@ -12,7 +12,7 @@ import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-internal class CourierNotificationHandler : CourierFlutterPushNotificationListener {
+internal class CourierSystemEventHandler : CourierFlutterPushNotificationListener {
 
     private var systemChannel: MethodChannel? = null
     private var eventsChannel: MethodChannel? = null

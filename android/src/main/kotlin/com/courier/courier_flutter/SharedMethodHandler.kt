@@ -9,7 +9,7 @@ import com.courier.android.modules.addInboxListener
 import com.courier.android.modules.archiveMessage
 import com.courier.android.modules.clickMessage
 import com.courier.android.modules.fcmToken
-import com.courier.android.modules.fetchNextPage
+import com.courier.android.modules.fetchNextInboxPage
 import com.courier.android.modules.getToken
 import com.courier.android.modules.inboxPaginationLimit
 import com.courier.android.modules.isUserSignedIn
@@ -250,7 +250,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                 "inbox.fetch_next_page" -> {
 
-                    val messages = Courier.shared.fetchNextPage()
+                    val messages = Courier.shared.fetchNextInboxPage()
 
                     val json = messages.map { it.toJson() }
 

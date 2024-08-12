@@ -7,7 +7,7 @@ import io.flutter.embedding.engine.FlutterEngine
 
 open class CourierFlutterFragmentActivity : FlutterFragmentActivity() {
 
-    private val handler = CourierNotificationHandler()
+    private val handler = CourierSystemEventHandler()
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
