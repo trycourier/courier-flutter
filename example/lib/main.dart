@@ -210,7 +210,7 @@ showAlert(BuildContext context, String title, String body) {
       ),
       actions: [
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('OK'),
           onPressed: () => Navigator.pop(context),
         )
       ],
