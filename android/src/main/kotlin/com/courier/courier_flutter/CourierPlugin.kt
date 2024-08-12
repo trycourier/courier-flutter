@@ -11,11 +11,6 @@ internal class CourierPlugin : FlutterPlugin {
         internal const val TAG = "Courier Android SDK Error"
     }
 
-    enum class Channels(val channelName: String) {
-        CLIENT("courier_flutter_client"),
-        CLIENT_EVENTS("courier_flutter_client_events"),
-    }
-
     init {
         Courier.USER_AGENT = CourierAgent.FLUTTER_ANDROID
     }
@@ -28,10 +23,20 @@ internal class CourierPlugin : FlutterPlugin {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
 
-        clientChannel = MethodChannel(flutterPluginBinding.binaryMessenger, Channels.CLIENT.channelName).apply {
-            val handler = CourierClientMethodHandler()
-            setMethodCallHandler(handler)
-        }
+        ClientMethodHandler(
+            channel = CourierFlutterChannel.CLIENT,
+            binding = flutterPluginBinding
+        ).attach()
+
+       SharedMethodHandler(
+           channel = CourierFlutterChannel.SHARED,
+           binding = flutterPluginBinding
+        ).attach()
+
+//        clientChannel = MethodChannel(flutterPluginBinding.binaryMessenger, Channels.CLIENT.id).apply {
+//            val handler = ClientMethodHandler()
+//            setMethodCallHandler(handler)
+//        }
 
 //        // Get the core channel
 //        coreChannel = MethodChannel(flutterPluginBinding.binaryMessenger, CORE_CHANNEL).apply {

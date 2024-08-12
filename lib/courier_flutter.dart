@@ -240,6 +240,14 @@ class Courier extends CourierChannelManager {
   }
 
   @override
+  Future<String?> get fcmToken async {
+    if (!Platform.isAndroid) {
+      return null;
+    }
+    return await CourierFlutterChannels.shared.invokeMethod('tokens.get_fcm_token');
+  }
+
+  @override
   Future<Map<String, String>> get tokens async {
     final result = await CourierFlutterChannels.shared.invokeMethod('tokens.get_all_tokens');
     return result?.cast<String, String>() ?? {};
@@ -445,6 +453,7 @@ abstract class CourierChannelManager extends PlatformInterface {
   // Push & Tokens
 
   Future<String?> get apnsToken => throw UnimplementedError('apnsToken has not been implemented.');
+  Future<String?> get fcmToken => throw UnimplementedError('fcmToken has not been implemented.');
   Future<Map<String, String>> get tokens => throw UnimplementedError('tokens has not been implemented.');
 
   Future setToken({required String token, required String provider}) async {

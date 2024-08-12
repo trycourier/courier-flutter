@@ -99,6 +99,12 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                 case "auth.add_authentication_listener":
                     
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierFlutterError.missingParameter(value: "params")
+                    }
+                    
+                    let listenerId: String = try params.extract("listenerId")
+                    
                     // Create the listener
                     let listener = Courier.shared.addAuthenticationListener { userId in
                         
@@ -110,11 +116,10 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     }
                     
                     // Hold reference to the auth listeners
-                    let id = UUID().uuidString
-                    authenticationListeners[id] = listener
+                    authenticationListeners[listenerId] = listener
                     
                     // Return the id of the listener
-                    result(id)
+                    result(listenerId)
                     
                 case "auth.remove_authentication_listener":
                     
@@ -211,7 +216,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                     let messages = await Courier.shared.inboxMessages
                     
-                    let json = messages.map { $0.toDictionary() }
+                    let json = messages.map { $0.toDictionary().toJson() }
                     
                     result(json)
                     

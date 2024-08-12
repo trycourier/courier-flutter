@@ -7,11 +7,11 @@ import com.courier.android.models.CourierPreferenceStatus
 import com.courier.android.models.CourierTrackingEvent
 import com.courier.android.modules.inboxPaginationLimit
 import com.courier.courier_flutter.CourierPlugin.Companion.TAG
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
-internal class CourierClientMethodHandler : MethodCallHandler {
+internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = post {
 
@@ -25,7 +25,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 // == Brand ==
 
-                "client.brands.get_brand" -> {
+                "brands.get_brand" -> {
 
                     val (brandId) = listOf<String>(
                         params.extract("brandId"),
@@ -39,7 +39,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 // == Token Management ==
 
-                "client.tokens.put_user_token" -> {
+                "tokens.put_user_token" -> {
 
                     val (token, provider) = listOf<String>(
                         params.extract("token"),
@@ -59,7 +59,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.tokens.delete_user_token" -> {
+                "tokens.delete_user_token" -> {
 
                     val (token) = listOf<String>(
                         params.extract("token"),
@@ -75,7 +75,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 // == Inbox ==
 
-                "client.inbox.get_messages" -> {
+                "inbox.get_messages" -> {
 
                     val paginationLimit = params["paginationLimit"] as? Int
                     val startCursor = params["startCursor"] as? String
@@ -90,7 +90,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.get_archived_messages" -> {
+                "inbox.get_archived_messages" -> {
 
                     val paginationLimit = params["paginationLimit"] as? Int
                     val startCursor = params["startCursor"] as? String
@@ -105,14 +105,14 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.get_unread_message_count" -> {
+                "inbox.get_unread_message_count" -> {
 
                     val count = client.inbox.getUnreadMessageCount()
                     result.success(count)
 
                 }
 
-                "client.inbox.get_message_by_id" -> {
+                "inbox.get_message_by_id" -> {
 
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
@@ -127,7 +127,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.click_message" -> {
+                "inbox.click_message" -> {
 
                     val (messageId, trackingId) = listOf<String>(
                         params.extract("messageId"),
@@ -143,7 +143,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.unread_message" -> {
+                "inbox.unread_message" -> {
 
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
@@ -157,7 +157,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.read_message" -> {
+                "inbox.read_message" -> {
 
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
@@ -171,7 +171,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.open_message" -> {
+                "inbox.open_message" -> {
 
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
@@ -185,7 +185,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.archive_message" -> {
+                "inbox.archive_message" -> {
 
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
@@ -199,7 +199,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.inbox.read_all_messages" -> {
+                "inbox.read_all_messages" -> {
 
                     client.inbox.trackAllRead()
 
@@ -209,7 +209,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 // == Preferences ==
 
-                "client.preferences.get_user_preferences" -> {
+                "preferences.get_user_preferences" -> {
 
                     val paginationCursor = params["paginationCursor"] as? String
 
@@ -222,7 +222,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.preferences.get_user_preference_topic" -> {
+                "preferences.get_user_preference_topic" -> {
 
                     val (topicId) = listOf<String>(
                         params.extract("topicId"),
@@ -237,7 +237,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 }
 
-                "client.preferences.put_user_preference_topic" -> {
+                "preferences.put_user_preference_topic" -> {
 
                     val topicId = params.extract<String>("topicId")
                     val status = params.extract<String>("status")
@@ -257,7 +257,7 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
                 // == Tracking ==
 
-                "client.tracking.post_tracking_url" -> {
+                "tracking.post_tracking_url" -> {
 
                     val (url, event) = listOf<String>(
                         params.extract("url"),
@@ -287,21 +287,4 @@ internal class CourierClientMethodHandler : MethodCallHandler {
 
     }
 
-}
-
-internal fun Map<*, *>.toCourierDevice(): CourierDevice {
-    val appId = this["app_id"] as? String
-    val adId = this["ad_id"] as? String
-    val deviceId = this["device_id"] as? String
-    val platform = this["platform"] as? String
-    val manufacturer = this["manufacturer"] as? String
-    val model = this["model"] as? String
-    return CourierDevice(
-        app_id = appId,
-        ad_id = adId,
-        device_id = deviceId,
-        platform = platform,
-        manufacturer = manufacturer,
-        model = model
-    )
 }

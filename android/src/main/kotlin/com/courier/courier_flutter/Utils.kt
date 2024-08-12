@@ -1,10 +1,30 @@
 package com.courier.courier_flutter
 
 import com.courier.android.client.CourierClient
+import com.courier.android.models.CourierDevice
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+// Courier Device
+
+internal fun Map<*, *>.toCourierDevice(): CourierDevice {
+    val appId = this["app_id"] as? String
+    val adId = this["ad_id"] as? String
+    val deviceId = this["device_id"] as? String
+    val platform = this["platform"] as? String
+    val manufacturer = this["manufacturer"] as? String
+    val model = this["model"] as? String
+    return CourierDevice(
+        appId = appId,
+        adId = adId,
+        deviceId = deviceId,
+        platform = platform,
+        manufacturer = manufacturer,
+        model = model
+    )
+}
 
 // Create Client
 
