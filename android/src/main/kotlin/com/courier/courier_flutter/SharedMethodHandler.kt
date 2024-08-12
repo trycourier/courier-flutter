@@ -28,7 +28,6 @@ import com.courier.courier_flutter.CourierPlugin.Companion.TAG
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import java.util.UUID
 
 internal class SharedMethodHandler(channel: CourierFlutterChannel, private val binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
 
@@ -123,7 +122,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     // Create the listener
                     val listener = Courier.shared.addAuthenticationListener { userId ->
-                        CourierFlutterChannel.EVENTS.getChannel(binding).invokeMethod("auth.state_changed", mapOf(
+                        CourierFlutterChannel.EVENTS.getChannel(binding.binaryMessenger).invokeMethod("auth.state_changed", mapOf(
                             "userId" to userId
                         ))
                     }
@@ -265,7 +264,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val listenerId = params.extract("listenerId") as String
 
-                    val channel = CourierFlutterChannel.EVENTS.getChannel(binding)
+                    val channel = CourierFlutterChannel.EVENTS.getChannel(binding.binaryMessenger)
 
                     val listener = Courier.shared.addInboxListener(
                         onInitialLoad = {
@@ -324,15 +323,9 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val messageId = params.extract("messageId") as String
 
-                    Courier.shared.openMessage(
-                        messageId = messageId,
-                        onSuccess = {
-                            result.success(null)
-                        },
-                        onFailure = { error ->
-                            result.error(TAG, error.message, error)
-                        }
-                    )
+                    Courier.shared.openMessage(messageId)
+
+                    result.success(null)
 
                 }
 
@@ -342,15 +335,9 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val messageId = params.extract("messageId") as String
 
-                    Courier.shared.readMessage(
-                        messageId = messageId,
-                        onSuccess = {
-                            result.success(null)
-                        },
-                        onFailure = { error ->
-                            result.error(TAG, error.message, error)
-                        }
-                    )
+                    Courier.shared.readMessage(messageId)
+
+                    result.success(null)
 
                 }
 
@@ -360,15 +347,9 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val messageId = params.extract("messageId") as String
 
-                    Courier.shared.unreadMessage(
-                        messageId = messageId,
-                        onSuccess = {
-                            result.success(null)
-                        },
-                        onFailure = { error ->
-                            result.error(TAG, error.message, error)
-                        }
-                    )
+                    Courier.shared.unreadMessage(messageId)
+
+                    result.success(null)
 
                 }
 
@@ -378,15 +359,9 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val messageId = params.extract("messageId") as String
 
-                    Courier.shared.clickMessage(
-                        messageId = messageId,
-                        onSuccess = {
-                            result.success(null)
-                        },
-                        onFailure = { error ->
-                            result.error(TAG, error.message, error)
-                        }
-                    )
+                    Courier.shared.clickMessage(messageId)
+
+                    result.success(null)
 
                 }
 
@@ -396,15 +371,9 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val messageId = params.extract("messageId") as String
 
-                    Courier.shared.archiveMessage(
-                        messageId = messageId,
-                        onSuccess = {
-                            result.success(null)
-                        },
-                        onFailure = { error ->
-                            result.error(TAG, error.message, error)
-                        }
-                    )
+                    Courier.shared.archiveMessage(messageId)
+
+                    result.success(null)
 
                 }
 

@@ -6,7 +6,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
 internal abstract class CourierMethodHandler(channel: CourierFlutterChannel, binding: FlutterPlugin.FlutterPluginBinding) : MethodCallHandler {
 
-    private val methodChannel: MethodChannel = MethodChannel(binding.binaryMessenger, channel.id)
+    private val methodChannel: MethodChannel = channel.getChannel(binding.binaryMessenger)
 
     fun attach() = methodChannel.setMethodCallHandler(this)
 

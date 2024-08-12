@@ -26,8 +26,8 @@ class PreferenceClient {
     return GetCourierUserPreferencesTopic.fromJson(map);
   }
 
-  Future putUserPreferencesTopic({required String topicId, required CourierUserPreferencesStatus status, required bool hasCustomRouting, required List<CourierUserPreferencesChannel> customRouting}) async {
-    await _options.invokeClient('preferences.put_user_preferences_topic', {
+  Future putUserPreferenceTopic({required String topicId, required CourierUserPreferencesStatus status, required bool hasCustomRouting, required List<CourierUserPreferencesChannel> customRouting}) async {
+    await _options.invokeClient('preferences.put_user_preference_topic', {
       'topicId': topicId,
       'status': status.value,
       'hasCustomRouting': hasCustomRouting,

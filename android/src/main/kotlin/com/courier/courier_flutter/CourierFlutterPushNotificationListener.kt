@@ -6,3 +6,4 @@ interface CourierFlutterPushNotificationListener {
     fun postPushNotificationDelivered(message: RemoteMessage)
     fun postPushNotificationClicked(message: RemoteMessage)
 }
+

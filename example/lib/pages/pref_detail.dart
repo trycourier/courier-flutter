@@ -63,7 +63,7 @@ class _PreferencesDetailPageState extends State<PreferencesDetailPage> {
 
     try {
       final client = await Courier.shared.client;
-      await client?.preferences.putUserPreferencesTopic(
+      await client?.preferences.putUserPreferenceTopic(
         topicId: widget.topicId,
         status: _selectedStatus ?? _topic.status,
         hasCustomRouting: _hasCustomRouting ?? _topic.hasCustomRouting,

@@ -1,58 +1,29 @@
 package com.courier.courier_flutter
 
-import android.app.Activity
 import android.content.Intent
-import com.courier.android.Courier
-import com.courier.android.models.*
-import com.courier.android.modules.isPushPermissionGranted
-import com.courier.android.modules.requestNotificationPermission
-import com.courier.android.utils.pushNotification
+import com.courier.android.models.CourierBrand
+import com.courier.android.models.CourierBrandColors
+import com.courier.android.models.CourierBrandInApp
+import com.courier.android.models.CourierBrandSettings
+import com.courier.android.models.CourierPreferenceTopic
+import com.courier.android.models.CourierUserPreferences
+import com.courier.android.models.InboxAction
+import com.courier.android.models.InboxMessage
+import com.courier.android.models.Paging
 import com.courier.android.utils.trackPushNotificationClick
 import com.google.firebase.messaging.RemoteMessage
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodChannel
 
-fun FlutterEngine.setupCourierMethodChannel(activity: Activity, onGetClickedNotification: (() -> Unit)? = null): MethodChannel {
+fun Intent.getAndTrackRemoteMessage(): RemoteMessage? {
 
-    // Create the method channel
-    val channel = MethodChannel(dartExecutor.binaryMessenger, CourierPlugin.Channels.CLIENT.id)
+    var clickedMessage: RemoteMessage? = null
 
-    // Handle the calls
-    channel.setMethodCallHandler { call, result ->
-
-        when (call.method) {
-
-            "requestNotificationPermission" -> {
-
-                Courier.shared.requestNotificationPermission(activity)
-                result.success("unknown")
-
-            }
-
-            "getNotificationPermissionStatus" -> {
-
-                val isGranted = Courier.shared.isPushPermissionGranted(activity)
-                result.success(if (isGranted) "authorized" else "denied")
-
-            }
-
-            "getClickedNotification" -> {
-
-                onGetClickedNotification?.invoke()
-                result.success(null)
-
-            }
-
-            else -> {
-                result.notImplemented()
-            }
-
-        }
-
+    // Try and track the clicked message
+    // Will return a message if the message was able to be tracked
+    trackPushNotificationClick { message ->
+        clickedMessage = message
     }
 
-    // Return the channel
-    return channel
+    return clickedMessage
 
 }
 
@@ -129,26 +100,4 @@ internal fun Paging.toMap(): Map<String, Any?>{
         "cursor" to cursor,
         "more" to more,
     )
-}
-
-fun MethodChannel.deliverCourierPushNotification(message: RemoteMessage) {
-    invokeMethod("pushNotificationDelivered", message.pushNotification)
-}
-
-fun MethodChannel.clickCourierPushNotification(message: RemoteMessage) {
-    invokeMethod("pushNotificationClicked", message.pushNotification)
-}
-
-fun Intent.getAndTrackRemoteMessage(): RemoteMessage? {
-
-    var clickedMessage: RemoteMessage? = null
-
-    // Try and track the clicked message
-    // Will return a message if the message was able to be tracked
-    trackPushNotificationClick { message ->
-        clickedMessage = message
-    }
-
-    return clickedMessage
-
 }

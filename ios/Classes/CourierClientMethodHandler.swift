@@ -104,7 +104,7 @@ internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
                     let json = try res.toJson()
                     result(json)
                     
-                case "preferences.put_user_preferences_topic":
+                case "preferences.put_user_preference_topic":
                     
                     let (topicId, status, hasCustomRouting, customRouting): (String, String, Bool, [String]) = (
                         try params.extract("topicId"),

@@ -11,7 +11,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
+internal class ClientMethodHandler(channel: CourierFlutterChannel, private val binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = post {
 
@@ -52,7 +52,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
                     client.tokens.putUserToken(
                         token = token,
                         provider = provider,
-                        device = device ?: CourierDevice.current,
+                        device = device ?: CourierDevice.current(binding.applicationContext),
                     )
 
                     result.success(null)
@@ -134,7 +134,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
                         params.extract("trackingId"),
                     )
 
-                    client.inbox.trackClick(
+                    client.inbox.click(
                         messageId = messageId,
                         trackingId = trackingId
                     )
@@ -149,7 +149,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
                         params.extract("messageId"),
                     )
 
-                    client.inbox.trackUnread(
+                    client.inbox.unread(
                         messageId = messageId,
                     )
 
@@ -163,7 +163,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
                         params.extract("messageId"),
                     )
 
-                    client.inbox.trackRead(
+                    client.inbox.read(
                         messageId = messageId,
                     )
 
@@ -177,7 +177,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
                         params.extract("messageId"),
                     )
 
-                    client.inbox.trackOpened(
+                    client.inbox.open(
                         messageId = messageId,
                     )
 
@@ -191,7 +191,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
                         params.extract("messageId"),
                     )
 
-                    client.inbox.trackArchive(
+                    client.inbox.archive(
                         messageId = messageId,
                     )
 
@@ -201,7 +201,7 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, binding: Flut
 
                 "inbox.read_all_messages" -> {
 
-                    client.inbox.trackAllRead()
+                    client.inbox.readAll()
 
                     result.success(null)
 

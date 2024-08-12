@@ -302,7 +302,7 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       try {
 
         final client = await Courier.shared.client;
-        await client?.preferences.putUserPreferencesTopic(
+        await client?.preferences.putUserPreferenceTopic(
             topicId: topic.topicId,
             status: newStatus,
             hasCustomRouting: topic.hasCustomRouting,
@@ -370,7 +370,7 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       try {
 
         final client = await Courier.shared.client;
-        await client?.preferences.putUserPreferencesTopic(
+        await client?.preferences.putUserPreferenceTopic(
             topicId: topic.topicId,
             status: newStatus,
             hasCustomRouting: hasCustomRouting,

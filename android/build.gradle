@@ -28,10 +28,10 @@ apply plugin: 'kotlin-android'
 
 android {
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
     }
 
     compileOptions {
