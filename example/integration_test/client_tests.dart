@@ -170,5 +170,24 @@ void main() {
       final client = await ClientBuilder.build(userId: userId);
       await client.inbox.readAll();
     });
+    test('Socket Creation', () async {
+
+      final client = await ClientBuilder.build(userId: userId);
+
+      final socket = client.inbox.socket;
+
+      await socket.onReceivedMessage((message) {
+        print(message);
+      });
+
+      await socket.onReceivedMessageEvent((event) {
+        print(event);
+      });
+
+      await socket.connect();
+      await socket.sendSubscribe();
+      await socket.disconnect();
+
+    });
   });
 }

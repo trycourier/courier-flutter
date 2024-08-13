@@ -140,9 +140,12 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val listenerId = params.extract("listenerId") as String
 
-                    // Get and remove the listener
+                    // Get the listener
                     val listener = authenticationListeners[listenerId] ?: throw InvalidParameter("listenerId")
+
+                    // Remove the listener
                     listener.remove()
+                    authenticationListeners.remove(listenerId)
 
                     result.success(null)
 
@@ -307,9 +310,12 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val listenerId = params.extract("listenerId") as String
 
-                    // Get and remove the listener
+                    // Get listener
                     val listener = inboxListeners[listenerId] ?: throw InvalidParameter("listenerId")
+
+                    // Remove the listener
                     listener.remove()
+                    inboxListeners.remove(listenerId)
 
                     result.success(null)
 

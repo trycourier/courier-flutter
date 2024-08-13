@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
+import 'package:courier_flutter_sample/env.dart';
+import 'package:courier_flutter_sample/example_server.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -35,6 +38,20 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   }
 
   Future _start() async {
+
+    final userId = await Courier.shared.userId;
+    final jwt = await ExampleServer.generateJwt(authKey: Env.authKey, userId: userId!);
+    final client = CourierClient(jwt: jwt, userId: userId, clientKey: Env.clientKey);
+    final socket = client.inbox.socket;
+    await socket.onReceivedMessage((message) {
+      print(message);
+    });
+    await socket.onReceivedMessageEvent((event) {
+      print(event);
+    });
+    await socket.connect();
+    await socket.sendSubscribe();
+
     _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () {
         if (mounted) {

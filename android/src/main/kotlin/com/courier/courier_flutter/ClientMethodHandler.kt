@@ -6,12 +6,15 @@ import com.courier.android.models.CourierPreferenceChannel
 import com.courier.android.models.CourierPreferenceStatus
 import com.courier.android.models.CourierTrackingEvent
 import com.courier.android.modules.inboxPaginationLimit
+import com.courier.android.socket.InboxSocket
 import com.courier.courier_flutter.CourierPlugin.Companion.TAG
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 internal class ClientMethodHandler(channel: CourierFlutterChannel, private val binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
+
+    private var inboxSockets = mutableMapOf<String, InboxSocket>()
 
     override suspend fun handleMethod(call: MethodCall, result: MethodChannel.Result) {
 
@@ -204,6 +207,125 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     client.inbox.readAll()
 
                     result.success(null)
+
+                }
+
+                "inbox.socket.add_socket" -> {
+
+                    val (socketId) = listOf<String>(
+                        params.extract("socketId"),
+                    )
+
+                    val socket = client.inbox.socket
+
+                    inboxSockets[socketId] = socket
+
+                    result.success(socketId)
+
+                }
+
+                "inbox.socket.remove_socket" -> {
+
+                    val (socketId) = listOf<String>(
+                        params.extract("socketId"),
+                    )
+
+                    inboxSockets[socketId] ?: throw InvalidParameter(value = "socketId")
+
+                    // Remove the connection
+                    inboxSockets.remove(socketId)
+
+                    result.success(null)
+
+                }
+
+                "inbox.socket.connect" -> {
+
+                    val (socketId) = listOf<String>(
+                        params.extract("socketId"),
+                    )
+
+                    val socket = inboxSockets[socketId] ?: throw InvalidParameter(value = "socketId")
+
+                    socket.connect()
+
+                    result.success(socketId)
+
+                }
+
+                "inbox.socket.disconnect" -> {
+
+                    val (socketId) = listOf<String>(
+                        params.extract("socketId"),
+                    )
+
+                    val socket = inboxSockets[socketId] ?: throw InvalidParameter(value = "socketId")
+
+                    // Remove the connection
+                    socket.disconnect()
+
+                    result.success(socketId)
+
+                }
+
+                "inbox.socket.send_subscribe" -> {
+
+                    val socketId = params.extract("socketId") as String
+                    val version = params.extract("version") as Int
+
+                    val socket = inboxSockets[socketId] ?: throw InvalidParameter(value = "socketId")
+
+                    socket.sendSubscribe(
+                        version = version
+                    )
+
+                    result.success(socketId)
+
+                }
+
+                "inbox.socket.receive_messages" -> {
+
+                    val (socketId) = listOf<String>(
+                        params.extract("socketId"),
+                    )
+
+                    val socket = inboxSockets[socketId] ?: throw InvalidParameter(value = "socketId")
+
+                    socket.receivedMessage = { message ->
+                        CourierFlutterChannel.EVENTS.invokeMethod(
+                            messenger = binding.binaryMessenger,
+                            method = "client.inbox.socket.received_message",
+                            arguments = mapOf(
+                                "socketId" to socketId,
+                                "message" to message.toJson(),
+                            )
+                        )
+                    }
+
+                    result.success(socketId)
+
+                }
+
+                "inbox.socket.receive_message_events" -> {
+
+                    val (socketId) = listOf<String>(
+                        params.extract("socketId"),
+                    )
+
+                    val socket = inboxSockets[socketId] ?: throw InvalidParameter(value = "socketId")
+
+                    socket.receivedMessageEvent = { event ->
+                        CourierFlutterChannel.EVENTS.invokeMethod(
+                            messenger = binding.binaryMessenger,
+                            method = "client.inbox.socket.received_message_event",
+                            arguments = mapOf(
+                                "socketId" to socketId,
+                                "event" to event.toJson(),
+                            )
+                        )
+                    }
+
+                    result.success(socketId)
 
                 }
 

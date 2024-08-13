@@ -1,5 +1,4 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/inbox_message.dart';
 
 class CourierInboxListener {
   String listenerId;
