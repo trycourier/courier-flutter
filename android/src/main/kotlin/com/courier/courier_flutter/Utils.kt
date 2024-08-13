@@ -3,9 +3,6 @@ package com.courier.courier_flutter
 import com.courier.android.client.CourierClient
 import com.courier.android.models.CourierDevice
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 // Courier Device
 
@@ -54,14 +51,6 @@ internal fun HashMap<*, *>.toClient(): CourierClient {
 
 internal fun Any.toJson(): String {
     return GsonBuilder().setPrettyPrinting().create().toJson(this)
-}
-
-// Threaded Callback
-
-internal fun post(block: suspend CoroutineScope.() -> Unit) {
-    CoroutineScope(Dispatchers.Main).launch {
-        block()
-    }
 }
 
 // Handle Params

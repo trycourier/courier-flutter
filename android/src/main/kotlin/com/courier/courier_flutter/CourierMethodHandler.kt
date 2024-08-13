@@ -13,6 +13,7 @@ internal abstract class CourierMethodHandler(channel: CourierFlutterChannel, bin
     private val methodChannel = channel.getChannel(binding.binaryMessenger)
 
     fun attach() = methodChannel.setMethodCallHandler(this)
+    fun detach() = methodChannel.setMethodCallHandler(null)
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         CoroutineScope(Dispatchers.Main).launch {
