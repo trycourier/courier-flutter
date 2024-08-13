@@ -34,7 +34,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
     private var authenticationListeners = mutableMapOf<String, CourierAuthenticationListener>()
     private var inboxListeners = mutableMapOf<String, CourierInboxListener>()
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = post {
+    override suspend fun handleMethod(call: MethodCall, result: MethodChannel.Result) {
 
         try {
 
@@ -48,7 +48,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     if (options == null) {
                         result.success(null)
-                        return@post
+                        return
                     }
 
                     val client = mapOf(
@@ -122,7 +122,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     // Create the listener
                     val listener = Courier.shared.addAuthenticationListener { userId ->
-                        CourierFlutterChannel.EVENTS.getChannel(binding.binaryMessenger).invokeMethod("auth.state_changed", mapOf(
+                        CourierFlutterChannel.EVENTS.invokeMethod(binding.binaryMessenger, method = "auth.state_changed", mapOf(
                             "userId" to userId
                         ))
                     }
@@ -264,24 +264,34 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val listenerId = params.extract("listenerId") as String
 
-                    val channel = CourierFlutterChannel.EVENTS.getChannel(binding.binaryMessenger)
-
                     val listener = Courier.shared.addInboxListener(
                         onInitialLoad = {
-                            channel.invokeMethod("inbox.listener_loading", null)
+                            CourierFlutterChannel.EVENTS.invokeMethod(
+                                messenger = binding.binaryMessenger,
+                                method = "auth.state_changed",
+                                arguments = null
+                            )
                         },
                         onError = { error ->
-                            channel.invokeMethod("inbox.listener_error", mapOf(
-                                "error" to error.message
-                            ))
+                            CourierFlutterChannel.EVENTS.invokeMethod(
+                                messenger = binding.binaryMessenger,
+                                method = "inbox.listener_error",
+                                arguments = mapOf(
+                                    "error" to error.message
+                                )
+                            )
                         },
                         onMessagesChanged = { messages, unreadMessageCount, totalMessageCount, canPaginate ->
-                            channel.invokeMethod("inbox.listener_messages_changed", mapOf(
-                                "messages" to messages.map { it.toJson() },
-                                "unreadMessageCount" to unreadMessageCount,
-                                "totalMessageCount" to totalMessageCount,
-                                "canPaginate" to canPaginate,
-                            ))
+                            CourierFlutterChannel.EVENTS.invokeMethod(
+                                messenger = binding.binaryMessenger,
+                                method = "inbox.listener_messages_changed",
+                                arguments = mapOf(
+                                    "messages" to messages.map { it.toJson() },
+                                    "unreadMessageCount" to unreadMessageCount,
+                                    "totalMessageCount" to totalMessageCount,
+                                    "canPaginate" to canPaginate,
+                                )
+                            )
                         }
                     )
 

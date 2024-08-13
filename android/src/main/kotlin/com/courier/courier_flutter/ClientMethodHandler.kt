@@ -13,7 +13,7 @@ import io.flutter.plugin.common.MethodChannel
 
 internal class ClientMethodHandler(channel: CourierFlutterChannel, private val binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = post {
+    override suspend fun handleMethod(call: MethodCall, result: MethodChannel.Result) {
 
         try {
 

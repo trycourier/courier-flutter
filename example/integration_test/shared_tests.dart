@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter_sample/env.dart';
@@ -28,6 +30,10 @@ void main() {
     });
 
     test('iOS Foreground Presentation Options', () async {
+
+      if (!Platform.isIOS) {
+        return;
+      }
 
       const options = iOSNotificationPresentationOption.values;
       final newOptions = await Courier.setIOSForegroundPresentationOptions(options: options);
@@ -98,7 +104,10 @@ void main() {
 
     test('Sign In', () async {
 
-      await UserBuilder.build(userId: userId);
+      await Courier.shared.signIn(
+          userId: userId,
+          accessToken: "example_key"
+      );
 
       final currentUserId = await Courier.shared.userId;
       final currentTenantId = await Courier.shared.tenantId;
@@ -150,10 +159,27 @@ void main() {
 
     test('APNS Token', () async {
 
+      if (!Platform.isIOS) {
+        return;
+      }
+
       await UserBuilder.build(userId: userId);
 
       final apnsToken = await Courier.shared.apnsToken;
       print(apnsToken);
+
+    });
+
+    test('FCM Token', () async {
+
+      if (!Platform.isAndroid) {
+        return;
+      }
+
+      await UserBuilder.build(userId: userId);
+
+      final fcmToken = await Courier.shared.fcmToken;
+      print(fcmToken);
 
     });
 
