@@ -5,7 +5,6 @@ import 'package:courier_flutter/client/preference_client.dart';
 import 'package:courier_flutter/client/token_client.dart';
 import 'package:courier_flutter/client/tracking_client.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 class CourierClientOptions {
   final String? jwt;

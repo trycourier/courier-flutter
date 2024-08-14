@@ -77,7 +77,8 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
                 case "notifications.get_clicked_notification":
 
                     // Fetch the last push notification that was clicked
-                    if let self = self, let _ = self.lastClickedPushNotification {
+                    if let self = self, let lastPush = self.lastClickedPushNotification {
+                        CourierFlutterChannel.events.channel?.invokeMethod("push.clicked", arguments: lastPush)
                         self.lastClickedPushNotification = nil
                     }
 
@@ -123,54 +124,69 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     
     open override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        let content = notification.request.content
-        let message = content.userInfo
-        
-        // Track the message in Courier
         Task {
-            do {
-                if let trackingUrl = message["trackingUrl"] as? String {
-                    try await CourierClient.default.tracking.postTrackingUrl(
-                        url: trackingUrl,
-                        event: .delivered
-                    )
-                }
-            } catch {
-                Courier.shared.client?.options.error(error.localizedDescription)
-            }
-        }
+            
+            await handleNotification(
+                content: notification.request.content,
+                event: .delivered
+            )
+            
+            completionHandler(foregroundPresentationOptions)
 
-        let pushNotification = Courier.formatPushNotification(content: content)
-        CourierFlutterChannel.events.channel?.invokeMethod("push.delivered", arguments: pushNotification)
-        
-        completionHandler(foregroundPresentationOptions)
+        }
         
     }
     
     open override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        let content = response.notification.request.content
-        let message = content.userInfo
-        
-        // Track the message in Courier
         Task {
-            do {
-                if let trackingUrl = message["trackingUrl"] as? String {
-                    try await CourierClient.default.tracking.postTrackingUrl(
-                        url: trackingUrl,
-                        event: .clicked
-                    )
-                }
-            } catch {
-                Courier.shared.client?.options.error(error.localizedDescription)
-            }
+            
+            await handleNotification(
+                content: response.notification.request.content,
+                event: .clicked
+            )
+            
+            completionHandler()
+
         }
         
-        let pushNotification = Courier.formatPushNotification(content: content)
-        lastClickedPushNotification = pushNotification
-        CourierFlutterChannel.events.channel?.invokeMethod("push.clicked", arguments: pushNotification)
+    }
+    
+    private func handleNotification(content: UNNotificationContent, event: CourierTrackingEvent) async {
         
-        completionHandler()
+        let message = content.userInfo
+        
+        do {
+            if let trackingUrl = message["trackingUrl"] as? String {
+                try await CourierClient.default.tracking.postTrackingUrl(
+                    url: trackingUrl,
+                    event: event
+                )
+            }
+        } catch {
+            Courier.shared.client?.options.error(error.localizedDescription)
+        }
+        
+        // Format the payload sent back to dart
+        let pushNotification = Courier.formatPushNotification(content: content)
+        
+        let channel = CourierFlutterChannel.events.channel
+        
+        // Handle the event
+        switch (event) {
+            
+        case .clicked:
+            
+            lastClickedPushNotification = pushNotification
+            channel?.invokeMethod("push.clicked", arguments: pushNotification)
+            
+        case .delivered:
+            
+            channel?.invokeMethod("push.delivered", arguments: pushNotification)
+            
+        default:
+            break
+        }
         
     }
     

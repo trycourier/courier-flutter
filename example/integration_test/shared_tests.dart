@@ -7,17 +7,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:uuid/uuid.dart';
 
-import 'example_server.dart';
-import 'user_builder.dart';
+import 'utils.dart';
 
 void main() {
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  final userId = const Uuid().v1();
-
-  Future<String> sendMessage(String userId) {
-    return ExampleServer.sendTest(Env.authKey, userId, "inbox");
-  }
+  final userId = const Uuid().v4();
 
   group('Push', () {
 
@@ -281,26 +277,13 @@ void main() {
 
     test('Add Inbox Listener', () async {
 
-      if (Platform.isAndroid) {
-        print("Android threading issue with tests prevents this test from working. Be sure to test the sample app.");
-        return;
-      }
-
       await UserBuilder.build(userId: userId);
-
-      var hold = true;
 
       final listener = await Courier.shared.addInboxListener(
         onInitialLoad: null,
         onError: null,
-        onMessagesChanged: (messages, unreadCount, totalCount, canPaginate) {
-          hold = false;
-        }
+        onMessagesChanged: null
       );
-
-      while (hold) {
-        // Hold
-      }
 
       await listener.remove();
 

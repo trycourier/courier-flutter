@@ -1,8 +1,27 @@
 package com.courier.courier_flutter
 
+import android.content.Intent
 import com.courier.android.client.CourierClient
 import com.courier.android.models.CourierDevice
+import com.courier.android.utils.trackPushNotificationClick
+import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.GsonBuilder
+
+// Remote Message
+
+internal fun Intent.getAndTrackRemoteMessage(): RemoteMessage? {
+
+    var clickedMessage: RemoteMessage? = null
+
+    // Try and track the clicked message
+    // Will return a message if the message was able to be tracked
+    trackPushNotificationClick { message ->
+        clickedMessage = message
+    }
+
+    return clickedMessage
+
+}
 
 // Courier Device
 
