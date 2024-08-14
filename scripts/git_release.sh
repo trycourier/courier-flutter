@@ -33,16 +33,7 @@ run_git_status() {
 add_commit() {
     local version="$1"
     git add -A
-    git commit -m "🚀 $version"
-}
-
-# Function to merge the current branch into master
-merge_into_master() {
-    local branch=$(get_current_branch)
-    git checkout master
-    git merge --no-ff "$branch"
-    git push origin master
-    git checkout "$branch"
+    git commit -m "🚀 Bump version to $version"
 }
 
 # Function to install GitHub CLI if not already installed
@@ -65,25 +56,34 @@ create_github_release() {
 # Check if GitHub CLI is installed
 install_gh_cli
 
-# Get the package version from pubspec.yaml
+# Fetch the latest changes from master
+echo "Fetching the latest changes from master..."
+git fetch origin master || error_exit "Failed to fetch master."
+
+# Merge master into the current branch
+current_branch=$(get_current_branch)
+echo "Merging master into the current branch ($current_branch)..."
+git merge origin/master || error_exit "Failed to merge master into $current_branch."
+
+# Run git status
+run_git_status
+
+# Add and commit changes with the current version
 current_version=$(get_package_version)
-echo "Current version is $current_version"
+echo "Committing changes with version $current_version..."
+add_commit "$current_version"
 
-# Ask for confirmation to merge into master with versioned commit
-read -p "Merge into master and create release with commit: '🚀 $current_version'? (y/n): " confirmation
+# Merge the current branch into master
+echo "Merging $current_branch into master..."
+git checkout master || error_exit "Failed to switch to master branch."
+git merge --no-ff "$current_branch" || error_exit "Failed to merge $current_branch into master."
+git push origin master || error_exit "Failed to push changes to master."
+git checkout "$current_branch" || error_exit "Failed to switch back to $current_branch."
 
-if [[ $confirmation == "y" || $confirmation == "Y" ]]; then
-    # Perform the Git operations
-    run_git_status
-    add_commit "$current_version"
-    merge_into_master
+# Tag the new version
+echo "Tagging the new version $current_version..."
+git tag "$current_version" || error_exit "Failed to tag the new version."
+git push --tags || error_exit "Failed to push tags."
 
-    # Tag the new version
-    git tag "$current_version"
-    git push --tags
-
-    # Create the GitHub release
-    create_github_release "$current_version"
-else
-    echo "Merge and release process canceled."
-fi
+# Create the GitHub release
+create_github_release "$current_version"
