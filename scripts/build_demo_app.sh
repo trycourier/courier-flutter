@@ -1,10 +1,8 @@
 #!/bin/bash
 
 # Navigate to the example directory
-cd example || { echo "Failed to navigate to the example directory. Please ensure the path is correct."; exit 1; }
+cd ../example || { echo "Failed to navigate to the example directory. Please ensure the path is correct."; exit 1; }
 echo "Navigated to the example directory."
-
-sh ../dist.sh
 
 # Build Android app bundle
 echo "🤖 Building Android app bundle..."
