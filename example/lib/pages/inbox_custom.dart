@@ -20,8 +20,6 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   @override
   bool get wantKeepAlive => true;
 
-  late final ScrollController _scrollController = ScrollController();
-
   CourierInboxListener? _inboxListener;
 
   bool _isLoading = true;
@@ -116,7 +114,6 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     return RefreshIndicator(
       onRefresh: _refresh,
       child: Scrollbar(
-        controller: _scrollController,
         child: ListView.separated(
           separatorBuilder: (context, index) => const Divider(),
           itemCount: _messages.length,
@@ -155,6 +152,7 @@ extension InboxExtension on InboxMessage {
       'body': body,
       'data': data,
       'created': created,
+      'archived': archived,
       'actions': actions
               ?.map((action) => {
                     'title': action.content,
