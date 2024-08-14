@@ -129,9 +129,10 @@ void main() {
       await delay();
       final client = await ClientBuilder.build(userId: userId);
       await client.inbox.archive(messageId: messageId);
+      await delay();
       final res = await client.inbox.getArchivedMessages();
       final message = res.data?.messages?.nodes?.first;
-      expect(message?.archived, true);
+      expect(message?.isArchived, true);
     });
 
     test('Get Message By ID', () async {
@@ -143,7 +144,7 @@ void main() {
     });
 
     test('Get Unread Message Count', () async {
-      final newUser = const Uuid().v1();
+      final newUser = const Uuid().v4();
       await sendMessage(newUser);
       await delay();
       final client = await ClientBuilder.build(userId: newUser);

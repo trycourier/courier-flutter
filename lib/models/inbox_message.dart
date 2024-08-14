@@ -8,11 +8,11 @@ class InboxMessage {
   final String? body;
   final String? preview;
   final String? created;
-  final List<InboxAction>? actions;
-  final dynamic data;
-  bool? archived;
+  String? archived;
   String? read;
   String? opened;
+  final List<InboxAction>? actions;
+  final dynamic data;
 
   InboxMessage({
     required this.messageId,
@@ -34,9 +34,9 @@ class InboxMessage {
       title: data['title'],
       body: data['body'],
       preview: data['preview'],
-      created: data['created'],
       actions: actions?.map((action) => InboxAction(content: action['content'], href: action['href'], data: action['data'])).toList(),
       data: data['data'],
+      created: data['created'],
       archived: data['archived'],
       read: data['read'],
       opened: data['opened'],
@@ -49,7 +49,7 @@ class InboxMessage {
 
   bool get isOpened => opened != null;
 
-  bool get isArchived => archived ?? false;
+  bool get isArchived => archived != null;
 
   void setRead() {
     read = DateTime.now().toIso8601String();
