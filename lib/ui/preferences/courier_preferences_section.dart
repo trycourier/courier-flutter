@@ -1,9 +1,8 @@
-import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_list_item.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PreferenceSection {

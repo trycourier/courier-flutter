@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Change to the root directory
+cd "$(dirname "$0")/.."
+
 # Define ANSI color codes
 ORANGE='\033[0;33m'
 NC='\033[0m' # No Color

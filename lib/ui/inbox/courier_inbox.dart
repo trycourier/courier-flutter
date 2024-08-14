@@ -1,6 +1,8 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/inbox_action.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
@@ -10,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'courier_inbox_list_item.dart';
 
 class CourierInbox extends StatefulWidget {
-
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
 
@@ -60,27 +61,25 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   @override
   void initState() {
     super.initState();
-
-    // Ensure widget is mounted
-    if (mounted) {
-      _start();
-    }
-
+    _start();
   }
 
   void _scrollListener() {
     // Trigger the pagination
-    if (_scrollController.offset >= _scrollController.position.maxScrollExtent - _triggerPoint) {
-      Courier.shared.fetchNextPageOfMessages();
+    if (_scrollController.offset >=
+        _scrollController.position.maxScrollExtent - _triggerPoint) {
+      Courier.shared.fetchNextInboxPage();
     }
   }
 
   Future _start() async {
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    }
 
     // Attach scroll listener
     _scrollController.addListener(_scrollListener);
@@ -91,46 +90,53 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     // Attach inbox message listener
     _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () async {
-        final userId = await Courier.shared.userId;
-        setState(() {
-          _userId = userId;
-          _brand = brand;
-          _isLoading = true;
-          _error = null;
-        });
+        if (mounted) {
+          final userId = await Courier.shared.userId;
+          setState(() {
+            _userId = userId;
+            _brand = brand;
+            _isLoading = true;
+            _error = null;
+          });
+        }
       },
       onError: (error) async {
-        final userId = await Courier.shared.userId;
-        setState(() {
-          _userId = userId;
-          _brand = brand;
-          _isLoading = false;
-          _error = error;
-        });
+        if (mounted) {
+          final userId = await Courier.shared.userId;
+          setState(() {
+            _userId = userId;
+            _brand = brand;
+            _isLoading = false;
+            _error = error;
+          });
+        }
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
-        final userId = await Courier.shared.userId;
-        setState(() {
-          _userId = userId;
-          _brand = brand;
-          _messages = messages;
-          _isLoading = false;
-          _error = null;
-          _canPaginate = canPaginate;
-        });
+        if (mounted) {
+          final userId = await Courier.shared.userId;
+          setState(() {
+            _userId = userId;
+            _brand = brand;
+            _messages = messages;
+            _isLoading = false;
+            _error = null;
+            _canPaginate = canPaginate;
+          });
+        }
       },
     );
   }
 
   Future<CourierBrand?> _refreshBrand() async {
-
     if (!mounted) return null;
 
     try {
-
       // Get the theme
-      Brightness currentBrightness = PlatformDispatcher.instance.platformBrightness;
-      final brandId = currentBrightness == Brightness.dark ? widget._darkTheme.brandId : widget._lightTheme.brandId;
+      Brightness currentBrightness =
+          PlatformDispatcher.instance.platformBrightness;
+      final brandId = currentBrightness == Brightness.dark
+          ? widget._darkTheme.brandId
+          : widget._lightTheme.brandId;
 
       if (brandId == null) {
         widget._lightTheme.brand = null;
@@ -139,21 +145,19 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       }
 
       // Get / set the brand
-      CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
+      final client = await Courier.shared.client;
+      final res = await client?.brands.getBrand(brandId: brandId);
+      final brand = res?.data?.brand;
       widget._lightTheme.brand = brand;
       widget._darkTheme.brand = brand;
       return brand;
-
     } catch (error) {
-
       Courier.log(error.toString());
 
       widget._lightTheme.brand = null;
       widget._darkTheme.brand = null;
       return null;
-
     }
-
   }
 
   Future<void> _refresh() async {
@@ -226,7 +230,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
               child: ListView.separated(
                 physics: const AlwaysScrollableScrollPhysics(),
                 controller: _scrollController,
-                separatorBuilder: (context, index) => getTheme(isDarkMode).separator ?? const SizedBox(),
+                separatorBuilder: (context, index) =>
+                    getTheme(isDarkMode).separator ?? const SizedBox(),
                 itemCount: _itemCount,
                 itemBuilder: (BuildContext context, int index) {
                   if (index <= _messages.length - 1) {
@@ -236,21 +241,27 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
                       message: message,
                       onMessageClick: (message) {
                         message.markAsClicked();
-                        widget.onMessageClick != null ? widget.onMessageClick!(message, index) : null;
+                        widget.onMessageClick != null
+                            ? widget.onMessageClick!(message, index)
+                            : null;
                       },
-                      onActionClick: (action) => widget.onActionClick != null ? widget.onActionClick!(action, message, index) : null,
+                      onActionClick: (action) => widget.onActionClick != null
+                          ? widget.onActionClick!(action, message, index)
+                          : null,
                     );
                   } else {
                     return Container(
                       alignment: Alignment.center,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 24, bottom: _triggerPoint),
+                        padding:
+                            EdgeInsets.only(top: 24, bottom: _triggerPoint),
                         child: SizedBox(
                           height: 24,
                           width: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation<Color>(getTheme(isDarkMode).getLoadingColor(context)),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                getTheme(isDarkMode).getLoadingColor(context)),
                           ),
                         ),
                       ),
@@ -261,7 +272,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             ),
           ),
         ),
-        CourierFooter(shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
+        CourierFooter(
+            shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
       ],
     );
   }
@@ -277,11 +289,21 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     );
   }
 
+  void _removeInboxListener() {
+    if (_inboxListener != null) {
+      _inboxListener!.remove().then((_) {
+        _inboxListener = null;
+      }).catchError((error) {
+        Courier.log('Failed to remove inbox listener: $error');
+      });
+    }
+  }
+
   @override
   void dispose() {
 
     // Remove the listeners
-    _inboxListener?.remove();
+    _removeInboxListener();
     _scrollController.removeListener(_scrollListener);
 
     // Dispose the default controller

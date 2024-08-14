@@ -2,7 +2,7 @@ import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
@@ -49,10 +49,10 @@ class CourierPreferences extends StatefulWidget {
       _darkTheme = darkTheme ?? CourierPreferencesTheme();
 
   @override
-  CourierInboxState createState() => CourierInboxState();
+  CourierPreferencesState createState() => CourierPreferencesState();
 }
 
-class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliveClientMixin {
+class CourierPreferencesState extends State<CourierPreferences> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => widget.keepAlive;
 
@@ -83,11 +83,20 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
     try {
 
-      final preferences = await Courier.shared.getUserPreferences();
+      final client = await Courier.shared.client;
+      final res = await client?.preferences.getUserPreferences();
+
+      if (res == null) {
+        throw "Unable to get preferences";
+      }
+
+      if (!mounted) return;
+
+      final topics = res.items ?? [];
 
       List<PreferenceSection> sections = [];
 
-      for (var topic in preferences.items) {
+      for (var topic in topics) {
 
         String sectionId = topic.sectionId;
 
@@ -122,6 +131,8 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
     } catch (error) {
 
+      if (!mounted) return;
+
       setState(() {
         _userId = userId;
         _brand = brand;
@@ -151,7 +162,9 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
       }
 
       // Get / set the brand
-      CourierBrand? brand = await Courier.shared.getBrand(id: brandId);
+      final client = await Courier.shared.client;
+      final res = await client?.brands.getBrand(brandId: brandId);
+      final brand = res?.data?.brand;
       widget._lightTheme.brand = brand;
       widget._darkTheme.brand = brand;
       return brand;
@@ -292,7 +305,8 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       try {
 
-        await Courier.shared.putUserPreferencesTopic(
+        final client = await Courier.shared.client;
+        await client?.preferences.putUserPreferenceTopic(
             topicId: topic.topicId,
             status: newStatus,
             hasCustomRouting: topic.hasCustomRouting,
@@ -359,7 +373,8 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
 
       try {
 
-        await Courier.shared.putUserPreferencesTopic(
+        final client = await Courier.shared.client;
+        await client?.preferences.putUserPreferenceTopic(
             topicId: topic.topicId,
             status: newStatus,
             hasCustomRouting: hasCustomRouting,
@@ -385,6 +400,9 @@ class CourierInboxState extends State<CourierPreferences> with AutomaticKeepAliv
   }
 
   void _updateTopic(String topicId, CourierUserPreferencesTopic newTopic) {
+
+    if (!mounted) return;
+
     for (int sectionIndex = 0; sectionIndex < _sections.length; sectionIndex++) {
       final section = _sections[sectionIndex];
       final topicIndex = section.topics.indexWhere((topic) => topic.topicId == topicId);

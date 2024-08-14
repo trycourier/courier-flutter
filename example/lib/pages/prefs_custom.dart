@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/courier_preference_topic.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter_sample/pages/pref_detail.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +15,10 @@ class CustomPrefsPage extends StatefulWidget {
   State<CustomPrefsPage> createState() => _CustomPrefsPageState();
 }
 
-class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAliveClientMixin {
-
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+class _CustomPrefsPageState extends State<CustomPrefsPage>
+    with AutomaticKeepAliveClientMixin {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -33,11 +33,11 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
   }
 
   Future<void> _start() async {
-
     _refreshIndicatorKey.currentState?.show();
 
     try {
-      final preferences = await Courier.shared.getUserPreferences();
+      final client = await Courier.shared.client;
+      final preferences = await client?.preferences.getUserPreferences();
       setState(() {
         _error = null;
         _preferences = preferences;
@@ -48,7 +48,6 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
         _preferences = null;
       });
     }
-
   }
 
   Future<void> _refresh() async {
@@ -61,7 +60,10 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
 
     if (_error != null) {
       return Center(
-        child: Text(_error!),
+        child: Text(
+          _error!,
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
@@ -89,7 +91,7 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
                 );
               },
               subtitle: Text(
-                topic.toJson(),
+                topic.toListItem(),
                 style: GoogleFonts.robotoMono(),
               ),
             );
@@ -97,12 +99,11 @@ class _CustomPrefsPageState extends State<CustomPrefsPage> with AutomaticKeepAli
         ),
       ),
     );
-
   }
 }
 
 extension TopicExtension on CourierUserPreferencesTopic {
-  String toJson() {
+  String toListItem() {
     var jsonObject = {
       'topicId': topicId,
       'topicName': topicName,

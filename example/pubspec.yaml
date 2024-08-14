@@ -30,8 +30,11 @@ dependencies:
   firebase_messaging: ^14.7.3
   google_fonts: ^6.1.0
   http: ^1.2.1
+  uuid: ^4.4.2
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
 

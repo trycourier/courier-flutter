@@ -1,18 +1,10 @@
-import 'package:courier_flutter/courier_preference_channel.dart';
-import 'package:courier_flutter/courier_preference_status.dart';
-import 'package:courier_flutter/courier_provider.dart';
-import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
-import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/theme.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../example_server.dart';
 
@@ -256,7 +248,7 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   void dispose() {
-    super.dispose();
     _pushListener?.remove();
+    super.dispose();
   }
 }

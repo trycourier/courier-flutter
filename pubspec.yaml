@@ -1,6 +1,6 @@
 name: courier_flutter
 description: Inbox, Push Notifications and Preferences for Flutter
-version: 2.4.1
+version: 3.0.0
 homepage: https://courier.com
 
 environment:
@@ -14,8 +14,11 @@ dependencies:
   intl: ^0.19.0
   plugin_platform_interface: ^2.0.2
   url_launcher: ^6.2.3
+  uuid: ^4.4.2
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
@@ -39,9 +42,9 @@ flutter:
     platforms:
       android:
         package: com.courier.courier_flutter
-        pluginClass: CourierFlutterPlugin
+        pluginClass: CourierPlugin
       ios:
-        pluginClass: CourierFlutterPlugin
+        pluginClass: CourierPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

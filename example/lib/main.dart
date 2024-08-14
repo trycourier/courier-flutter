@@ -99,13 +99,19 @@ class _MyAppState extends State<MyApp> {
 
     await _refreshJwt();
 
-    _inboxListener = await Courier.shared.addInboxListener(onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-      setState(() => _unreadMessageCount = unreadMessageCount);
-    });
+    _inboxListener = await Courier.shared.addInboxListener(
+      onInitialLoad: null,
+      onError: (error) {
+        setState(() => _unreadMessageCount = 0);
+      },
+      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+        setState(() => _unreadMessageCount = unreadMessageCount);
+      }
+    );
 
-    _pushListener = Courier.shared.addPushListener(
-      onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
+    _pushListener = await Courier.shared.addPushListener(
       onPushDelivered: (push) => showAlert(context, 'Push Delivered', push.toString()),
+      onPushClicked: (push) => showAlert(context, 'Push Clicked', push.toString()),
     );
 
     try {
@@ -177,11 +183,17 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  void _removeListeners() {
+    _pushListener.remove();
+    _inboxListener.remove().catchError((error) {
+      Courier.log('Failed to remove inbox listener: $error');
+    });
+  }
+
   @override
   void dispose() {
+    _removeListeners();
     super.dispose();
-    _pushListener.remove();
-    _inboxListener.remove();
   }
 }
 
@@ -198,7 +210,7 @@ showAlert(BuildContext context, String title, String body) {
       ),
       actions: [
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('OK'),
           onPressed: () => Navigator.pop(context),
         )
       ],

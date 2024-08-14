@@ -1,4 +1,5 @@
-import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/models/inbox_action.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/utils.dart';

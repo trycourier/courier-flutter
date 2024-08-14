@@ -2,15 +2,11 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
-import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
-import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
 import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
-
-import 'package:google_fonts/google_fonts.dart';
 
 class PushPage extends StatefulWidget {
   const PushPage({super.key});
@@ -20,7 +16,7 @@ class PushPage extends StatefulWidget {
 }
 
 class _PushPageState extends State<PushPage> {
-  late CourierPushListener _pushListener;
+  late CourierPushListener? _pushListener;
 
   String? _apnsToken;
   String? _fcmToken;
@@ -33,23 +29,24 @@ class _PushPageState extends State<PushPage> {
     _start();
   }
 
-  void _start() {
-    _pushListener = Courier.shared.addPushListener(
-      onPushClicked: (push) {
+  Future<void> _start() async {
+    _pushListener = await Courier.shared.addPushListener(
+      onPushDelivered: (push) {
         print(push);
       },
-      onPushDelivered: (push) {
+      onPushClicked: (push) {
         print(push);
       },
     );
 
-    Courier.shared.iOSForegroundNotificationPresentationOptions = [
+    final options = await Courier.setIOSForegroundPresentationOptions(options: [
       iOSNotificationPresentationOption.banner,
       iOSNotificationPresentationOption.sound,
       iOSNotificationPresentationOption.list,
       iOSNotificationPresentationOption.badge,
-    ];
-    print(Courier.shared.iOSForegroundNotificationPresentationOptions);
+    ]);
+    print(options);
+    print(Courier.iOSForegroundNotificationPresentationOptions);
 
     _getTokens();
   }
@@ -70,7 +67,7 @@ class _PushPageState extends State<PushPage> {
   }
 
   Future _requestPermissions() async {
-    final status = await Courier.shared.requestNotificationPermission();
+    final status = await Courier.requestNotificationPermission();
     print(status);
   }
 
@@ -160,7 +157,7 @@ class _PushPageState extends State<PushPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inbox'),
+        title: const Text('Push'),
       ),
       body: _buildContent(context),
     );
@@ -168,7 +165,7 @@ class _PushPageState extends State<PushPage> {
 
   @override
   void dispose() {
+    _pushListener?.remove();
     super.dispose();
-    _pushListener.remove();
   }
 }

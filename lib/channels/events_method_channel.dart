@@ -52,7 +52,7 @@ class EventsChannelCourierFlutter extends CourierFlutterEventsPlatform {
     if (!Platform.isIOS) return;
 
     try {
-      return await channel.invokeMethod('iOSForegroundPresentationOptions', {
+      return await channel.invokeMethod('shared.push.set_ios_foreground_presentation_options', {
         'options': options.map((option) => option.value).toList(),
       });
     } catch (error) {

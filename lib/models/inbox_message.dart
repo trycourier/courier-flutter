@@ -1,4 +1,5 @@
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/models/inbox_action.dart';
 import 'package:intl/intl.dart';
 
 class InboxMessage {
@@ -7,11 +8,11 @@ class InboxMessage {
   final String? body;
   final String? preview;
   final String? created;
-  final List<InboxAction>? actions;
-  final dynamic data;
-  bool? archived;
+  String? archived;
   String? read;
   String? opened;
+  final List<InboxAction>? actions;
+  final dynamic data;
 
   InboxMessage({
     required this.messageId,
@@ -26,16 +27,16 @@ class InboxMessage {
     this.opened,
   });
 
-  factory InboxMessage.fromJson(dynamic data) {
+  factory InboxMessage.fromJson(Map<String, dynamic> data) {
     List<dynamic>? actions = data['actions'];
     return InboxMessage(
       messageId: data['messageId'],
       title: data['title'],
       body: data['body'],
       preview: data['preview'],
-      created: data['x'],
       actions: actions?.map((action) => InboxAction(content: action['content'], href: action['href'], data: action['data'])).toList(),
       data: data['data'],
+      created: data['created'],
       archived: data['archived'],
       read: data['read'],
       opened: data['opened'],
@@ -48,7 +49,7 @@ class InboxMessage {
 
   bool get isOpened => opened != null;
 
-  bool get isArchived => archived ?? false;
+  bool get isArchived => archived != null;
 
   void setRead() {
     read = DateTime.now().toIso8601String();
@@ -63,22 +64,33 @@ class InboxMessage {
   }
 
   String get time {
-    final dateFormatter = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZZZZZ');
-
     if (created != null) {
-      final date = dateFormatter.parse(created!);
-      final timeDifference = DateTime.now().difference(date);
+      // Define the date format and specify that it should be parsed in UTC to avoid timezone issues
+      final dateFormatter = DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ');
 
-      final timeSince = timeDifference.inSeconds;
+      try {
+        // Parse the created date in UTC and then convert it to the local time zone
+        final date = dateFormatter.parseUtc(created!).toLocal();
+        final timeDifference = DateTime.now().difference(date);
 
-      if (timeSince < 60) {
-        return 'now';
-      } else if (timeSince < 3600) {
-        return '${timeSince ~/ 60} minutes ago';
-      } else if (timeSince < 86400) {
-        return '${timeSince ~/ 3600} hours ago';
-      } else {
-        return '${timeSince ~/ 86400} days ago';
+        final timeSince = timeDifference.inSeconds;
+
+        if (timeSince < 1) {
+          return 'now';
+        } else if (timeSince < 60) {
+          return '$timeSince seconds ago';
+        } else if (timeSince < 120) {
+          return '1 minute ago';
+        } else if (timeSince < 3600) {
+          return '${timeSince ~/ 60} minutes ago';
+        } else if (timeSince < 86400) {
+          return '${timeSince ~/ 3600} hours ago';
+        } else {
+          return '${timeSince ~/ 86400} days ago';
+        }
+      } catch (e) {
+        // If parsing fails, return a default value
+        return 'unknown time';
       }
     }
 
@@ -87,7 +99,9 @@ class InboxMessage {
 }
 
 extension InboxMessageExtensions on InboxMessage {
-  Future markAsClicked() => Courier.shared.clickMessage(id: messageId);
-  Future markAsRead() => Courier.shared.readMessage(id: messageId);
-  Future markAsUnread() => Courier.shared.unreadMessage(id: messageId);
+  Future markAsOpened() => Courier.shared.openMessage(messageId: messageId);
+  Future markAsClicked() => Courier.shared.clickMessage(messageId: messageId);
+  Future markAsRead() => Courier.shared.readMessage(messageId: messageId);
+  Future markAsUnread() => Courier.shared.unreadMessage(messageId: messageId);
+  Future markAsArchived() => Courier.shared.archiveMessage(messageId: messageId);
 }

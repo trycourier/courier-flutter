@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -14,10 +15,12 @@ class CustomInboxPage extends StatefulWidget {
   State<CustomInboxPage> createState() => _CustomInboxPageState();
 }
 
-class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAliveClientMixin {
-
+class _CustomInboxPageState extends State<CustomInboxPage>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  late final ScrollController _scrollController = ScrollController();
 
   CourierInboxListener? _inboxListener;
 
@@ -32,26 +35,31 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
   }
 
   Future _start() async {
-
     _inboxListener = await Courier.shared.addInboxListener(
       onInitialLoad: () {
-        setState(() {
-          _isLoading = true;
-          _error = null;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = true;
+            _error = null;
+          });
+        }
       },
       onError: (error) {
-        setState(() {
-          _isLoading = false;
-          _error = error;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _error = error;
+          });
+        }
       },
       onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-        setState(() {
-          _messages = messages;
-          _isLoading = false;
-          _error = null;
-        });
+        if (mounted) {
+          setState(() {
+            _messages = messages;
+            _isLoading = false;
+            _error = null;
+          });
+        }
       },
     );
   }
@@ -64,10 +72,20 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
     message.isRead ? await message.markAsUnread() : await message.markAsRead();
   }
 
+  void _removeInboxListener() {
+    if (_inboxListener != null) {
+      _inboxListener!.remove().then((_) {
+        _inboxListener = null;
+      }).catchError((error) {
+        Courier.log('Failed to remove inbox listener: $error');
+      });
+    }
+  }
+
   @override
-  void dispose() {
+  void dispose() async {
+    _removeInboxListener();
     super.dispose();
-    _inboxListener?.remove();
   }
 
   Widget _buildContent() {
@@ -79,19 +97,26 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
 
     if (_error != null) {
       return Center(
-        child: Text(_error!),
+        child: Text(
+          _error!,
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
     if (_messages.isEmpty) {
       return const Center(
-        child: Text('No message found'),
+        child: Text(
+          'No message found',
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
     return RefreshIndicator(
       onRefresh: _refresh,
       child: Scrollbar(
+        controller: _scrollController,
         child: ListView.separated(
           separatorBuilder: (context, index) => const Divider(),
           itemCount: _messages.length,
@@ -119,10 +144,10 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
     super.build(context);
     return _buildContent();
   }
+
 }
 
 extension InboxExtension on InboxMessage {
-
   String toJson() {
     var jsonObject = {
       'messageId': messageId,
@@ -130,14 +155,16 @@ extension InboxExtension on InboxMessage {
       'body': body,
       'data': data,
       'created': created,
-      'actions': actions?.map((action) => {
-        'title': action.content,
-        'data': action.data,
-      }).toList() ?? [],
+      'actions': actions
+              ?.map((action) => {
+                    'title': action.content,
+                    'data': action.data,
+                  })
+              .toList() ??
+          [],
     };
 
     var encoder = const JsonEncoder.withIndent('  ');
     return encoder.convert(jsonObject);
   }
-
 }
