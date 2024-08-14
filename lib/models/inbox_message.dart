@@ -63,6 +63,14 @@ class InboxMessage {
     opened = DateTime.now().toIso8601String();
   }
 
+  void setArchived() {
+    archived = DateTime.now().toIso8601String();
+  }
+
+  void setUnarchived() {
+    archived = null;
+  }
+
   String get time {
     if (created != null) {
       // Define the date format and specify that it should be parsed in UTC to avoid timezone issues
@@ -99,9 +107,29 @@ class InboxMessage {
 }
 
 extension InboxMessageExtensions on InboxMessage {
-  Future markAsOpened() => Courier.shared.openMessage(messageId: messageId);
-  Future markAsClicked() => Courier.shared.clickMessage(messageId: messageId);
-  Future markAsRead() => Courier.shared.readMessage(messageId: messageId);
-  Future markAsUnread() => Courier.shared.unreadMessage(messageId: messageId);
-  Future markAsArchived() => Courier.shared.archiveMessage(messageId: messageId);
+
+  Future markAsOpened() {
+    setOpened();
+    return Courier.shared.openMessage(messageId: messageId);
+  }
+
+  Future markAsClicked() {
+    return Courier.shared.clickMessage(messageId: messageId);
+  }
+
+  Future markAsRead() {
+    setRead();
+    return Courier.shared.readMessage(messageId: messageId);
+  }
+
+  Future markAsUnread() {
+    setUnread();
+    return Courier.shared.unreadMessage(messageId: messageId);
+  }
+
+  Future markAsArchived() {
+    setArchived();
+    return Courier.shared.archiveMessage(messageId: messageId);
+  }
+
 }

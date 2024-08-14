@@ -8,6 +8,7 @@ import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import 'courier_inbox_list_item.dart';
 
@@ -236,18 +237,26 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
                 itemBuilder: (BuildContext context, int index) {
                   if (index <= _messages.length - 1) {
                     final message = _messages[index];
-                    return CourierInboxListItem(
-                      theme: getTheme(isDarkMode),
-                      message: message,
-                      onMessageClick: (message) {
-                        message.markAsClicked();
-                        widget.onMessageClick != null
-                            ? widget.onMessageClick!(message, index)
-                            : null;
+                    return VisibilityDetector(
+                      key: Key(message.messageId),
+                      onVisibilityChanged: (VisibilityInfo info) {
+                        if (info.visibleFraction > 0) {
+                          _onItemVisible(message, index);
+                        }
                       },
-                      onActionClick: (action) => widget.onActionClick != null
-                          ? widget.onActionClick!(action, message, index)
-                          : null,
+                      child: CourierInboxListItem(
+                        theme: getTheme(isDarkMode),
+                        message: message,
+                        onMessageClick: (message) {
+                          message.markAsClicked();
+                          widget.onMessageClick != null
+                              ? widget.onMessageClick!(message, index)
+                              : null;
+                        },
+                        onActionClick: (action) => widget.onActionClick != null
+                            ? widget.onActionClick!(action, message, index)
+                            : null,
+                      ),
                     );
                   } else {
                     return Container(
@@ -276,6 +285,14 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
       ],
     );
+  }
+
+  void _onItemVisible(InboxMessage message, int index) {
+    if (!message.isOpened) {
+      message.markAsOpened().then((value) {
+        Courier.log('Message opened: ${message.messageId}');
+      });
+    }
   }
 
   @override
