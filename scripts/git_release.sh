@@ -33,7 +33,7 @@ run_git_status() {
 add_commit() {
     local version="$1"
     git add -A
-    git commit -m "🚀 Bump version to $version"
+    git commit -m "🚀 $version"
 }
 
 # Function to install GitHub CLI if not already installed
