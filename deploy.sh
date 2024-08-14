@@ -15,7 +15,7 @@ declare -a steps=(
     "Build Demo App:sh build_demo_app.sh"
     "Update Build Version:sh update_version.sh"
     "Create Git Release:sh git_release.sh"
-    "Release Cocoapod:sh release_pod.sh"
+    "Publish Package:sh pub_publish.sh"
 )
 
 # Display available steps with indices
