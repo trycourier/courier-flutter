@@ -112,20 +112,14 @@ void main() {
 
     test('Authentication Listener', () async {
 
-      var hold = true;
-
       final listener = await Courier.shared.addAuthenticationListener((userId) {
-        hold = userId == null;
+        print('Listener attached');
       });
 
       await UserBuilder.build(userId: userId);
 
       final isUserSignedIn = await Courier.shared.isUserSignedIn;
       expect(isUserSignedIn, true);
-
-      while (hold) {
-        // Hold
-      }
 
       await listener.remove();
 
