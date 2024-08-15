@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:courier_flutter/channels/courier_flutter_channels.dart';
+import 'package:courier_flutter/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';

@@ -1,4 +1,4 @@
-import 'package:courier_flutter/channels/courier_flutter_channels.dart';
+import 'package:courier_flutter/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/brand_client.dart';
 import 'package:courier_flutter/client/inbox_client.dart';
 import 'package:courier_flutter/client/preference_client.dart';

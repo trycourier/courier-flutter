@@ -242,16 +242,14 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                     
                     let listenerId: String = try params.extract("listenerId")
                     
-                    let channel = CourierFlutterChannel.events.channel
-                    
                     // Create the listener
                     let listener = Courier.shared.addInboxListener(
                         onInitialLoad: {
-                            channel?.invokeMethod("inbox.listener_loading", arguments: nil)
+                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: nil)
                         },
                         onError: { error in
                             let courierError = CourierError(from: error)
-                            channel?.invokeMethod("inbox.listener_error", arguments: [
+                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_error", arguments: [
                                 "error": courierError.message
                             ])
                         },
@@ -262,7 +260,7 @@ internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
                                 "totalMessageCount": totalMessageCount,
                                 "canPaginate": canPaginate
                             ]
-                            channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
+                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
                         }
                     )
                     

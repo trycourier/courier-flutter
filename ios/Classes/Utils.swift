@@ -442,27 +442,21 @@ internal extension NSDictionary {
 internal extension UIApplication {
     
     func makeChannel(id: String) -> FlutterMethodChannel? {
-        
-        var channel: FlutterMethodChannel?
 
-        DispatchQueue.main.async {
-            // Get window
-            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
-                return
-            }
-
-            // Get messenger
-            let flutterViewController = window.rootViewController as? FlutterViewController
-            let binaryMessenger = flutterViewController as? FlutterBinaryMessenger
-            guard let messenger = binaryMessenger else {
-                return
-            }
-
-            // Create the channel
-            channel = FlutterMethodChannel(name: id, binaryMessenger: messenger)
+        // Get window
+        guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+            return nil
         }
 
-        return channel
+        // Get messenger
+        let flutterViewController = window.rootViewController as? FlutterViewController
+        let binaryMessenger = flutterViewController as? FlutterBinaryMessenger
+        guard let messenger = binaryMessenger else {
+            return nil
+        }
+
+        // Create the channel
+        return FlutterMethodChannel(name: id, binaryMessenger: messenger)
         
     }
     
