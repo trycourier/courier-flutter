@@ -8,7 +8,7 @@
 import Foundation
 import Courier_iOS
 
-internal class CourierClientMethodHandler: NSObject, FlutterPlugin {
+internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
         return FlutterMethodChannel(name: CourierFlutterChannel.client.rawValue, binaryMessenger: registrar.messenger())

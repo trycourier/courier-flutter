@@ -7,7 +7,7 @@
 
 import Courier_iOS
 
-internal class CourierSharedMethodHandler: NSObject, FlutterPlugin {
+internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
         return FlutterMethodChannel(name: CourierFlutterChannel.shared.rawValue, binaryMessenger: registrar.messenger())
