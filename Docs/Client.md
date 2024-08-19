@@ -43,8 +43,8 @@ await client.tokens.putUserToken(
 );
 
 // Deletes the token from Courier Token Management
-try await client.tokens.deleteUserToken(
-    token: "..."
+await client.tokens.deleteUserToken(
+    token: 'token'
 )
 ```
 
