@@ -97,8 +97,11 @@ void main() {
     test('Sign In', () async {
 
       await Courier.shared.signIn(
-          userId: userId,
-          accessToken: "example_key"
+        userId: userId,
+        accessToken: 'example',
+        clientKey: 'example',
+        tenantId: 'example',
+        showLogs: true,
       );
 
       final currentUserId = await Courier.shared.userId;
@@ -340,6 +343,26 @@ void main() {
       await sendMessage(userId);
 
       await Courier.shared.readAllInboxMessages();
+
+    });
+
+    test('Message Extensions', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messageId = await sendMessage(userId);
+
+      final message = InboxMessage(messageId: messageId);
+
+      await message.markAsOpened();
+      await message.markAsRead();
+      await message.markAsUnread();
+      await message.markAsClicked();
+      await message.markAsArchived();
+
+      expect(message.isArchived, true);
+      expect(message.isRead, false);
+      expect(message.isOpened, true);
 
     });
 

@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+Inbox, Push Notification & Preferences for Flutter by Courier
                        DESC
   s.homepage         = 'http://courier.com'
   s.license          = { :file => '../LICENSE' }

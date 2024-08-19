@@ -1,3 +1,4 @@
+import 'package:courier_flutter/client/courier_client.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
@@ -19,9 +20,24 @@ void main() {
   group('Options', () {
 
     test('Setup', () async {
-      final client = await ClientBuilder.build(userId: userId);
+
+      final client = CourierClient(
+        jwt: 'jwt',
+        clientKey: 'client_key',
+        userId: 'user_id',
+        connectionId: 'connection_id',
+        tenantId: 'tenant_id',
+        showLogs: true,
+      );
+
       final options = client.options;
-      expect(options.userId, userId);
+      expect(options.jwt, 'jwt');
+      expect(options.clientKey, 'client_key');
+      expect(options.userId, 'user_id');
+      expect(options.connectionId, 'connection_id');
+      expect(options.tenantId, 'tenant_id');
+      expect(options.showLogs, true);
+
     });
 
   });
@@ -58,13 +74,28 @@ void main() {
     });
 
     test('Delete Token', () async {
+
       final client = await ClientBuilder.build(userId: userId);
-      final device = CourierDevice(appId: 'example_app_id');
+
+      final device = CourierDevice(
+        appId: 'example',
+        adId: 'example',
+        deviceId: 'example',
+        platform: 'example',
+        manufacturer: 'example',
+        model: 'example',
+      );
+
       await client.tokens.putUserToken(
         token: 'example_token',
         provider: 'firebase-fcm',
         device: device,
       );
+
+      await client.tokens.deleteUserToken(
+          token: 'example_token'
+      );
+
     });
   });
 
@@ -92,7 +123,9 @@ void main() {
 
     test('Get Preferences', () async {
       final client = await ClientBuilder.build(userId: userId);
-      final res = await client.preferences.getUserPreferences();
+      final res = await client.preferences.getUserPreferences(
+        paginationCursor: null
+      );
       expect(res.items, isNotEmpty);
     });
 
@@ -120,7 +153,10 @@ void main() {
       await sendMessage(userId);
       await delay();
       final client = await ClientBuilder.build(userId: userId);
-      final res = await client.inbox.getMessages();
+      final res = await client.inbox.getMessages(
+        paginationLimit: 123,
+        startCursor: null,
+      );
       expect(res.data?.messages?.nodes?.length, 1);
     });
 
@@ -130,7 +166,10 @@ void main() {
       final client = await ClientBuilder.build(userId: userId);
       await client.inbox.archive(messageId: messageId);
       await delay();
-      final res = await client.inbox.getArchivedMessages();
+      final res = await client.inbox.getArchivedMessages(
+        paginationLimit: 123,
+        startCursor: null,
+      );
       final message = res.data?.messages?.nodes?.first;
       expect(message?.isArchived, true);
     });
