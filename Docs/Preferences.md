@@ -160,40 +160,8 @@ If you are interested in using a Courier "Brand", here is where you can adjust t
 
 &emsp;
 
-## Custom Preferences APIs
+---
 
-The raw data you can use to build whatever UI you'd like.
+👋 `Branding APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md#branding-apis"><code>here</code></a>
 
-# Get All User Preferences
-
-Returns all the user's preferences. [`listAllUserPreferences`](https://www.courier.com/docs/reference/user-preferences/list-all-user-preferences/)
-
-```dart
-// paginationCursor is optional
-final preferences = await Courier.shared.getUserPreferences(paginationCursor: cursor);
-```
-
-&emsp;
-
-# Update Preference Topic
-
-Updates a specific user preference topic. [`updateUserSubscriptionTopic`](https://www.courier.com/docs/reference/user-preferences/update-subscription-topic-preferences/)
-
-```dart
-await Courier.shared.putUserPreferencesTopic(
-  topicId: 'your_topic_id',
-  status: CourierUserPreferencesStatus.optedIn,
-  hasCustomRouting: true,
-  customRouting: [CourierUserPreferencesChannel.push]
-);
-```
-
-&emsp;
-
-# Get Preference Topic
-
-Gets a specific preference topic. [`getUserSubscriptionTopic`](https://www.courier.com/docs/reference/user-preferences/get-subscription-topic-preferences/)
-
-```dart
-final topic = await Courier.shared.getUserPreferencesTopic(topicId: 'your_topic_id');
-```
+👋 `Preference APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md#preferences-apis"><code>here</code></a>
