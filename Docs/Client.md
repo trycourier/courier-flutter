@@ -55,58 +55,28 @@ All available APIs for Inbox
 ```swift
 // Get all inbox messages
 // Includes the total count in the response
-let messages = try await client.inbox.getMessages(
-    paginationLimit: 123, // Optional
-    startCursor: nil      // Optional
-)
+final res = await client.inbox.getMessages(
+  paginationLimit: 123, // Optional
+  startCursor: null,    // Optional
+);
 
 // Returns only archived messages
 // Includes the total count of archived message in the response
-let archivedMessages = try await client.inbox.getArchivedMessages(
-    paginationLimit: 123, // Optional
-    startCursor: null     // Optional
-)
+final res = await client.inbox.getArchivedMessages(
+  paginationLimit: 123, // Optional
+  startCursor: null,    // Optional
+);
 
 // Gets the number of unread messages
-let unreadCount = client.inbox.getUnreadMessageCount()
+final count = await client.inbox.getUnreadMessageCount();
 
 // Tracking messages
-try await client.inbox.open(messageId = "...")
-try await client.inbox.read(messageId = "...")
-try await client.inbox.unread(messageId = "...")
-try await client.inbox.archive(messageId = "...")
-try await client.inbox.readAll()
-
-// Inbox Websocket
-let socket = client.inbox.socket
-
-socket.onOpen = {
-    print("Socket Opened")
-}
-
-socket.onClose = { code, reason in
-    print("Socket closed: \(code), \(String(describing: reason))")
-}
-
-socket.onError = { error in
-    print(error)
-}
-
-// Returns the event received
-// Note: This will not fire unless you provide a connectionId to the client and the event comes from another app using a different connectionId
-// Available events: .read, .unread, .markAllRead, .opened,.archive
-socket.receivedMessageEvent = { event in
-    print(event)
-}
-
-socket.receivedMessage = { message in
-    print(message)
-}
-
-try await socket.connect() // Connects the socket
-try await socket.sendSubscribe() // Subscribes to socket events for the user id in the client
-
-socket.disconnect() // Disconnects the socket
+await client.inbox.open(messageId: messageId);
+await client.inbox.click(messageId: messageId, trackingId: "example_id");
+await client.inbox.read(messageId: messageId);
+await client.inbox.unread(messageId: messageId);
+await client.inbox.archive(messageId: messageId);
+await client.inbox.readAll();
 ```
 
 ## Preferences APIs
@@ -115,22 +85,22 @@ All available APIs for Preferences
 
 ```swift
 // Get all the available preference topics
-let preferences = try await client.preferences.getUserPreferences(
-    paginationCursor: nil // Optional
-)
+final res = await client.preferences.getUserPreferences(
+  paginationCursor: null // Optional
+);
 
 // Gets a specific preference topic
-let topic = try await client.preferences.getUserPreferenceTopic(
-    topicId: "..."
-)
+final res = await client.preferences.getUserPreferenceTopic(
+  topicId: topicId
+);
 
 // Updates a user preference topic
-try await client.preferences.putUserPreferenceTopic(
-    topicId: "...",
-    status: .optedIn,
-    hasCustomRouting: true,
-    customRouting: [.push]
-)
+await client.preferences.putUserPreferenceTopic(
+  topicId: topicId,
+  status: CourierUserPreferencesStatus.optedIn,
+  hasCustomRouting: true,
+  customRouting: [CourierUserPreferencesChannel.push],
+);
 ```
 
 ## Branding APIs
@@ -138,7 +108,7 @@ try await client.preferences.putUserPreferenceTopic(
 All available APIs for Branding
 
 ```dart
-final res = await client.brands.getBrand(brandId: 'your_brand_id');
+final res = await client.brands.getBrand(brandId: brandId);
 ```
 
 ## URL Tracking APIs
@@ -147,10 +117,8 @@ All available APIs for URL Tracking
 
 ```swift
 // Pass a trackingUrl, usually found inside of a push notification payload or Inbox message
-// Tell which event happened. 
-// All available events: .clicked, .delivered, .opened, .read, .unread
-try await client.tracking.postTrackingUrl(
-    url: "courier_tracking_url",
-    event: .delivered
-)
+await client.tracking.postTrackingUrl(
+  url: trackingUrl,
+  event: CourierTrackingEvent.delivered,
+);
 ```
