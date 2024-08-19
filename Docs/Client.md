@@ -4,7 +4,7 @@ Base layer Courier API wrapper.
 
 ## Initialization
 
-Creating a client stores request authentication credentials only for that specific client. You can create as many clients as you'd like. See the "Going to Production" section <a href="https://github.com/trycourier/courier-ios/blob/master/Docs/Authentication.md#going-to-production"><code>here</code></a> for more info.
+Creating a client stores request authentication credentials only for that specific client. You can create as many clients as you'd like. See the "Going to Production" section <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production"><code>here</code></a> for more info.
 
 ```dart
 // Creating a client
@@ -52,7 +52,7 @@ try await client.tokens.deleteUserToken(
 
 All available APIs for Inbox
 
-```swift
+```dart
 // Get all inbox messages
 // Includes the total count in the response
 final res = await client.inbox.getMessages(
@@ -83,7 +83,7 @@ await client.inbox.readAll();
 
 All available APIs for Preferences
 
-```swift
+```dart
 // Get all the available preference topics
 final res = await client.preferences.getUserPreferences(
   paginationCursor: null // Optional
@@ -115,7 +115,7 @@ final res = await client.brands.getBrand(brandId: brandId);
 
 All available APIs for URL Tracking
 
-```swift
+```dart
 // Pass a trackingUrl, usually found inside of a push notification payload or Inbox message
 await client.tracking.postTrackingUrl(
   url: trackingUrl,
