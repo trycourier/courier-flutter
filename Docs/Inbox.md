@@ -199,6 +199,16 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
+..
+
+@override
+void dispose() {
+  _inboxListener?.remove().catchError((error) {
+    print('Failed to remove inbox listener: $error');
+  });
+  super.dispose();
+}
 ```
 
 &emsp;
