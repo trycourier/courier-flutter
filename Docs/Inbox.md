@@ -278,3 +278,7 @@ final inboxListener = await Courier.shared.addInboxListener(
 
 await inboxListener.remove();
 ```
+
+---
+
+👋 `Inbox APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md#inbox-apis"><code>here</code></a>
