@@ -8,7 +8,7 @@ Creating a client stores request authentication credentials only for that specif
 
 ```dart
 // Creating a client
-final client = final client = CourierClient(
+final client = CourierClient(
   jwt: 'jwt',                    // Optional. Likely needed for your use case. See above for more authentication details
   clientKey: 'client_key',       // Optional. Used only for Inbox
   userId: 'user_id',
