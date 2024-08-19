@@ -239,21 +239,29 @@ void dispose() {
 ```dart
 // Pagination
 await Courier.shared.setInboxPaginationLimit(limit: 100);
-final newMessages = await Courier.shared.fetchNextPageOfMessages();
+final messages = await Courier.shared.fetchNextInboxPage();
+
+// Currently fetched messages
+final messages = await Courier.shared.inboxMessages;
 
 // Pull to refresh
 await Courier.shared.refreshInbox();
 
-// Read / Unread
-await inboxMessage.markAsUnread();
-await inboxMessage.markAsRead();
-await Courier.shared.unreadMessage(id: 'messageId');
-await Courier.shared.readMessage(id: 'messageId');
+// Update a message
+await Courier.shared.openMessage(messageId: messageId);
+await Courier.shared.readMessage(messageId: messageId);
+await Courier.shared.unreadMessage(messageId: messageId);
+await Courier.shared.clickMessage(messageId: messageId);
+await Courier.shared.archiveMessage(messageId: messageId);
 await Courier.shared.readAllInboxMessages();
 
-// Brands
-await Courier.shared.setBrandId(id: 'CR1TTFKXSA49G2PGEKQ81Q9R9PT6');
-final brand = await Courier.shared.getBrand();
+// Update message shortcuts
+final message = InboxMessage(...);
+await message.markAsOpened();
+await message.markAsRead();
+await message.markAsUnread();
+await message.markAsClicked();
+await message.markAsArchived();
 
 // Listener
 final inboxListener = await Courier.shared.addInboxListener(
@@ -268,5 +276,5 @@ final inboxListener = await Courier.shared.addInboxListener(
   },
 );
 
-inboxListener.remove();
+await inboxListener.remove();
 ```
