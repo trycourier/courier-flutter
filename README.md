@@ -55,7 +55,7 @@ flutter pub add courier_flutter
 
 Update your deployment target to iOS 13
 
-### 2. Install the Cocoapods
+### 2. Install the Cocoapod
 
 From the root of your project run
 
