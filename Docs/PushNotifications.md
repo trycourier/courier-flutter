@@ -146,11 +146,11 @@ If you want to manually sync tokens, you can do this here and skip the remaining
 
 ```dart
 // Supported Courier providers
-await Courier.shared.setTokenForProvider(provider: CourierPushProvider.firebaseFcm, token: 'fcmToken');
+await Courier.shared.setTokenForProvider(token: 'fcmToken', provider: CourierPushProvider.firebaseFcm);
 final fcmToken = await Courier.shared.getTokenForProvider(provider: CourierPushProvider.firebaseFcm);
 
 // Unsupported Courier providers
-await Courier.shared.setToken(provider: 'YOUR_PROVIDER', token: 'token_value');
+await Courier.shared.setToken(token: 'token_value', provider: 'YOUR_PROVIDER');
 final token = await Courier.shared.getToken(provider: 'YOUR_PROVIDER');
 ```
 
@@ -351,19 +351,19 @@ class YourNotificationService: CourierService() {
 
 ```dart
 // Support the type of notifications you want to show on iOS
-Courier.shared.iOSForegroundNotificationPresentationOptions = [
+Courier.setIOSForegroundPresentationOptions(options: [
     iOSNotificationPresentationOption.banner,
     iOSNotificationPresentationOption.sound,
     iOSNotificationPresentationOption.list,
     iOSNotificationPresentationOption.badge,
-];
+]);
 
 // Request / Get Notification Permissions
-final currentPermissionStatus = await Courier.shared.getNotificationPermissionStatus();
-final requestPermissionStatus = await Courier.shared.requestNotificationPermission();
+final currentPermissionStatus = await Courier.getNotificationPermissionStatus();
+final requestPermissionStatus = await Courier.requestNotificationPermission();
 
 // Handle push events
-final pushListener = Courier.shared.addPushListener(
+final pushListener = await Courier.shared.addPushListener(
   onPushClicked: (push) {
     print(push);
   },
@@ -379,26 +379,41 @@ pushListener.remove();
 
 ## **Send a Message**
 
-```curl
-curl --request POST \
-  --url https://api.courier.com/send \
-  --header 'Authorization: Bearer YOUR_AUTH_KEY' \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"message": {
-		"to": {
-			"user_id": "your_user_id"
-		},
-		"content": {
-			"title": "Hey there 👋",
-			"body": "Have a great day 😄"
-		},
-		"routing": {
-			"method": "all",
-			"channels": [
-				"apn", "firebase-fcm" // Depending on your providers
-			]
-		}
-	}
-}'
-```
+<table>
+    <thead>
+        <tr>
+            <th width="600px" align="left">Provider</th>
+            <th width="200px" align="center">Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr width="600px">
+            <td align="left">
+                <a href="https://app.courier.com/channels/apn">
+                    <code>(APNS) - Apple Push Notification Service</code>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://www.courier.com/docs/platform/channels/push/apple-push-notification/#sending-messages">
+                    <code>Testing Docs</code>
+                </a>
+            </td>
+        </tr>
+        <tr width="600px">
+            <td align="left">
+                <a href="https://app.courier.com/channels/firebase-fcm">
+                    <code>(FCM) - Firebase Cloud Messaging</code>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://www.courier.com/docs/platform/channels/push/firebase-fcm/#sending-messages">
+                    <code>Testing Docs</code>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+---
+
+👋 `TokenManagement APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md#token-management-apis"><code>here</code></a>
