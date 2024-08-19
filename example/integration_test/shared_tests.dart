@@ -33,6 +33,35 @@ void main() {
 
     });
 
+    test('Request Push Permissions', () async {
+
+      final status = await Courier.requestNotificationPermission();
+      expect(status, isNotNull);
+
+    });
+
+    test('Get Push Permissions', () async {
+
+      final status = await Courier.getNotificationPermissionStatus();
+      expect(status, isNotNull);
+
+    });
+
+    test('Push Listener', () async {
+
+      final listener = await Courier.shared.addPushListener(
+        onPushDelivered: (message) {
+          // Empty
+        },
+        onPushClicked: (message) {
+          // Empty
+        }
+      );
+
+      listener.remove();
+
+    });
+
   });
 
   group('Client', () {
