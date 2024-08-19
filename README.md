@@ -4,8 +4,6 @@
 
 # Requirements & Support
 
-&emsp;
-
 <table>
     <thead>
         <tr>
@@ -86,7 +84,7 @@ allprojects {
 In your `app/build.gradle` update these values
 
 ```gradle
-minSdkVersion 21
+minSdkVersion 23
 targetSdkVersion 33+
 compileSdkVersion 33+
 ```
