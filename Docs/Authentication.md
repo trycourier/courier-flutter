@@ -55,14 +55,25 @@ Put this code where you normally manage your user's state. The user's access to 
 
 ```dart
 await Courier.shared.signIn(
-  accessToken: Env.accessToken, // Can be a Courier API key or a Generated JWT. More info here: https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production
-  clientKey: Env.clientKey, // Optional
-  userId: "YOUR_USER_ID",
+  userId: userId,
+  accessToken: 'example', // Can be a Courier API key or a Generated JWT. More info here: https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production
+  clientKey: 'example', // Optional
+  tenantId: 'example', // Optional
+  showLogs: true, // Optional
 );
 
-final userId = await Courier.shared.userId;
-
 await Courier.shared.signOut();
+
+// Other available properties and functions
+
+let userId = Courier.shared.userId
+let isUserSignedIn = Courier.shared.isUserSignedIn
+
+let listener = await Courier.shared.addAuthenticationListener { userId in
+    print(userId ?? "No userId found")
+}
+
+await listener.remove()
 ```
 
 &emsp;
