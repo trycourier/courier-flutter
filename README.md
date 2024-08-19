@@ -45,6 +45,8 @@ Run the following command at your project's root directory:
 flutter pub add courier_flutter
 ```
 
+&emsp;
+
 ## **iOS Setup**
 
 ### 1. Support iOS 13.0+ in your Project
