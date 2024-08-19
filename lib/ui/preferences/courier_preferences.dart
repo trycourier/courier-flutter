@@ -92,7 +92,7 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
 
       if (!mounted) return;
 
-      final topics = res.items ?? [];
+      final topics = res.items;
 
       List<PreferenceSection> sections = [];
 
