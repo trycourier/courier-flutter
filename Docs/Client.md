@@ -45,7 +45,7 @@ await client.tokens.putUserToken(
 // Deletes the token from Courier Token Management
 await client.tokens.deleteUserToken(
     token: 'token'
-)
+);
 ```
 
 ## Inbox APIs
