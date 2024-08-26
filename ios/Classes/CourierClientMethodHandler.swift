@@ -134,7 +134,7 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                         startCursor: startCursor
                     )
 
-                    let json = res.toDictionary().toJson()
+                    let json = try res.toJson()
                     result(json)
 
                 case "inbox.get_archived_messages":
@@ -147,7 +147,7 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                         startCursor: startCursor
                     )
 
-                    let json = res.toDictionary().toJson()
+                    let json = try res.toJson()
                     result(json)
 
                 case "inbox.get_unread_message_count":
@@ -163,7 +163,7 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                         messageId: messageId
                     )
 
-                    let json = res.toDictionary().toJson()
+                    let json = try res.toJson()
                     result(json)
 
                 case "inbox.click_message":

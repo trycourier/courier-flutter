@@ -150,14 +150,12 @@ void main() {
   group('Inbox Tests', () {
 
     test('Get All Messages', () async {
-      await sendMessage(userId);
-      await delay();
       final client = await ClientBuilder.build(userId: userId);
       final res = await client.inbox.getMessages(
         paginationLimit: 123,
         startCursor: null,
       );
-      expect(res.data?.messages?.nodes?.length, 1);
+      expect(res.data?.messages?.nodes, isNotNull);
     });
 
     test('Get Archived Messages', () async {

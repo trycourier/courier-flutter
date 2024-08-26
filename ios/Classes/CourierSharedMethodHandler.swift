@@ -216,7 +216,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let messages = await Courier.shared.inboxMessages
                     
-                    let json = messages.map { $0.toDictionary().toJson() }
+                    let json = try messages.map { try $0.toJson() ?? "" }
                     
                     result(json)
                     
@@ -230,7 +230,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let messages = try await Courier.shared.fetchNextInboxPage()
                     
-                    let json = messages.map { $0.toDictionary().toJson() }
+                    let json = try messages.map { try $0.toJson() ?? "" }
                     
                     result(json)
                     
@@ -254,13 +254,17 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                             ])
                         },
                         onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
-                            let json: [String: Any] = [
-                                "messages": messages.map { $0.toDictionary().toJson() },
-                                "unreadMessageCount": unreadMessageCount,
-                                "totalMessageCount": totalMessageCount,
-                                "canPaginate": canPaginate
-                            ]
-                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
+                            do {
+                                let json: [String: Any] = [
+                                    "messages": try messages.map { try $0.toJson() ?? "" },
+                                    "unreadMessageCount": unreadMessageCount,
+                                    "totalMessageCount": totalMessageCount,
+                                    "canPaginate": canPaginate
+                                ]
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
+                            } catch {
+                                Courier.shared.client?.error(error.localizedDescription)
+                            }
                         }
                     )
                     

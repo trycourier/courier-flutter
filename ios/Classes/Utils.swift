@@ -34,170 +34,6 @@ internal extension Encodable {
     
 }
 
-internal extension [String: Any?] {
-    
-    func clean() -> NSMutableDictionary {
-        
-        let mutableDictionary = NSMutableDictionary()
-        for (key, value) in self {
-            if let unwrappedValue = value {
-                mutableDictionary[key] = unwrappedValue
-            }
-        }
-        
-        return mutableDictionary
-        
-    }
-    
-}
-
-internal extension CourierBrand {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "settings": settings?.toDictionary(),
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension CourierBrandSettings {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "colors": colors?.toDictionary(),
-            "inapp": inapp?.toDictionary(),
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension CourierBrandInApp {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "showCourierFooter": showCourierFooter,
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension CourierBrandColors {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "primary": primary,
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension CourierUserPreferences {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "items": items.map { $0.toDictionary() },
-            "paging": paging.toDictionary(),
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension CourierUserPreferencesTopic {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "defaultStatus": defaultStatus.rawValue,
-            "hasCustomRouting": hasCustomRouting,
-            "customRouting": customRouting.map { $0.rawValue },
-            "status": status.rawValue,
-            "topicId": topicId,
-            "topicName": topicName,
-            "sectionName": sectionName,
-            "sectionId": sectionId,
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension CourierUserPreferencesPaging {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "cursor": cursor,
-            "more": more,
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension InboxMessage {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "messageId": messageId,
-            "title": title,
-            "body": body,
-            "preview": preview,
-            "created": created,
-            "actions": actions?.map { $0.toDictionary() },
-            "data": data,
-            "read": read,
-            "opened": opened,
-            "archived": archived
-        ]
-        
-        return dictionary.clean()
-        
-    }
-    
-}
-
-internal extension InboxAction {
-    
-    @objc func toDictionary() -> NSDictionary {
-        
-        let dictionary: [String: Any?] = [
-            "content": content,
-            "href": href,
-            "data": data
-        ]
-
-        return dictionary.clean()
-        
-    }
-    
-}
-
 internal extension String {
     
     func toRowAnimation() -> UITableView.RowAnimation {
@@ -315,7 +151,7 @@ internal extension Error {
         
         let code: String
         let message: String
-
+        
         switch self {
         case let courierError as CourierFlutterError:
             switch courierError {
@@ -329,7 +165,7 @@ internal extension Error {
         default:
             message = String(describing: self)
         }
-
+        
         return FlutterError(
             code: "COURIER_IOS_SDK_ERROR",
             message: message,
@@ -337,92 +173,6 @@ internal extension Error {
         )
         
     }
-    
-}
-
-internal extension InboxResponse {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "data": data?.toDictionary()
-        ]
-        return dictionary.clean()
-    }
-    
-}
-
-internal extension InboxData {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "count": count,
-            "messages": messages?.toDictionary()
-        ]
-        return dictionary.clean()
-    }
-    
-}
-
-internal extension InboxNodes {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "pageInfo": pageInfo?.toDictionary(),
-            "nodes": nodes?.map { $0.toDictionary() }
-        ]
-        return dictionary.clean()
-    }
-    
-}
-
-internal extension InboxPageInfo {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "startCursor": startCursor,
-            "hasNextPage": hasNextPage
-        ]
-        return dictionary.clean()
-    }
-    
-}
-
-internal extension CourierTrackingIds {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "archiveTrackingId": archiveTrackingId,
-            "openTrackingId": openTrackingId,
-            "clickTrackingId": clickTrackingId,
-            "deliverTrackingId": deliverTrackingId,
-            "unreadTrackingId": unreadTrackingId,
-            "readTrackingId": readTrackingId
-        ]
-        return dictionary.clean()
-    }
-    
-}
-
-internal extension GetInboxMessageData {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "message": message?.toDictionary(),
-        ]
-        return dictionary.clean()
-    }
-    
-}
-
-internal extension CourierGetInboxMessageResponse {
-    
-    @objc func toDictionary() -> NSDictionary {
-        let dictionary: [String: Any?] = [
-            "data": data?.toDictionary(),
-        ]
-        return dictionary.clean()
-    }
-    
 }
 
 internal extension NSDictionary {
