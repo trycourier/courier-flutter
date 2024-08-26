@@ -7,7 +7,7 @@ Future<String> sendMessage(String userId) {
   return ExampleServer.sendTest(Env.authKey, userId, "inbox");
 }
 
-Future delay({int milliseconds = 5000}) {
+Future delay({int milliseconds = 10000}) {
   return Future.delayed(Duration(milliseconds: milliseconds));
 }
 

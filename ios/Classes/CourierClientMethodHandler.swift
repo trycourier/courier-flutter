@@ -10,6 +10,8 @@ import Courier_iOS
 
 internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     
+    private var clients: [String: CourierClient] = [:]
+    
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
         return FlutterMethodChannel(name: CourierFlutterChannel.client.rawValue, binaryMessenger: registrar.messenger())
     }
@@ -27,19 +29,49 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
             
             do {
                 
-                guard let params = call.arguments as? Dictionary<String, Any>, let client = try params.toClient() else {
-                    throw CourierFlutterError.missingParameter(value: "client")
+                guard let params = call.arguments as? Dictionary<String, Any> else {
+                    throw CourierFlutterError.invalidParameter(value: "params")
                 }
                 
                 switch call.method {
+                    
+                    // MARK: Client
+                    
+                case "client.add":
+                    
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    do {
+                        let existingClient = try getClient(for: clientId)
+                        result(clientId)
+                    } catch {
+                        let newClient = try params.toClient()
+                        clients[clientId] = newClient
+                        result(clientId)
+                    }
+                    
+                case "client.remove":
+                    
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    clients.removeValue(forKey: clientId)
+                    
+                    result(clientId)
                     
                     // MARK: Brand
                     
                 case "brands.get_brand":
                     
-                    let (brandId): (String) = (
+                    let (clientId, brandId): (String, String) = (
+                        try params.extract("clientId"),
                         try params.extract("brandId")
                     )
+                    
+                    let client = try getClient(for: clientId)
                     
                     let brand = try await client.brands.getBrand(
                         brandId: brandId
@@ -52,10 +84,13 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "tokens.put_user_token":
                     
-                    let (token, provider): (String, String) = (
+                    let (clientId, token, provider): (String, String, String) = (
+                        try params.extract("clientId"),
                         try params.extract("token"),
                         try params.extract("provider")
                     )
+                    
+                    let client = try getClient(for: clientId)
                     
                     let deviceParams = params["device"] as? [String: Any]
                     let device = try deviceParams?.toCourierDevice()
@@ -70,9 +105,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "tokens.delete_user_token":
                     
-                    let (token): (String) = (
+                    let (clientId, token): (String, String) = (
+                        try params.extract("clientId"),
                         try params.extract("token")
                     )
+                    
+                    let client = try getClient(for: clientId)
                     
                     try await client.tokens.deleteUserToken(
                         token: token
@@ -83,6 +121,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     // MARK: Preferences
                     
                 case "preferences.get_user_preferences":
+                    
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
                     
                     let paginationCursor = params["paginationCursor"] as? String
                     
@@ -95,7 +139,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "preferences.get_user_preference_topic":
                     
-                    let topicId: String = try params.extract("topicId")
+                    let (clientId, topicId): (String, String) = (
+                        try params.extract("clientId"),
+                        try params.extract("topicId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
                     
                     let res = try await client.preferences.getUserPreferenceTopic(
                         topicId: topicId
@@ -106,12 +155,15 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "preferences.put_user_preference_topic":
                     
-                    let (topicId, status, hasCustomRouting, customRouting): (String, String, Bool, [String]) = (
+                    let (clientId, topicId, status, hasCustomRouting, customRouting): (String, String, String, Bool, [String]) = (
+                        try params.extract("clientId"),
                         try params.extract("topicId"),
                         try params.extract("status"),
                         try params.extract("hasCustomRouting"),
                         try params.extract("customRouting")
                     )
+                    
+                    let client = try getClient(for: clientId)
                     
                     try await client.preferences.putUserPreferenceTopic(
                         topicId: topicId,
@@ -126,6 +178,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "inbox.get_messages":
                     
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
+                    
                     let paginationLimit = params["paginationLimit"] as? Int
                     let startCursor = params["startCursor"] as? String
 
@@ -138,6 +196,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     result(json)
 
                 case "inbox.get_archived_messages":
+                    
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
                     
                     let paginationLimit = params["paginationLimit"] as? Int
                     let startCursor = params["startCursor"] as? String
@@ -152,12 +216,23 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.get_unread_message_count":
                     
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
+                    
                     let count = try await client.inbox.getUnreadMessageCount()
                     result(count)
 
                 case "inbox.get_message_by_id":
                     
-                    let messageId: String = try params.extract("messageId")
+                    let (clientId, messageId): (String, String) = (
+                        try params.extract("clientId"),
+                        try params.extract("messageId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
 
                     let res = try await client.inbox.getMessage(
                         messageId: messageId
@@ -168,10 +243,13 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.click_message":
                     
-                    let (messageId, trackingId): (String, String) = (
+                    let (clientId, messageId, trackingId): (String, String, String) = (
+                        try params.extract("clientId"),
                         try params.extract("messageId"),
                         try params.extract("trackingId")
                     )
+                    
+                    let client = try getClient(for: clientId)
 
                     try await client.inbox.click(
                         messageId: messageId,
@@ -182,7 +260,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.unread_message":
                     
-                    let messageId: String = try params.extract("messageId")
+                    let (clientId, messageId): (String, String) = (
+                        try params.extract("clientId"),
+                        try params.extract("messageId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
 
                     try await client.inbox.unread(
                         messageId: messageId
@@ -192,7 +275,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.read_message":
                     
-                    let messageId: String = try params.extract("messageId")
+                    let (clientId, messageId): (String, String) = (
+                        try params.extract("clientId"),
+                        try params.extract("messageId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
 
                     try await client.inbox.read(
                         messageId: messageId
@@ -202,7 +290,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.open_message":
                     
-                    let messageId: String = try params.extract("messageId")
+                    let (clientId, messageId): (String, String) = (
+                        try params.extract("clientId"),
+                        try params.extract("messageId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
 
                     try await client.inbox.open(
                         messageId: messageId
@@ -212,7 +305,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.archive_message":
                     
-                    let messageId: String = try params.extract("messageId")
+                    let (clientId, messageId): (String, String) = (
+                        try params.extract("clientId"),
+                        try params.extract("messageId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
 
                     try await client.inbox.archive(
                         messageId: messageId
@@ -222,6 +320,12 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
 
                 case "inbox.read_all_messages":
                     
+                    let (clientId): (String) = (
+                        try params.extract("clientId")
+                    )
+                    
+                    let client = try getClient(for: clientId)
+                    
                     try await client.inbox.readAll()
                     result(nil)
                     
@@ -229,10 +333,13 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "tracking.post_tracking_url":
                     
-                    let (url, event): (String, String) = (
+                    let (clientId, url, event): (String, String, String) = (
+                        try params.extract("clientId"),
                         try params.extract("url"),
                         try params.extract("event")
                     )
+                    
+                    let client = try getClient(for: clientId)
                     
                     guard let trackingEvent = CourierTrackingEvent(rawValue: event) else {
                         throw CourierFlutterError.missingParameter(value: "tracking_event")
@@ -259,6 +366,16 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
             
         }
           
+    }
+    
+    private func getClient(for clientId: String) throws -> CourierClient {
+        
+        guard let client = clients[clientId] else {
+            throw CourierFlutterError.invalidParameter(value: "clientId")
+        }
+        
+        return client
+        
     }
     
 }
