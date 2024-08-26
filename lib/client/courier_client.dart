@@ -5,8 +5,10 @@ import 'package:courier_flutter/client/preference_client.dart';
 import 'package:courier_flutter/client/token_client.dart';
 import 'package:courier_flutter/client/tracking_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 class CourierClientOptions {
+  final String id;
   final String? jwt;
   final String? clientKey;
   final String userId;
@@ -15,6 +17,7 @@ class CourierClientOptions {
   final bool showLogs;
 
   CourierClientOptions({
+    required this.id,
     this.jwt,
     this.clientKey,
     required this.userId,
@@ -34,13 +37,28 @@ class CourierClientOptions {
     };
   }
 
-  Future<dynamic> invokeClient(String method, [dynamic arguments]) {
-    final Map<String, dynamic> invokingArguments = {
-      'options': toJson(),
+  Future<dynamic> invokeClient(String method, [dynamic arguments]) async {
+    final clientId = await add();
+    final invokingArguments = {
+      'clientId': clientId,
       if (arguments is Map<String, dynamic>) ...arguments,
     };
     return CourierFlutterChannels.client.invokeMethod(method, invokingArguments);
   }
+
+  Future<String> add() async {
+    return await CourierFlutterChannels.client.invokeMethod('client.add', {
+      'clientId': id,
+      'options': toJson(),
+    });
+  }
+
+  Future<String> remove() async {
+    return await CourierFlutterChannels.client.invokeMethod('client.remove', {
+      'clientId': id,
+    });
+  }
+
 }
 
 class CourierClient {
@@ -60,11 +78,21 @@ class CourierClient {
     String? tenantId,
     bool? showLogs,
   }) : options = CourierClientOptions(
-          jwt: jwt,
-          clientKey: clientKey,
-          userId: userId,
-          connectionId: connectionId,
-          tenantId: tenantId,
-          showLogs: showLogs ?? kDebugMode,
-        );
+    id: const Uuid().v4(),
+    jwt: jwt,
+    clientKey: clientKey,
+    userId: userId,
+    connectionId: connectionId,
+    tenantId: tenantId,
+    showLogs: showLogs ?? kDebugMode,
+  );
+
+  Future add() async {
+    return options.add();
+  }
+
+  Future<String> remove() async {
+    return await options.remove();
+  }
+
 }
