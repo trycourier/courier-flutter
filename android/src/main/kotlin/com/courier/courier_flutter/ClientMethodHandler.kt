@@ -1,6 +1,7 @@
 package com.courier.courier_flutter
 
 import com.courier.android.Courier
+import com.courier.android.client.CourierClient
 import com.courier.android.models.CourierDevice
 import com.courier.android.models.CourierPreferenceChannel
 import com.courier.android.models.CourierPreferenceStatus
@@ -13,15 +14,36 @@ import io.flutter.plugin.common.MethodChannel
 
 internal class ClientMethodHandler(channel: CourierFlutterChannel, private val binding: FlutterPlugin.FlutterPluginBinding) : CourierMethodHandler(channel, binding) {
 
+    private var clients = mutableMapOf<String, CourierClient>()
+
     override suspend fun handleMethod(call: MethodCall, result: MethodChannel.Result) {
 
         try {
 
-            val params = call.arguments as? HashMap<*, *>
-
-            val client = params?.toClient() ?: throw MissingParameter("client")
+            val params = call.arguments as? HashMap<*, *> ?: throw MissingParameter("params")
+            val clientId = params.extract<String>("clientId")
 
             when (call.method) {
+
+                // == Client ==
+
+                "client.add" -> {
+
+                    try {
+                        getClient(clientId)
+                        result.success(clientId)
+                    } catch (e: Exception) {
+                        val newClient = params.toClient()
+                        clients[clientId] = newClient
+                        result.success(clientId)
+                    }
+
+                }
+
+                "client.remove" -> {
+                    clients.remove(clientId)
+                    result.success(clientId)
+                }
 
                 // == Brand ==
 
@@ -30,6 +52,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     val (brandId) = listOf<String>(
                         params.extract("brandId"),
                     )
+
+                    val client = getClient(clientId)
 
                     val brand = client.brands.getBrand(brandId)
                     val json = brand.toJson()
@@ -49,6 +73,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     val deviceParams = params["device"] as? Map<*, *>
                     val device = deviceParams?.toCourierDevice()
 
+                    val client = getClient(clientId)
+
                     client.tokens.putUserToken(
                         token = token,
                         provider = provider,
@@ -65,6 +91,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("token"),
                     )
 
+                    val client = getClient(clientId)
+
                     client.tokens.deleteUserToken(
                         token = token,
                     )
@@ -79,6 +107,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
 
                     val paginationLimit = params["paginationLimit"] as? Int
                     val startCursor = params["startCursor"] as? String
+
+                    val client = getClient(clientId)
 
                     val res = client.inbox.getMessages(
                         paginationLimit = paginationLimit ?: Courier.shared.inboxPaginationLimit,
@@ -95,6 +125,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     val paginationLimit = params["paginationLimit"] as? Int
                     val startCursor = params["startCursor"] as? String
 
+                    val client = getClient(clientId)
+
                     val res = client.inbox.getArchivedMessages(
                         paginationLimit = paginationLimit ?: Courier.shared.inboxPaginationLimit,
                         startCursor = startCursor
@@ -107,6 +139,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
 
                 "inbox.get_unread_message_count" -> {
 
+                    val client = getClient(clientId)
+
                     val count = client.inbox.getUnreadMessageCount()
                     result.success(count)
 
@@ -117,6 +151,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
                     )
+
+                    val client = getClient(clientId)
 
                     val res = client.inbox.getMessage(
                         messageId = messageId
@@ -134,6 +170,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("trackingId"),
                     )
 
+                    val client = getClient(clientId)
+
                     client.inbox.click(
                         messageId = messageId,
                         trackingId = trackingId
@@ -149,6 +187,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("messageId"),
                     )
 
+                    val client = getClient(clientId)
+
                     client.inbox.unread(
                         messageId = messageId,
                     )
@@ -162,6 +202,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     val (messageId) = listOf<String>(
                         params.extract("messageId"),
                     )
+
+                    val client = getClient(clientId)
 
                     client.inbox.read(
                         messageId = messageId,
@@ -177,6 +219,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("messageId"),
                     )
 
+                    val client = getClient(clientId)
+
                     client.inbox.open(
                         messageId = messageId,
                     )
@@ -191,6 +235,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("messageId"),
                     )
 
+                    val client = getClient(clientId)
+
                     client.inbox.archive(
                         messageId = messageId,
                     )
@@ -200,6 +246,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                 }
 
                 "inbox.read_all_messages" -> {
+
+                    val client = getClient(clientId)
 
                     client.inbox.readAll()
 
@@ -212,6 +260,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                 "preferences.get_user_preferences" -> {
 
                     val paginationCursor = params["paginationCursor"] as? String
+
+                    val client = getClient(clientId)
 
                     val res = client.preferences.getUserPreferences(
                         paginationCursor = paginationCursor
@@ -228,6 +278,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("topicId"),
                     )
 
+                    val client = getClient(clientId)
+
                     val res = client.preferences.getUserPreferenceTopic(
                         topicId = topicId
                     )
@@ -243,6 +295,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                     val status = params.extract<String>("status")
                     val hasCustomRouting = params.extract<Boolean>("hasCustomRouting")
                     val customRouting = params.extract<List<String>>("customRouting")
+
+                    val client = getClient(clientId)
 
                     client.preferences.putUserPreferenceTopic(
                         topicId = topicId,
@@ -263,6 +317,8 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
                         params.extract("url"),
                         params.extract("event"),
                     )
+
+                    val client = getClient(clientId)
 
                     client.tracking.postTrackingUrl(
                         url = url,
@@ -285,6 +341,10 @@ internal class ClientMethodHandler(channel: CourierFlutterChannel, private val b
 
         }
 
+    }
+
+    private fun getClient(clientId: String): CourierClient {
+        return clients[clientId] ?: throw MissingParameter("clientId")
     }
 
 }
