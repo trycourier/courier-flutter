@@ -137,7 +137,7 @@ void main() {
       final currentTenantId = await Courier.shared.tenantId;
       final isUserSignedIn = await Courier.shared.isUserSignedIn;
       expect(currentUserId, userId);
-      expect(currentTenantId, isNull);
+      expect(currentTenantId, 'example');
       expect(isUserSignedIn, true);
 
     });
