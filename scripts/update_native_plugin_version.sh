@@ -40,5 +40,7 @@ update_swift_file "../ios/Classes/CourierFlutterMethodHandler.swift"
 
 # Update the Kotlin file
 update_kotlin_file "../android/src/main/kotlin/com/courier/courier_flutter/CourierPlugin.kt"
+update_kotlin_file "../android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterFragmentActivity.kt"
+update_kotlin_file "../android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterActivity.kt"
 
 echo "All files updated successfully with version $version."
