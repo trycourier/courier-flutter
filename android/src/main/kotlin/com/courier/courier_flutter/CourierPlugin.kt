@@ -1,5 +1,4 @@
 package com.courier.courier_flutter
-
 import com.courier.android.Courier
 import com.courier.android.models.CourierAgent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -14,7 +13,7 @@ internal class CourierPlugin : FlutterPlugin {
     }
 
     init {
-        Courier.USER_AGENT = CourierAgent.FLUTTER_ANDROID
+        Courier.agent = CourierAgent.FlutterAndroid(version = "3.3.0")
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {

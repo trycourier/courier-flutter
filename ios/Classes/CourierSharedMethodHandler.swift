@@ -20,9 +20,6 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
         )
     }
     
-    // MARK: iOS Options
-    private var foregroundPresentationOptions: UNNotificationPresentationOptions = []
-    
     // MARK: Listeners
     private var authenticationListeners = [String: CourierAuthenticationListener]()
     private var inboxListeners = [String: CourierInboxListener]()

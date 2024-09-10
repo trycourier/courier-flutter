@@ -1,6 +1,6 @@
 name: courier_flutter
 description: Inbox, Push Notifications and Preferences for Flutter
-version: 3.2.0
+version: 3.3.0
 homepage: https://courier.com
 
 environment:
@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.0.9
   intl: ^0.19.0
+  package_info_plus: ^8.0.2
   plugin_platform_interface: ^2.0.2
   url_launcher: ^6.2.3
   uuid: ^4.4.2

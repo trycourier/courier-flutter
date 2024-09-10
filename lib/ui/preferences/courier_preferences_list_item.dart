@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:courier_flutter/courier_preference_status.dart';
+import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:flutter/material.dart';
-
-import '../../models/courier_user_preferences.dart';
 
 class CourierPreferencesListItem extends StatefulWidget {
   final Mode mode;

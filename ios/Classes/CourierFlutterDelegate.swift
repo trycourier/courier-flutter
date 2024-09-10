@@ -40,6 +40,10 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     override init() {
         super.init()
         
+        // Set the api agent version
+        Courier.agent = CourierAgent.flutterIOS("3.3.0")
+        
+        // Handle notification registration
         app.registerForRemoteNotifications()
         notificationCenter.delegate = self
         

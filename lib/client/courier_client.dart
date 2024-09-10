@@ -4,6 +4,7 @@ import 'package:courier_flutter/client/inbox_client.dart';
 import 'package:courier_flutter/client/preference_client.dart';
 import 'package:courier_flutter/client/token_client.dart';
 import 'package:courier_flutter/client/tracking_client.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -38,12 +39,23 @@ class CourierClientOptions {
   }
 
   Future<dynamic> invokeClient(String method, [dynamic arguments]) async {
-    final clientId = await add();
+
+    final result = await Future.wait([
+      add(),
+      PackageInfo.fromPlatform(),
+    ]);
+
+    final clientId = result[0] as String;
+    final packageInfo = result[1] as PackageInfo;
+
     final invokingArguments = {
       'clientId': clientId,
+      'version': packageInfo.version,
       if (arguments is Map<String, dynamic>) ...arguments,
     };
+
     return CourierFlutterChannels.client.invokeMethod(method, invokingArguments);
+    
   }
 
   Future<String> add() async {

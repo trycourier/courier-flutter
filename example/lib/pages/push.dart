@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';

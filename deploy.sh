@@ -14,6 +14,7 @@ declare -a steps=(
     "Run Tests:sh run_tests.sh"
     "Build Demo App:sh build_demo_app.sh"
     "Update Build Version:sh update_version.sh"
+    "Update Native Plugin Version:sh update_native_plugin_version.sh"
     "Create Git Release:sh git_release.sh"
     "Publish Package:sh pub_publish.sh"
 )
