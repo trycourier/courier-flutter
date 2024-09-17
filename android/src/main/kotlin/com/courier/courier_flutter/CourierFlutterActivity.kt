@@ -21,7 +21,7 @@ open class CourierFlutterActivity : FlutterActivity() {
         handler.attach(context, intent)
 
         // Setup and run the agent
-        Courier.agent = CourierAgent.FlutterAndroid(version = "3.4.1")
+        Courier.agent = CourierAgent.FlutterAndroid(version = "3.5.0")
         Courier.initialize(context)
 
     }
