@@ -66,10 +66,10 @@ await Courier.shared.signOut();
 
 // Other available properties and functions
 
-let userId = Courier.shared.userId
-let isUserSignedIn = Courier.shared.isUserSignedIn
+final userId = Courier.shared.userId
+final isUserSignedIn = Courier.shared.isUserSignedIn
 
-let listener = await Courier.shared.addAuthenticationListener { userId in
+final listener = await Courier.shared.addAuthenticationListener { userId in
     print(userId ?? "No userId found")
 }
 
