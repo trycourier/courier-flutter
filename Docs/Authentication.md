@@ -56,7 +56,7 @@ Put this code where you normally manage your user's state. The user's access to 
 ```dart
 await Courier.shared.signIn(
   userId: userId,
-  accessToken: 'example', // Can be a Courier API key or a Generated JWT. More info here: https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production
+  accessToken: 'example', // Should be a Generated JWT but can be a Courier API key for testing. More info here: https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production
   clientKey: 'example', // Optional
   tenantId: 'example', // Optional
   showLogs: true, // Optional
