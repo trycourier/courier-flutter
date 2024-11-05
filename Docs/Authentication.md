@@ -53,82 +53,16 @@ Manages user credentials between app sessions.
 
 Put this code where you normally manage your user's state. The user's access to [`Inbox`](https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md), [`Push Notifications`](https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md) and [`Preferences`](https://github.com/trycourier/courier-flutter/blob/master/Docs/Preferences.md) will automatically be managed by the SDK and stored in persistent storage. This means that if your user fully closes your app and starts it back up, they will still be "signed in".
 
-```dart
-await Courier.shared.signIn(
-  userId: userId,
-  accessToken: 'example', // Should be a Generated JWT but can be a Courier API key for testing. More info here: https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production
-  clientKey: 'example', // Optional
-  tenantId: 'example', // Optional
-  showLogs: true, // Optional
-);
-
-await Courier.shared.signOut();
-
-// Other available properties and functions
-
-final userId = Courier.shared.userId
-final isUserSignedIn = Courier.shared.isUserSignedIn
-
-final listener = await Courier.shared.addAuthenticationListener { userId in
-    print(userId ?? "No userId found")
-}
-
-await listener.remove()
-```
-
 &emsp;
 
-<table>
-    <thead>
-        <tr>
-            <th width="150px" align="left">Properties</th>
-            <th width="450px" align="left">Details</th>
-            <th width="400px" align="left">Where is this?</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr width="600px">
-            <td align="left">
-                <code>accessToken</code>
-            </td>
-            <td align="left">
-                The key or token needed to authenticate requests to the Courier API.
-            </td>
-            <td align="left">
-                For development only: <a href="https://app.courier.com/settings/api-keys"><code>authKey</code></a><br>
-                For development or production: <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md#going-to-production"><code>accessToken</code></a>
-            </td>
-        </tr>
-        <tr width="600px">
-            <td align="left">
-                <code>clientKey</code>
-            </td>
-            <td align="left">
-                The key required to get <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md"><code>Courier Inbox</code></a> messages for the current user. Can be <code>nil</code> if you do not need Courier Inbox.
-            </td>
-            <td align="left">
-                <a href="https://app.courier.com/channels/courier"><code>Courier Inbox clientKey</code></a>
-            </td>
-        </tr>
-        <tr width="600px">
-            <td align="left">
-                <code>userId</code>
-            </td>
-            <td align="left">
-                The id of the user you want to read and write to. This likely will be the same as the <code>userId</code> you are already using in your authentication system, but it can be different if you'd like.
-            </td>
-            <td align="left">
-                You are responsible for this
-            </td>
-        </tr>
-    </tbody>
-</table>
+## 1. Generate a JWT
 
-&emsp;
+To generate a JWT, you will need to:
+1. Create an endpoint on your backend
+2. Call this function inside that endpoint: [`Generate Auth Tokens`](https://www.courier.com/docs/reference/auth/issue-token/)
+3. Return the JWT
 
-# Going to Production
-
-To create a production ready `accessToken`, call this:
+Here is a curl example with all the scopes needed that the SDK uses. Change the scopes to the scopes you need for your use case.
 
 ```curl
 curl --request POST \
@@ -143,4 +77,42 @@ curl --request POST \
   }'
 ```
 
-More Info: [`Courier Issue Token Docs`](https://www.courier.com/docs/reference/auth/issue-token/)
+## 2. Get a JWT in your app
+
+```dart
+final userId = "your_user_id";
+final jwt = await YourBackend.generateCourierJWT(userId);
+```
+
+## 3. Sign your user in
+
+Signed in users will stay signed in between app sessions.
+
+```dart
+final userId = "your_user_id";
+await Courier.shared.signIn(userId: userId, accessToken: jwt);
+```
+
+If the token is expired, you can generate a new one from your endpoint and call `Courier.shared.signIn(...)` again. You will need to check the token manually for expiration or generate a new one when the user views a specific screen in your app. It is up to you to handle token expiration and refresh based on your security needs.
+
+## 4. Sign your user out
+
+This will remove any credentials that are stored between app sessions.
+
+```dart
+await Courier.shared.signOut();
+```
+
+## All Available Authentication Values
+
+```dart
+final userId = await Courier.shared.userId;
+final tenantId = await Courier.shared.tenantId;
+final isUserSignedIn = await Courier.shared.isUserSignedIn;
+
+final listener = await Courier.shared.addAuthenticationListener { userId in
+    print(userId ?? "No userId found")
+}
+
+await listener.remove();
+```
