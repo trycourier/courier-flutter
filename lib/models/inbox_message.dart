@@ -1,5 +1,4 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/inbox_action.dart';
 import 'package:intl/intl.dart';
 
 class InboxMessage {
@@ -41,6 +40,25 @@ class InboxMessage {
       read: data['read'],
       opened: data['opened'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'messageId': messageId,
+      'title': title,
+      'body': body, 
+      'preview': preview,
+      'created': created,
+      'archived': archived,
+      'read': read,
+      'opened': opened,
+      'actions': actions?.map((action) => {
+        'content': action.content,
+        'href': action.href,
+        'data': action.data,
+      }).toList(),
+      'data': data,
+    };
   }
 
   String? get subtitle => body ?? preview;

@@ -106,9 +106,11 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     let listener = Courier.shared.addAuthenticationListener { userId in
                         
                         // Call the event function
-                        CourierFlutterChannel.events.channel?.invokeMethod("auth.state_changed", arguments: [
-                            "userId": userId
-                        ])
+                        DispatchQueue.main.async {
+                            CourierFlutterChannel.events.channel?.invokeMethod("auth.state_changed", arguments: [
+                                "userId": userId
+                            ])
+                        }
                         
                     }
                     
@@ -225,7 +227,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "inbox.fetch_next_page":
                     
-                    let messages = try await Courier.shared.fetchNextInboxPage()
+                    let messages = try await Courier.shared.fetchNextInboxPage(.feed) // TODO:
                     
                     let json = try messages.map { try $0.toJson() ?? "" }
                     
@@ -241,26 +243,97 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     // Create the listener
                     let listener = Courier.shared.addInboxListener(
-                        onInitialLoad: {
-                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: nil)
+                        onLoading: {
+                            DispatchQueue.main.async {
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: nil)
+                            }
                         },
                         onError: { error in
-                            let courierError = CourierError(from: error)
-                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_error", arguments: [
-                                "error": courierError.message
-                            ])
+                            DispatchQueue.main.async {
+                                let courierError = CourierError(from: error)
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_error", arguments: [
+                                    "error": courierError.message
+                                ])
+                            }
                         },
-                        onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
-                            do {
-                                let json: [String: Any] = [
-                                    "messages": try messages.map { try $0.toJson() ?? "" },
-                                    "unreadMessageCount": unreadMessageCount,
-                                    "totalMessageCount": totalMessageCount,
-                                    "canPaginate": canPaginate
-                                ]
-                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
-                            } catch {
-                                Courier.shared.client?.error(error.localizedDescription)
+                        onUnreadCountChanged: { count in
+                            DispatchQueue.main.async {
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_unread_count_changed", arguments: [
+                                    "count": count
+                                ])
+                            }
+                        },
+                        onFeedChanged: { messageSet in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_feed_changed", arguments: [
+                                        "messageSet": try messageSet.toJson()
+                                    ])
+                                } catch {
+                                    Courier.shared.client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onArchiveChanged: { messageSet in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_archive_changed", arguments: [
+                                        "messageSet": try messageSet.toJson()
+                                    ])
+                                } catch {
+                                    Courier.shared.client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onPageAdded: { feed, page in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_page_added", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "page": try page.toJson()
+                                    ])
+                                } catch {
+                                    Courier.shared.client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onMessageChanged: { feed, index, message in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_changed", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "index": index,
+                                        "message": try message.toJson() ?? ""
+                                    ])
+                                } catch {
+                                    Courier.shared.client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onMessageAdded: { feed, index, message in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_added", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "index": index,
+                                        "message": try message.toJson() ?? ""
+                                    ])
+                                } catch {
+                                    Courier.shared.client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onMessageRemoved: { feed, index, message in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_removed", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "index": index,
+                                        "message": try message.toJson() ?? ""
+                                    ])
+                                } catch {
+                                    Courier.shared.client?.log(error.localizedDescription)
+                                }
                             }
                         }
                     )

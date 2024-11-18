@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
-import 'package:courier_flutter/models/inbox_message.dart';
+import 'package:courier_flutter/models/inbox_feed.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -25,6 +25,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   bool _isLoading = true;
   String? _error;
   List<InboxMessage> _messages = [];
+  bool _canLoadMore = false;
 
   @override
   void initState() {
@@ -32,30 +33,63 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     _start();
   }
 
+  void didMount() {
+    _start();
+  }
+
   Future _start() async {
+
+    if (!mounted) {
+      return;
+    }
+
     _inboxListener = await Courier.shared.addInboxListener(
-      onInitialLoad: () {
-        if (mounted) {
-          setState(() {
-            _isLoading = true;
-            _error = null;
-          });
-        }
+      onLoading: () {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+        });
       },
       onError: (error) {
-        if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _error = error;
+        });
+      },
+      onFeedChanged: (messageSet) {
+        setState(() {
+          _messages = messageSet.messages;
+          _isLoading = false;
+          _error = null;
+          _canLoadMore = messageSet.canPaginate;
+        });
+      },
+      onMessageChanged: (feed, index, message) {
+        if (feed == InboxFeed.feed) {
           setState(() {
-            _isLoading = false;
-            _error = error;
+            _messages[index] = message;
           });
         }
       },
-      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-        if (mounted) {
+      onMessageAdded: (feed, index, message) {
+        if (feed == InboxFeed.feed) {
           setState(() {
-            _messages = messages;
-            _isLoading = false;
-            _error = null;
+            _messages.insert(index, message);
+          });
+        }
+      },
+      onMessageRemoved: (feed, index, message) {
+        if (feed == InboxFeed.feed) {
+          setState(() {
+            _messages.removeAt(index);
+          });
+        }
+      },
+      onPageAdded: (feed, page) {
+        if (feed == InboxFeed.feed) {
+          setState(() {
+            _messages += page.messages;
+            _canLoadMore = page.canPaginate;
           });
         }
       },
@@ -116,8 +150,18 @@ class _CustomInboxPageState extends State<CustomInboxPage>
       child: Scrollbar(
         child: ListView.separated(
           separatorBuilder: (context, index) => const Divider(),
-          itemCount: _messages.length,
+          itemCount: _messages.length + (_canLoadMore ? 1 : 0),
           itemBuilder: (BuildContext context, int index) {
+            if (_canLoadMore && index == _messages.length) {
+              _loadMore();
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
             final message = _messages[index];
 
             return Container(
@@ -125,7 +169,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
               child: ListTile(
                 onTap: () => _onMessageClick(message),
                 subtitle: Text(
-                  message.toJson(),
+                  message.toDisplayString(),
                   style: GoogleFonts.robotoMono(),
                 ),
               ),
@@ -142,10 +186,14 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     return _buildContent();
   }
 
+  Future<void> _loadMore() async {
+    await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
+  }
+
 }
 
 extension InboxExtension on InboxMessage {
-  String toJson() {
+  String toDisplayString() {
     var jsonObject = {
       'messageId': messageId,
       'title': title,

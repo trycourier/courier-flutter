@@ -1,6 +1,7 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
+import 'package:courier_flutter/models/inbox_feed.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
@@ -65,9 +66,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   void _scrollListener() {
     // Trigger the pagination
-    if (_scrollController.offset >=
-        _scrollController.position.maxScrollExtent - _triggerPoint) {
-      Courier.shared.fetchNextInboxPage();
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent - _triggerPoint && _canPaginate) {
+      Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
     }
   }
 
@@ -86,9 +86,11 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     // Get the brand if needed
     final brand = await _refreshBrand();
 
+    // TODO: Add a listener for the archive
+
     // Attach inbox message listener
     _inboxListener = await Courier.shared.addInboxListener(
-      onInitialLoad: () async {
+      onLoading: () async {
         if (mounted) {
           final userId = await Courier.shared.userId;
           setState(() {
@@ -110,16 +112,16 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           });
         }
       },
-      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) async {
+      onFeedChanged: (messageSet) async {
         if (mounted) {
           final userId = await Courier.shared.userId;
           setState(() {
             _userId = userId;
             _brand = brand;
-            _messages = messages;
+            _messages = messageSet.messages;
             _isLoading = false;
             _error = null;
-            _canPaginate = canPaginate;
+            _canPaginate = messageSet.canPaginate;
           });
         }
       },

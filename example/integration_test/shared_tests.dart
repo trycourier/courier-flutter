@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
+import 'package:courier_flutter/models/inbox_feed.dart';
 import 'package:courier_flutter_sample/env.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -296,7 +297,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final messages = await Courier.shared.fetchNextInboxPage();
+      final messages = await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
       expect(messages, []);
 
     });
@@ -305,11 +306,7 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final listener = await Courier.shared.addInboxListener(
-        onInitialLoad: null,
-        onError: null,
-        onMessagesChanged: null
-      );
+      final listener = await Courier.shared.addInboxListener();
 
       await listener.remove();
 
