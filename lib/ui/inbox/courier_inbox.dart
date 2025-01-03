@@ -145,15 +145,15 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           setState(() {
             if (feed == InboxFeed.feed) {
               if (index >= 0 && index <= _feedMessages.length) {
-                _feedMessages = List.from(_feedMessages)..insert(index, message);
+                _feedMessages.insert(index, message);
               } else {
-                _feedMessages = List.from(_feedMessages)..insert(0, message);
+                _feedMessages.insert(0, message);
               }
             } else {
               if (index >= 0 && index <= _archivedMessages.length) {
-                _archivedMessages = List.from(_archivedMessages)..insert(index, message);
+                _archivedMessages.insert(index, message);
               } else {
-                _archivedMessages = List.from(_archivedMessages)..insert(0, message);
+                _archivedMessages.insert(0, message);
               }
             }
           });
@@ -164,11 +164,11 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           setState(() {
             if (feed == InboxFeed.feed) {
               if (index >= 0 && index < _feedMessages.length) {
-                _feedMessages = List.from(_feedMessages)..removeAt(index);
+                _feedMessages.removeAt(index);
               }
             } else {
               if (index >= 0 && index < _archivedMessages.length) {
-                _archivedMessages = List.from(_archivedMessages)..removeAt(index);
+                _archivedMessages.removeAt(index);
               }
             }
           });
