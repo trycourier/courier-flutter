@@ -55,6 +55,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   CourierInboxListener? _inboxListener;
   List<InboxMessage> _feedMessages = [];
   List<InboxMessage> _archivedMessages = [];
+  bool _canPaginateFeed = false;
+  bool _canPaginateArchived = false;
   bool _isLoading = true;
   String? _error;
   CourierBrand? _brand;
@@ -107,6 +109,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             _userId = userId;
             _brand = brand;
             _feedMessages = messageSet.messages;
+            _canPaginateFeed = messageSet.canPaginate;
             _isLoading = false;
             _error = null;
           });
@@ -116,6 +119,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         if (mounted) {
           setState(() {
             _archivedMessages = messageSet.messages;
+            _canPaginateArchived = messageSet.canPaginate;
             _isLoading = false;
             _error = null;
           });
@@ -256,6 +260,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           child: CourierInboxPage(
             feedMessages: _feedMessages,
             archivedMessages: _archivedMessages,
+            canPaginateFeed: _canPaginateFeed,
+            canPaginateArchived: _canPaginateArchived,
             theme: getTheme(isDarkMode),
             scrollController: widget.scrollController,
             onMessageClick: widget.onMessageClick,
@@ -342,6 +348,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 class CourierInboxPage extends StatefulWidget {
   final List<InboxMessage> feedMessages;
   final List<InboxMessage> archivedMessages;
+  final bool canPaginateFeed;
+  final bool canPaginateArchived;
   final CourierInboxTheme theme;
   final ScrollController? scrollController;
   final Function(InboxMessage, int)? onMessageClick;
@@ -355,6 +363,8 @@ class CourierInboxPage extends StatefulWidget {
     super.key,
     required this.feedMessages,
     required this.archivedMessages,
+    required this.canPaginateFeed,
+    required this.canPaginateArchived,
     required this.theme,
     required this.scrollController,
     required this.onMessageClick,
@@ -407,6 +417,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
       CourierMessageList(
         messages: widget.feedMessages,
         theme: widget.theme,
+        canPaginate: widget.canPaginateFeed,
         scrollController: widget.scrollController,
         onMessageClick: widget.onMessageClick,
         onMessageLongPress: widget.onMessageLongPress,
@@ -419,6 +430,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
       CourierMessageList(
         messages: widget.archivedMessages,
         theme: widget.theme,
+        canPaginate: widget.canPaginateArchived,
         scrollController: widget.scrollController,
         onMessageClick: widget.onMessageClick,
         onMessageLongPress: widget.onMessageLongPress,
@@ -442,6 +454,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
 class CourierMessageList extends StatefulWidget {
   final List<InboxMessage> messages;
   final CourierInboxTheme theme;
+  final bool canPaginate;
   final ScrollController? scrollController;
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
@@ -455,6 +468,7 @@ class CourierMessageList extends StatefulWidget {
     super.key,
     required this.messages,
     required this.theme,
+    required this.canPaginate,
     required this.scrollController,
     required this.onMessageClick,
     required this.onMessageLongPress,
@@ -471,7 +485,6 @@ class CourierMessageList extends StatefulWidget {
 
 class _CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
   late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
-  bool _canPaginate = false;
   double _triggerPoint = 0;
 
   @override
@@ -488,7 +501,7 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
   }
 
   Widget _buildListItem(BuildContext context, int index) {
-    if (index <= widget.messages.length - 1) {
+    if (index < widget.messages.length) {
       final message = widget.messages[index];
       Widget listItem = Column(
         children: [
@@ -561,7 +574,7 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
       }
 
       return listItem;
-    } else {
+    } else if (index == widget.messages.length && widget.canPaginate) {
       return Container(
         alignment: Alignment.center,
         child: Padding(
@@ -577,6 +590,8 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
           ),
         ),
       );
+    } else {
+      return const SizedBox.shrink();
     }
   }
 
@@ -601,7 +616,7 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _scrollController,
-          itemCount: widget.messages.length + (_canPaginate ? 1 : 0),
+          itemCount: widget.messages.length + (widget.canPaginate ? 1 : 0),
           itemBuilder: (context, index) {
             return _buildListItem(context, index);
           },
