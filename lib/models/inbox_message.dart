@@ -69,6 +69,15 @@ class InboxMessage {
 
   bool get isArchived => archived != null;
 
+  DateTime? get createdAt {
+    if (created == null) return null;
+    try {
+      return DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').parseUtc(created!).toLocal();
+    } catch (e) {
+      return null;
+    }
+  }
+
   void setRead() {
     read = DateTime.now().toIso8601String();
   }

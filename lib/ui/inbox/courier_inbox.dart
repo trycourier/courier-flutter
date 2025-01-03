@@ -7,6 +7,7 @@ import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import 'courier_inbox_list_item.dart';
@@ -58,6 +59,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   String? _error;
   CourierBrand? _brand;
   String? _userId;
+  String? _dismissingMessageId;
 
   @override
   void initState() {
@@ -110,7 +112,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           });
         }
       },
-      onArchiveChanged: (messageSet) async {
+      onArchiveChanged: (messageSet) {
         if (mounted) {
           setState(() {
             _archivedMessages = messageSet.messages;
@@ -120,7 +122,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         }
       },
       onMessageChanged: (feed, index, message) async {
-        if (mounted) {
+        if (mounted && message.messageId != _dismissingMessageId) {
           setState(() {
             if (feed == InboxFeed.feed) {
               if (index >= 0 && index < _feedMessages.length) {
@@ -135,34 +137,34 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         }
       },
       onMessageAdded: (feed, index, message) async {
-        if (mounted) {
+        if (mounted && message.messageId != _dismissingMessageId) {
           setState(() {
             if (feed == InboxFeed.feed) {
               if (index >= 0 && index <= _feedMessages.length) {
-                _feedMessages.insert(index, message);
+                _feedMessages = List.from(_feedMessages)..insert(index, message);
               } else {
-                _feedMessages.insert(0, message);
+                _feedMessages = List.from(_feedMessages)..insert(0, message);
               }
             } else {
               if (index >= 0 && index <= _archivedMessages.length) {
-                _archivedMessages.insert(index, message);
+                _archivedMessages = List.from(_archivedMessages)..insert(index, message);
               } else {
-                _archivedMessages.insert(0, message);
+                _archivedMessages = List.from(_archivedMessages)..insert(0, message);
               }
             }
           });
         }
       },
       onMessageRemoved: (feed, index, message) async {
-        if (mounted) {
+        if (mounted && message.messageId != _dismissingMessageId) {
           setState(() {
             if (feed == InboxFeed.feed) {
               if (index >= 0 && index < _feedMessages.length) {
-                _feedMessages.removeAt(index);
+                _feedMessages = List.from(_feedMessages)..removeAt(index);
               }
             } else {
               if (index >= 0 && index < _archivedMessages.length) {
-                _archivedMessages.removeAt(index);
+                _archivedMessages = List.from(_archivedMessages)..removeAt(index);
               }
             }
           });
@@ -261,10 +263,51 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             onActionClick: widget.onActionClick,
             onRefresh: _refresh,
             canSwipePages: widget.canSwipePages,
+            onArchive: (message, index) async {
+              _dismissingMessageId = message.messageId;
+              
+              // Store original state
+              final originalFeedMessages = List<InboxMessage>.from(_feedMessages);
+              final originalArchivedMessages = List<InboxMessage>.from(_archivedMessages);
+              
+              setState(() {
+                // Find index to insert archived message based on timestamp
+                if (message.createdAt == null) {
+                  // If message has no timestamp, insert at beginning
+                  _archivedMessages.insert(0, message);
+                } else {
+                  int insertIndex = _archivedMessages.indexWhere(
+                    (m) => m.createdAt?.isBefore(message.createdAt!) ?? false
+                  );
+                  if (insertIndex == -1) {
+                    // If no earlier messages found, add to end
+                    _archivedMessages.add(message);
+                  } else {
+                    // Insert at correct position
+                    _archivedMessages.insert(insertIndex, message);
+                  }
+                }
+                _feedMessages.removeAt(index);
+              });
+
+              try {
+                await message.markAsArchived();
+              } catch (error) {
+                Courier.log('Failed to archive message: $error');
+                // Reset to original state on error
+                setState(() {
+                  _feedMessages = originalFeedMessages;
+                  _archivedMessages = originalArchivedMessages;
+                });
+              }
+              
+              _dismissingMessageId = null;
+            },
           ),
         ),
         CourierFooter(
-            shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
+          shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true,
+        ),
       ],
     );
   }
@@ -306,6 +349,7 @@ class CourierInboxPage extends StatefulWidget {
   final Function(InboxAction, InboxMessage, int)? onActionClick;
   final Future<void> Function() onRefresh;
   final bool canSwipePages;
+  final Function(InboxMessage, int)? onArchive;
 
   const CourierInboxPage({
     super.key,
@@ -318,6 +362,7 @@ class CourierInboxPage extends StatefulWidget {
     required this.onActionClick,
     required this.onRefresh,
     required this.canSwipePages,
+    required this.onArchive,
   });
 
   @override
@@ -369,6 +414,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
         onRefresh: widget.onRefresh,
         feed: InboxFeed.feed,
         canSwipeItems: !widget.canSwipePages,
+        onArchive: widget.onArchive,
       ),
       CourierMessageList(
         messages: widget.archivedMessages,
@@ -380,6 +426,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
         onRefresh: widget.onRefresh,
         feed: InboxFeed.archived,
         canSwipeItems: !widget.canSwipePages,
+        onArchive: widget.onArchive,
       ),
     ];
   }
@@ -402,6 +449,7 @@ class CourierMessageList extends StatefulWidget {
   final Future<void> Function() onRefresh;
   final InboxFeed feed;
   final bool canSwipeItems;
+  final Function(InboxMessage, int)? onArchive;
 
   const CourierMessageList({
     super.key,
@@ -414,6 +462,7 @@ class CourierMessageList extends StatefulWidget {
     required this.onRefresh,
     required this.feed,
     required this.canSwipeItems,
+    required this.onArchive,
   });
 
   @override
@@ -422,7 +471,6 @@ class CourierMessageList extends StatefulWidget {
 
 class _CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
   late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   bool _canPaginate = false;
   double _triggerPoint = 0;
 
@@ -439,12 +487,7 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
     // Pagination logic here if needed
   }
 
-  Future<void> _onDismissed(InboxMessage message) async {
-    print('dismissed');
-    // await Courier.shared.archiveMessage(messageId: message.messageId);
-  }
-
-  Widget _buildListItem(BuildContext context, int index, Animation<double> animation) {
+  Widget _buildListItem(BuildContext context, int index) {
     if (index <= widget.messages.length - 1) {
       final message = widget.messages[index];
       Widget listItem = Column(
@@ -479,13 +522,15 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
         listItem = Dismissible(
           key: Key(message.messageId),
           direction: DismissDirection.horizontal,
+          movementDuration: const Duration(milliseconds: 150),
           confirmDismiss: (direction) async {
+            HapticFeedback.mediumImpact();
             if (direction == DismissDirection.startToEnd) {
               // Left to right swipe - toggle read status
               if (message.isRead) {
-                await message.markAsUnread();
+                message.markAsUnread();
               } else {
-                await message.markAsRead();
+                message.markAsRead();
               }
               return false; // Don't dismiss
             }
@@ -508,24 +553,14 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
           ),
           onDismissed: (direction) {
             if (direction == DismissDirection.endToStart) {
-              // Right to left swipe - archive
-              _onDismissed(message);
+              widget.onArchive?.call(message, index);
             }
           },
           child: listItem,
         );
       }
 
-      return SizeTransition(
-        sizeFactor: animation,
-        child: SlideTransition(
-          position: animation.drive(
-            Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOut))
-          ),
-          child: listItem,
-        ),
-      );
+      return listItem;
     } else {
       return Container(
         alignment: Alignment.center,
@@ -563,12 +598,13 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
       onRefresh: widget.onRefresh,
       child: Scrollbar(
         controller: _scrollController,
-        child: AnimatedList(
-          key: _listKey,
+        child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _scrollController,
-          initialItemCount: widget.messages.length + (_canPaginate ? 1 : 0),
-          itemBuilder: _buildListItem,
+          itemCount: widget.messages.length + (_canPaginate ? 1 : 0),
+          itemBuilder: (context, index) {
+            return _buildListItem(context, index);
+          },
         ),
       ),
     );
