@@ -276,11 +276,20 @@ void main() {
 
     });
 
-    test('Get Inbox Messages', () async {
+    test('Get Feed Messages', () async {
 
       await UserBuilder.build(userId: userId);
 
-      final messages = await Courier.shared.inboxMessages;
+      final messages = await Courier.shared.feedMessages;
+      expect(messages, []);
+
+    });
+
+    test('Get Archived Messages', () async {
+
+      await UserBuilder.build(userId: userId);
+
+      final messages = await Courier.shared.archivedMessages;
       expect(messages, []);
 
     });
@@ -297,8 +306,8 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final messages = await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
-      expect(messages, []);
+      final set = await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
+      expect(set.messages, []);
 
     });
 

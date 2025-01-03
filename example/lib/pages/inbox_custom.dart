@@ -56,6 +56,9 @@ class _CustomInboxPageState extends State<CustomInboxPage>
           _error = error;
         });
       },
+      onUnreadCountChanged: (unreadCount) {
+        print('unreadCount: $unreadCount');
+      },
       onFeedChanged: (messageSet) {
         setState(() {
           _messages = messageSet.messages;
@@ -187,7 +190,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
   }
 
   Future<void> _loadMore() async {
-    await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
+    // await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
   }
 
 }

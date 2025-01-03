@@ -21,6 +21,7 @@ class CourierInbox extends StatefulWidget {
 
   // Actions
   final Function(InboxMessage, int)? onMessageClick;
+  final Function(InboxMessage, int)? onMessageLongPress;
   final Function(InboxAction, InboxMessage, int)? onActionClick;
 
   // Scroll handling
@@ -33,6 +34,7 @@ class CourierInbox extends StatefulWidget {
     CourierInboxTheme? darkTheme,
     this.scrollController,
     this.onMessageClick,
+    this.onMessageLongPress,
     this.onActionClick,
   })  : _lightTheme = lightTheme ?? CourierInboxTheme(),
         _darkTheme = darkTheme ?? CourierInboxTheme();
@@ -45,15 +47,12 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   @override
   bool get wantKeepAlive => widget.keepAlive;
 
-  late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
   CourierInboxListener? _inboxListener;
 
   bool _isLoading = true;
   String? _error;
-  List<InboxMessage> _messages = [];
-  bool _canPaginate = false;
-
-  double _triggerPoint = 0;
+  List<InboxMessage> _feedMessages = [];
+  List<InboxMessage> _archivedMessages = [];
 
   CourierBrand? _brand;
   String? _userId;
@@ -64,15 +63,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     _start();
   }
 
-  void _scrollListener() {
-    // Trigger the pagination
-    if (_scrollController.offset >= _scrollController.position.maxScrollExtent - _triggerPoint && _canPaginate) {
-      Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
-    }
-  }
-
   Future _start() async {
-
     if (mounted) {
       setState(() {
         _isLoading = true;
@@ -80,13 +71,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       });
     }
 
-    // Attach scroll listener
-    _scrollController.addListener(_scrollListener);
-
     // Get the brand if needed
     final brand = await _refreshBrand();
-
-    // TODO: Add a listener for the archive
 
     // Attach inbox message listener
     _inboxListener = await Courier.shared.addInboxListener(
@@ -118,10 +104,67 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           setState(() {
             _userId = userId;
             _brand = brand;
-            _messages = messageSet.messages;
+            _feedMessages = messageSet.messages;
             _isLoading = false;
             _error = null;
-            _canPaginate = messageSet.canPaginate;
+          });
+        }
+      },
+      onArchiveChanged: (messageSet) async {
+        if (mounted) {
+          setState(() {
+            _archivedMessages = messageSet.messages;
+            _isLoading = false;
+            _error = null;
+          });
+        }
+      },
+      onMessageChanged: (feed, index, message) async {
+        if (mounted) {
+          setState(() {
+            if (feed == InboxFeed.feed) {
+              if (index >= 0 && index < _feedMessages.length) {
+                _feedMessages[index] = message;
+              }
+            } else {
+              if (index >= 0 && index < _archivedMessages.length) {
+                _archivedMessages[index] = message;
+              }
+            }
+          });
+        }
+      },
+      onMessageAdded: (feed, index, message) async {
+        if (mounted) {
+          setState(() {
+            if (feed == InboxFeed.feed) {
+              if (index >= 0 && index <= _feedMessages.length) {
+                _feedMessages.insert(index, message);
+              } else {
+                _feedMessages.insert(0, message);
+              }
+            } else {
+              if (index >= 0 && index <= _archivedMessages.length) {
+                _archivedMessages.insert(index, message);
+              } else {
+                _archivedMessages.insert(0, message);
+              }
+            }
+          });
+        }
+      },
+      onMessageRemoved: (feed, index, message) async {
+        if (mounted) {
+          setState(() {
+            if (feed == InboxFeed.feed) {
+              if (index >= 0 && index < _feedMessages.length) {
+                _feedMessages.removeAt(index);
+              }
+            } else {
+              if (index >= 0 && index < _archivedMessages.length) {
+                _archivedMessages.removeAt(index);
+              }
+            }
           });
         }
       },
@@ -175,8 +218,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     await Courier.shared.refreshInbox();
   }
 
-  int get _itemCount => _messages.length + (_canPaginate ? 1 : 0);
-
   CourierInboxTheme getTheme(bool isDarkMode) {
     return isDarkMode ? widget._darkTheme : widget._lightTheme;
   }
@@ -211,73 +252,46 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       );
     }
 
-    if (_messages.isEmpty) {
-      return Center(
-        child: Text(
-          style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
-          'No message found',
-        ),
-      );
-    }
-
     return Column(
       children: [
         Expanded(
-          child: RefreshIndicator(
-            color: getTheme(isDarkMode).getLoadingColor(context),
-            onRefresh: _refresh,
-            child: Scrollbar(
-              controller: _scrollController,
-              child: ListView.separated(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _scrollController,
-                separatorBuilder: (context, index) =>
-                    getTheme(isDarkMode).separator ?? const SizedBox(),
-                itemCount: _itemCount,
-                itemBuilder: (BuildContext context, int index) {
-                  if (index <= _messages.length - 1) {
-                    final message = _messages[index];
-                    return VisibilityDetector(
-                      key: Key(message.messageId),
-                      onVisibilityChanged: (VisibilityInfo info) {
-                        if (info.visibleFraction > 0) {
-                          _onItemVisible(message, index);
-                        }
-                      },
-                      child: CourierInboxListItem(
+          child: DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                TabBar(
+                  tabs: const [
+                    Tab(text: 'Inbox'),
+                    Tab(text: 'Archive'),
+                  ],
+                ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      CourierMessageList(
+                        messages: _feedMessages,
                         theme: getTheme(isDarkMode),
-                        message: message,
-                        onMessageClick: (message) {
-                          message.markAsClicked();
-                          widget.onMessageClick != null
-                              ? widget.onMessageClick!(message, index)
-                              : null;
-                        },
-                        onActionClick: (action) => widget.onActionClick != null
-                            ? widget.onActionClick!(action, message, index)
-                            : null,
+                        scrollController: widget.scrollController,
+                        onMessageClick: widget.onMessageClick,
+                        onMessageLongPress: widget.onMessageLongPress,
+                        onActionClick: widget.onActionClick,
+                        onRefresh: _refresh,
+                        feed: InboxFeed.feed,
                       ),
-                    );
-                  } else {
-                    return Container(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding:
-                            EdgeInsets.only(top: 24, bottom: _triggerPoint),
-                        child: SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                getTheme(isDarkMode).getLoadingColor(context)),
-                          ),
-                        ),
+                      CourierMessageList(
+                        messages: _archivedMessages,
+                        theme: getTheme(isDarkMode),
+                        scrollController: widget.scrollController,
+                        onMessageClick: widget.onMessageClick,
+                        onMessageLongPress: widget.onMessageLongPress,
+                        onActionClick: widget.onActionClick,
+                        onRefresh: _refresh,
+                        feed: InboxFeed.archived,
                       ),
-                    );
-                  }
-                },
-              ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -287,20 +301,11 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     );
   }
 
-  void _onItemVisible(InboxMessage message, int index) {
-    if (!message.isOpened) {
-      message.markAsOpened().then((value) {
-        Courier.log('Message opened: ${message.messageId}');
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return ClipRect(
       child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
-        _triggerPoint = constraints.maxHeight / 2;
         return _buildContent(context, isDarkMode);
       }),
     );
@@ -318,17 +323,131 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   @override
   void dispose() {
-
     // Remove the listeners
     _removeInboxListener();
-    _scrollController.removeListener(_scrollListener);
 
-    // Dispose the default controller
+    super.dispose();
+  }
+}
+
+class CourierMessageList extends StatefulWidget {
+  final List<InboxMessage> messages;
+  final CourierInboxTheme theme;
+  final ScrollController? scrollController;
+  final Function(InboxMessage, int)? onMessageClick;
+  final Function(InboxMessage, int)? onMessageLongPress;
+  final Function(InboxAction, InboxMessage, int)? onActionClick;
+  final Future<void> Function() onRefresh;
+  final InboxFeed feed;
+
+  const CourierMessageList({
+    super.key,
+    required this.messages,
+    required this.theme,
+    required this.scrollController,
+    required this.onMessageClick,
+    required this.onMessageLongPress,
+    required this.onActionClick,
+    required this.onRefresh,
+    required this.feed,
+  });
+
+  @override
+  State<CourierMessageList> createState() => _CourierMessageListState();
+}
+
+class _CourierMessageListState extends State<CourierMessageList> {
+  late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
+  bool _canPaginate = false;
+  double _triggerPoint = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    // if (_scrollController.offset >= _scrollController.position.maxScrollExtent - _triggerPoint && _canPaginate) {
+    //   Courier.shared.fetchNextInboxPage(feed: widget.feed);
+    // }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.messages.isEmpty) {
+      return Center(
+        child: Text(
+          style: widget.theme.getInfoViewTitleStyle(context),
+          'No messages found',
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: widget.theme.getLoadingColor(context),
+      onRefresh: widget.onRefresh,
+      child: Scrollbar(
+        controller: _scrollController,
+        child: ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _scrollController,
+          separatorBuilder: (context, index) =>
+              widget.theme.separator ?? const SizedBox(),
+          itemCount: widget.messages.length + (_canPaginate ? 1 : 0),
+          itemBuilder: (BuildContext context, int index) {
+            if (index <= widget.messages.length - 1) {
+              final message = widget.messages[index];
+              return VisibilityDetector(
+                key: Key(message.messageId),
+                onVisibilityChanged: (VisibilityInfo info) {
+                  if (info.visibleFraction > 0 && !message.isOpened) {
+                    message.markAsOpened().then((value) {
+                      Courier.log('Message opened: ${message.messageId}');
+                    });
+                  }
+                },
+                child: CourierInboxListItem(
+                  theme: widget.theme,
+                  message: message,
+                  onMessageClick: (message) {
+                    message.markAsClicked();
+                    widget.onMessageClick?.call(message, index);
+                  },
+                  onMessageLongPress: (message) {
+                    widget.onMessageLongPress?.call(message, index);
+                  },
+                  onActionClick: (action) => widget.onActionClick?.call(action, message, index),
+                ),
+              );
+            } else {
+              return Container(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 24, bottom: _triggerPoint),
+                  child: SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          widget.theme.getLoadingColor(context)),
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
     if (widget.scrollController == null) {
       _scrollController.dispose();
     }
-
     super.dispose();
-
   }
 }

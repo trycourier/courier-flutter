@@ -38,9 +38,8 @@ class Courier extends CourierChannelManager {
       switch (call.method) {
         case 'auth.state_changed': {
           String? userId = call.arguments['userId'];
-          _authenticationListeners.forEach((key, listener) {
-            listener.onUserStateChanged(userId);
-          });
+          String? listenerId = call.arguments['id'];
+          _authenticationListeners[listenerId]?.onUserStateChanged(userId);
           break;
         }
         case 'push.clicked': {
@@ -56,47 +55,41 @@ class Courier extends CourierChannelManager {
           break;
         }
         case 'inbox.listener_loading': {
-          _inboxListeners.forEach((key, listener) {
-            listener.onLoading?.call();
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onLoading?.call();
           break;
         }
         case 'inbox.listener_error': {
-          _inboxListeners.forEach((key, listener) {
-            listener.onError?.call(call.arguments['error']);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onError?.call(call.arguments['error']);
           break;
         }
         case 'inbox.listener_unread_count_changed': {
           final count = call.arguments['count'];
-          _inboxListeners.forEach((key, listener) {
-            listener.onUnreadCountChanged?.call(count);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onUnreadCountChanged?.call(count);
           break;
         }
         case 'inbox.listener_feed_changed': {
           final json = jsonDecode(call.arguments['messageSet']);
           final messageSet = InboxMessageSet.fromJson(json);
-          _inboxListeners.forEach((key, listener) {
-            listener.onFeedChanged?.call(messageSet);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onFeedChanged?.call(messageSet);
           break;
         }
         case 'inbox.listener_archive_changed': {
           final json = jsonDecode(call.arguments['messageSet']);
           final messageSet = InboxMessageSet.fromJson(json);
-          _inboxListeners.forEach((key, listener) {
-            listener.onArchiveChanged?.call(messageSet);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onArchiveChanged?.call(messageSet);
           break;
         }
         case 'inbox.listener_page_added': {
           final feed = InboxFeed.fromValue(call.arguments['feed']);
           final json = jsonDecode(call.arguments['page']);
           final page = InboxMessageSet.fromJson(json);
-          _inboxListeners.forEach((key, listener) {
-            listener.onPageAdded?.call(feed, page);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onPageAdded?.call(feed, page);
           break;
         }
         case 'inbox.listener_message_changed': {
@@ -104,9 +97,8 @@ class Courier extends CourierChannelManager {
           final index = call.arguments['index'];
           final json = jsonDecode(call.arguments['message']);
           final message = InboxMessage.fromJson(json);
-          _inboxListeners.forEach((key, listener) {
-            listener.onMessageChanged?.call(feed, index, message);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onMessageChanged?.call(feed, index, message);
           break;
         }
         case 'inbox.listener_message_added': {
@@ -114,9 +106,8 @@ class Courier extends CourierChannelManager {
           final index = call.arguments['index'];
           final json = jsonDecode(call.arguments['message']);
           final message = InboxMessage.fromJson(json);
-          _inboxListeners.forEach((key, listener) {
-            listener.onMessageAdded?.call(feed, index, message);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onMessageAdded?.call(feed, index, message);
           break;
         }
         case 'inbox.listener_message_removed': {
@@ -124,9 +115,8 @@ class Courier extends CourierChannelManager {
           final index = call.arguments['index'];
           final json = jsonDecode(call.arguments['message']);
           final message = InboxMessage.fromJson(json);
-          _inboxListeners.forEach((key, listener) {
-            listener.onMessageRemoved?.call(feed, index, message);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onMessageRemoved?.call(feed, index, message);
           break;
         }
       }
@@ -359,8 +349,15 @@ class Courier extends CourierChannelManager {
   }
 
   @override
-  Future<List<InboxMessage>> get inboxMessages async {
-    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_messages');
+  Future<List<InboxMessage>> get feedMessages async {
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_feed_messages');
+    List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
+    return inboxMessages;
+  }
+
+  @override
+  Future<List<InboxMessage>> get archivedMessages async {
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_archived_messages');
     List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
     return inboxMessages;
   }
@@ -371,14 +368,11 @@ class Courier extends CourierChannelManager {
   }
 
   @override
-  Future<List<InboxMessage>> fetchNextInboxPage({required InboxFeed feed}) async {
-    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page', {
+  Future<InboxMessageSet> fetchNextInboxPage({required InboxFeed feed}) async {
+    dynamic json = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page', {
       'feed': feed.value,
     });
-    return messages.map((message) {
-      final Map<String, dynamic> map = json.decode(message);
-      return InboxMessage.fromJson(map);
-    }).toList();
+    return InboxMessageSet.fromJson(jsonDecode(json));
   }
 
   @override
@@ -554,13 +548,14 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('setInboxPaginationLimit() has not been implemented.');
   }
 
-  Future<List<InboxMessage>> get inboxMessages => throw UnimplementedError('inboxMessages has not been implemented.');
+  Future<List<InboxMessage>> get feedMessages => throw UnimplementedError('feedMessages has not been implemented.');
+  Future<List<InboxMessage>> get archivedMessages => throw UnimplementedError('archivedMessages has not been implemented.');
 
   Future refreshInbox() async {
     throw UnimplementedError('refreshInbox() has not been implemented.');
   }
 
-  Future<List<InboxMessage>> fetchNextInboxPage({required InboxFeed feed}) async {
+  Future<InboxMessageSet> fetchNextInboxPage({required InboxFeed feed}) async {
     throw UnimplementedError('fetchNextInboxPage() has not been implemented.');
   }
 

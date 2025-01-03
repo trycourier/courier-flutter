@@ -9,6 +9,7 @@ class CourierInboxListItem extends StatefulWidget {
   final CourierInboxTheme theme;
   final InboxMessage message;
   final Function(InboxMessage) onMessageClick;
+  final Function(InboxMessage) onMessageLongPress;
   final Function(InboxAction) onActionClick;
 
   const CourierInboxListItem({
@@ -16,6 +17,7 @@ class CourierInboxListItem extends StatefulWidget {
     required this.theme,
     required this.message,
     required this.onMessageClick,
+    required this.onMessageLongPress,
     required this.onActionClick,
   });
 
@@ -113,6 +115,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => widget.onMessageClick(_message),
+        onLongPress: () => widget.onMessageLongPress(_message),
         child: Stack(
           children: [
             !_showDotIndicator ? Positioned(left: 2, top: 2, bottom: 2, width: 3.0, child: Container(color: _message.isRead ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context))) : const SizedBox(),

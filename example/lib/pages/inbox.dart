@@ -1,5 +1,4 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/env.dart';
@@ -60,6 +59,44 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       scrollController: _customScrollController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
+      },
+      onMessageLongPress: (message, index) {
+        showModalBottomSheet(
+          context: context,
+          clipBehavior: Clip.hardEdge,
+          builder: (BuildContext context) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(message.isRead ? 'Mark as unread' : 'Mark as read'),
+                      onTap: () {
+                        message.isRead ? message.markAsUnread() : message.markAsRead();
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Archive'),
+                      onTap: () {
+                        message.markAsArchived();
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Cancel'),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
       },
       onActionClick: (action, message, index) {
         print(action);

@@ -7,8 +7,10 @@ import com.courier.android.models.remove
 import com.courier.android.modules.addAuthenticationListener
 import com.courier.android.modules.addInboxListener
 import com.courier.android.modules.archiveMessage
+import com.courier.android.modules.archivedMessages
 import com.courier.android.modules.clickMessage
 import com.courier.android.modules.fcmToken
+import com.courier.android.modules.feedMessages
 import com.courier.android.modules.fetchNextInboxPage
 import com.courier.android.modules.getToken
 import com.courier.android.modules.inboxPaginationLimit
@@ -24,6 +26,7 @@ import com.courier.android.modules.tenantId
 import com.courier.android.modules.tokens
 import com.courier.android.modules.unreadMessage
 import com.courier.android.modules.userId
+import com.courier.android.ui.inbox.InboxMessageFeed
 import com.courier.courier_flutter.CourierPlugin.Companion.TAG
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -230,9 +233,19 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                 }
 
-                "inbox.get_messages" -> {
+                "inbox.get_feed_messages" -> {
 
-                    val messages = Courier.shared.inboxMessages ?: emptyList()
+                    val messages = Courier.shared.feedMessages
+
+                    val json = messages.map { it.toJson() }
+
+                    result.success(json)
+
+                }
+
+                "inbox.get_archived_messages" -> {
+
+                    val messages = Courier.shared.archivedMessages
 
                     val json = messages.map { it.toJson() }
 
@@ -250,11 +263,19 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                 "inbox.fetch_next_page" -> {
 
-                    val messages = Courier.shared.fetchNextInboxPage()
+                    val params = call.arguments as? HashMap<*, *> ?: throw MissingParameter("params")
+
+                    val feed = params.extract("feed") as String
+
+                    val inboxFeed = if (feed == "archived") InboxMessageFeed.ARCHIVE else InboxMessageFeed.FEED
+
+                    val messageSet = Courier.shared.fetchNextInboxPage(feed = inboxFeed)
 
                     val json = messages.map { it.toJson() }
 
-                    result.success(json)
+                    val feed = messageSet?.toJson()
+
+                    result.success(feed)
 
                 }
 
