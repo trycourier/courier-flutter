@@ -56,6 +56,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       keepAlive: true,
       lightTheme: customTheme,
       darkTheme: customTheme,
+      canSwipePages: true,
       scrollController: _customScrollController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
@@ -138,6 +139,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       ),
       body: TabBarView(
         controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
         children: pages.values.toList(),
       ),
     );

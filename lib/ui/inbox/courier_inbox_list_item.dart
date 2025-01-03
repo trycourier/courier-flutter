@@ -30,9 +30,8 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
 
   bool get _showDotIndicator => widget.theme.unreadIndicatorStyle.indicator == CourierInboxUnreadIndicator.dot;
 
-  List<Widget> _buildContent(BuildContext context) {
+  List<Widget> _buildContent(BuildContext context, bool showUnreadStyle) {
     List<Widget> items = [];
-
     if (_message.title != null) {
       items.add(
         Row(
@@ -52,13 +51,13 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
                             height: CourierTheme.dotSize,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: _message.isRead ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context),
+                              color: showUnreadStyle ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context),
                             ),
                           ),
                         )
                       : const SizedBox(),
                   Text(
-                    style: widget.theme.getTitleStyle(context, _message.isRead),
+                    style: widget.theme.getTitleStyle(context, showUnreadStyle),
                     _message.title ?? "Missing",
                   ),
                 ],
@@ -67,7 +66,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
             const SizedBox(width: CourierTheme.margin),
             Text(
               _message.time,
-              style: widget.theme.getTimeStyle(context, _message.isRead),
+              style: widget.theme.getTimeStyle(context, showUnreadStyle),
               textAlign: TextAlign.right,
             ),
           ],
@@ -78,7 +77,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
     if (_message.subtitle != null) {
       items.add(
         Text(
-          style: widget.theme.getBodyStyle(context, _message.isRead),
+          style: widget.theme.getBodyStyle(context, showUnreadStyle),
           _message.subtitle!,
         ),
       );
@@ -95,7 +94,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
             runSpacing: 0.0,
             children: actions.map((action) {
               return FilledButton(
-                style: widget.theme.getButtonStyle(context, _message.isRead),
+                style: widget.theme.getButtonStyle(context, showUnreadStyle),
                 onPressed: () => widget.onActionClick(action),
                 child: Text(action.content ?? ''),
               );
@@ -111,6 +110,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
 
   @override
   Widget build(BuildContext context) {
+    final isDone = _message.isRead || _message.isArchived;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -118,7 +118,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
         onLongPress: () => widget.onMessageLongPress(_message),
         child: Stack(
           children: [
-            !_showDotIndicator ? Positioned(left: 2, top: 2, bottom: 2, width: 3.0, child: Container(color: _message.isRead ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context))) : const SizedBox(),
+            !_showDotIndicator ? Positioned(left: 2, top: 2, bottom: 2, width: 3.0, child: Container(color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context))) : const SizedBox(),
             Padding(
               padding: EdgeInsets.only(left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5, right: CourierTheme.margin, top: CourierTheme.margin * 0.75, bottom: CourierTheme.margin * 0.75),
               child: Row(
@@ -126,7 +126,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: _buildContent(context).addSeparator(() {
+                      children: _buildContent(context, isDone).addSeparator(() {
                         return const SizedBox(height: 2.0);
                       }),
                     ),
