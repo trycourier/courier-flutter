@@ -14,7 +14,8 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
-  final ScrollController _customScrollController = ScrollController();
+  final ScrollController _feedScrollController = ScrollController();
+  final ScrollController _archivedScrollController = ScrollController();
   TabController? _tabController;
 
   final customTheme = CourierInboxTheme(
@@ -57,7 +58,8 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       lightTheme: customTheme,
       darkTheme: customTheme,
       canSwipePages: true,
-      scrollController: _customScrollController,
+      feedScrollController: _feedScrollController,
+      archivedScrollController: _archivedScrollController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
       },
@@ -86,6 +88,13 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
                         Navigator.pop(context);
                       },
                     ),
+                    // ListTile(
+                    //   title: const Text('Scroll to top'),
+                    //   onTap: () {
+                    //     _feedScrollController.jumpTo(0);
+                    //     Navigator.pop(context);
+                    //   },
+                    // ),
                     ListTile(
                       title: const Text('Cancel'),
                       onTap: () {
@@ -101,7 +110,6 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
       onActionClick: (action, message, index) {
         print(action);
-        _customScrollController.jumpTo(0);
       },
     ),
     'Custom': const CustomInboxPage(),
@@ -116,7 +124,8 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _tabController?.dispose();
-    _customScrollController.dispose();
+    _feedScrollController.dispose();
+    _archivedScrollController.dispose();
     super.dispose();
   }
 

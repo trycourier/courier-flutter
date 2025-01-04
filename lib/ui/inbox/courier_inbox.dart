@@ -26,7 +26,8 @@ class CourierInbox extends StatefulWidget {
   final Function(InboxAction, InboxMessage, int)? onActionClick;
 
   // Scroll handling
-  final ScrollController? scrollController;
+  final ScrollController feedScrollController;
+  final ScrollController archivedScrollController;
 
   // Swipe behavior
   final bool canSwipePages;
@@ -36,13 +37,16 @@ class CourierInbox extends StatefulWidget {
     this.keepAlive = false,
     CourierInboxTheme? lightTheme,
     CourierInboxTheme? darkTheme,
-    this.scrollController,
+    ScrollController? feedScrollController,
+    ScrollController? archivedScrollController,
     this.onMessageClick,
     this.onMessageLongPress,
     this.onActionClick,
     this.canSwipePages = false,
   })  : _lightTheme = lightTheme ?? CourierInboxTheme(),
-        _darkTheme = darkTheme ?? CourierInboxTheme();
+        _darkTheme = darkTheme ?? CourierInboxTheme(),
+        feedScrollController = feedScrollController ?? ScrollController(),
+        archivedScrollController = archivedScrollController ?? ScrollController();
 
   @override
   State<CourierInbox> createState() => CourierInboxState();
@@ -206,6 +210,15 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     }
   }
 
+  void _disposeScrollControllers() {
+    if (widget.feedScrollController.hasClients) {
+      widget.feedScrollController.dispose();
+    }
+    if (widget.archivedScrollController.hasClients) {
+      widget.archivedScrollController.dispose();
+    }
+  }
+
   Future<void> _refresh() async {
     await _refreshBrand();
     await Courier.shared.refreshInbox();
@@ -263,7 +276,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             canPaginateFeed: _canPaginateFeed,
             canPaginateArchived: _canPaginateArchived,
             theme: getTheme(isDarkMode),
-            scrollController: widget.scrollController,
+            feedScrollController: widget.feedScrollController,
+            archivedScrollController: widget.archivedScrollController,
             onMessageClick: widget.onMessageClick,
             onMessageLongPress: widget.onMessageLongPress,
             onActionClick: widget.onActionClick,
@@ -340,6 +354,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   @override
   void dispose() {
+    _disposeScrollControllers();
     _removeInboxListener();
     super.dispose();
   }
@@ -351,7 +366,8 @@ class CourierInboxPage extends StatefulWidget {
   final bool canPaginateFeed;
   final bool canPaginateArchived;
   final CourierInboxTheme theme;
-  final ScrollController? scrollController;
+  final ScrollController feedScrollController;
+  final ScrollController archivedScrollController;
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
   final Function(InboxAction, InboxMessage, int)? onActionClick;
@@ -366,7 +382,8 @@ class CourierInboxPage extends StatefulWidget {
     required this.canPaginateFeed,
     required this.canPaginateArchived,
     required this.theme,
-    required this.scrollController,
+    required this.feedScrollController,
+    required this.archivedScrollController,
     required this.onMessageClick,
     required this.onMessageLongPress,
     required this.onActionClick,
@@ -382,6 +399,7 @@ class CourierInboxPage extends StatefulWidget {
 class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
+  int _lastSelectedTab = 0;
 
   @override
   void initState() {
@@ -400,6 +418,18 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
             Tab(text: 'Inbox'),
             Tab(text: 'Archive'),
           ],
+          onTap: (index) {
+            if (index == _lastSelectedTab) {
+              final controller = index == 0 ? widget.feedScrollController : widget.archivedScrollController;
+              controller.animateTo(
+                0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+              return;
+            }
+            _lastSelectedTab = index;
+          },
         ),
         Expanded(
           child: TabBarView(
@@ -418,7 +448,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
         messages: widget.feedMessages,
         theme: widget.theme,
         canPaginate: widget.canPaginateFeed,
-        scrollController: widget.scrollController,
+        scrollController: widget.feedScrollController,
         onMessageClick: widget.onMessageClick,
         onMessageLongPress: widget.onMessageLongPress,
         onActionClick: widget.onActionClick,
@@ -431,7 +461,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
         messages: widget.archivedMessages,
         theme: widget.theme,
         canPaginate: widget.canPaginateArchived,
-        scrollController: widget.scrollController,
+        scrollController: widget.archivedScrollController,
         onMessageClick: widget.onMessageClick,
         onMessageLongPress: widget.onMessageLongPress,
         onActionClick: widget.onActionClick,
@@ -455,7 +485,7 @@ class CourierMessageList extends StatefulWidget {
   final List<InboxMessage> messages;
   final CourierInboxTheme theme;
   final bool canPaginate;
-  final ScrollController? scrollController;
+  final ScrollController scrollController;
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
   final Function(InboxAction, InboxMessage, int)? onActionClick;
@@ -484,7 +514,7 @@ class CourierMessageList extends StatefulWidget {
 }
 
 class _CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
-  late final ScrollController _scrollController = widget.scrollController ?? ScrollController();
+ 
   double _triggerPoint = 0;
 
   @override
@@ -493,7 +523,7 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_scrollListener);
+    widget.scrollController?.addListener(_scrollListener);
   }
 
   void _scrollListener() {
@@ -612,24 +642,15 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
       color: widget.theme.getLoadingColor(context),
       onRefresh: widget.onRefresh,
       child: Scrollbar(
-        controller: _scrollController,
+        controller: widget.scrollController,
         child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
-          controller: _scrollController,
+          controller: widget.scrollController,
           itemCount: widget.messages.length + (widget.canPaginate ? 1 : 0),
-          itemBuilder: (context, index) {
-            return _buildListItem(context, index);
-          },
+          itemBuilder: (context, index) => _buildListItem(context, index),
         ),
       ),
     );
   }
 
-  @override
-  void dispose() {
-    if (widget.scrollController == null) {
-      _scrollController.dispose();
-    }
-    super.dispose();
-  }
 }
