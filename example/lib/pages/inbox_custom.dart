@@ -44,7 +44,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
     }
 
     _inboxListener = await Courier.shared.addInboxListener(
-      onLoading: () {
+      onLoading: (isRefresh) {
         setState(() {
           _isLoading = true;
           _error = null;

@@ -1,7 +1,6 @@
-package com.courier.courier_flutter_sample
+package com.courier.courier_flutter
 
 import android.annotation.SuppressLint
-import com.courier.android.notifications.presentNotification
 import com.courier.android.service.CourierService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -21,11 +20,11 @@ class ExampleService: CourierService() {
         // For details on how to customize an Android notification, check here:
         // https://developer.android.com/develop/ui/views/notifications/build-notification
 
-        message.presentNotification(
-            context = this,
-            handlingClass = MainActivity::class.java,
-            icon = android.R.drawable.ic_dialog_info
-        )
+//        message.presentNotification(
+//            context = this,
+//            handlingClass = MainActivity::class.java,
+//            icon = android.R.drawable.ic_dialog_dialer
+//        )
 
     }
 

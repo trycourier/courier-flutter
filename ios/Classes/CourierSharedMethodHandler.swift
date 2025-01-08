@@ -5,7 +5,7 @@
 //  Created by Michael Miller on 8/7/24.
 //
 
-import Courier_iOS
+@preconcurrency import Courier_iOS
 
 internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     
@@ -262,10 +262,11 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     // Create the listener
                     let listener = await Courier.shared.addInboxListener(
-                        onLoading: {
+                        onLoading: { isRefresh in
                             DispatchQueue.main.async {
                                 CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: [
-                                    "id": listenerId
+                                    "id": listenerId,
+                                    "isRefresh": isRefresh
                                 ])
                             }
                         },

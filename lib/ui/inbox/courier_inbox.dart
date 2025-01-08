@@ -7,7 +7,6 @@ import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import 'courier_inbox_list_item.dart';
@@ -66,6 +65,61 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   CourierBrand? _brand;
   String? _userId;
   String? _dismissingMessageId;
+  
+  // Map to store list item states at the top level
+  final Map<String, GlobalKey<CourierInboxListItemState>> _listItemStates = {};
+
+  void _handleMessageArchive(InboxMessage message, int index) async {
+    _dismissingMessageId = message.messageId;
+    
+    // Store original state
+    final originalFeedMessages = List<InboxMessage>.from(_feedMessages);
+    final originalArchivedMessages = List<InboxMessage>.from(_archivedMessages);
+    
+    // Find index to insert archived message based on timestamp
+    if (message.createdAt == null) {
+      // If message has no timestamp, insert at beginning
+      _archivedMessages.insert(0, message);
+    } else {
+      int insertIndex = _archivedMessages.indexWhere(
+        (m) => m.createdAt?.isBefore(message.createdAt!) ?? false
+      );
+      if (insertIndex == -1) {
+        // If no earlier messages found, add to end
+        _archivedMessages.add(message);
+      } else {
+        // Insert at correct position
+        _archivedMessages.insert(insertIndex, message);
+      }
+    }
+    _feedMessages.removeAt(index);
+    await dismissItem(message.messageId);
+
+    try {
+      await message.markAsArchived();
+    } catch (error) {
+      Courier.log('Failed to archive message: $error');
+      // Reset to original state on error
+      setState(() {
+        _feedMessages = originalFeedMessages;
+        _archivedMessages = originalArchivedMessages;
+      });
+    }
+    
+    _dismissingMessageId = null;
+  }
+
+  Future<void> dismissItem(String messageId) async {
+    if (_listItemStates.containsKey(messageId)) {
+      await _listItemStates[messageId]?.currentState?.dismiss();
+    }
+  }
+
+  Future<void> animateItemIn(String messageId, {SlideDirection direction = SlideDirection.fromRight}) async {
+    if (_listItemStates.containsKey(messageId)) {
+      await _listItemStates[messageId]?.currentState?.animateIn(direction: direction);
+    }
+  }
 
   @override
   void initState() {
@@ -84,13 +138,13 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     final brand = await _refreshBrand();
 
     _inboxListener = await Courier.shared.addInboxListener(
-      onLoading: () async {
+      onLoading: (isRefresh) async {
         if (mounted) {
           final userId = await Courier.shared.userId;
           setState(() {
             _userId = userId;
             _brand = brand;
-            _isLoading = true;
+            _isLoading = !isRefresh;
             _error = null;
           });
         }
@@ -164,19 +218,19 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         }
       },
       onMessageRemoved: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          setState(() {
-            if (feed == InboxFeed.feed) {
-              if (index >= 0 && index < _feedMessages.length) {
-                _feedMessages.removeAt(index);
-              }
-            } else {
-              if (index >= 0 && index < _archivedMessages.length) {
-                _archivedMessages.removeAt(index);
-              }
-            }
-          });
-        }
+        // if (mounted && message.messageId != _dismissingMessageId) {
+        //   setState(() {
+        //     if (feed == InboxFeed.feed) {
+        //       if (index >= 0 && index < _feedMessages.length) {
+        //         _feedMessages.removeAt(index);
+        //       }
+        //     } else {
+        //       if (index >= 0 && index < _archivedMessages.length) {
+        //         _archivedMessages.removeAt(index);
+        //       }
+        //     }
+        //   });
+        // }
       },
     );
   }
@@ -237,7 +291,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     return isDarkMode ? widget._darkTheme : widget._lightTheme;
   }
 
-  Widget _buildContent(BuildContext context, bool isDarkMode) {
+  Widget _buildContent(BuildContext context, bool isDarkMode, double triggerPoint) {
     if (_isLoading) {
       return Center(
         child: CircularProgressIndicator(
@@ -282,47 +336,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             onMessageLongPress: widget.onMessageLongPress,
             onActionClick: widget.onActionClick,
             onRefresh: _refresh,
+            triggerPoint: triggerPoint,
             canSwipePages: widget.canSwipePages,
-            onArchive: (message, index) async {
-              _dismissingMessageId = message.messageId;
-              
-              // Store original state
-              final originalFeedMessages = List<InboxMessage>.from(_feedMessages);
-              final originalArchivedMessages = List<InboxMessage>.from(_archivedMessages);
-              
-              setState(() {
-                // Find index to insert archived message based on timestamp
-                if (message.createdAt == null) {
-                  // If message has no timestamp, insert at beginning
-                  _archivedMessages.insert(0, message);
-                } else {
-                  int insertIndex = _archivedMessages.indexWhere(
-                    (m) => m.createdAt?.isBefore(message.createdAt!) ?? false
-                  );
-                  if (insertIndex == -1) {
-                    // If no earlier messages found, add to end
-                    _archivedMessages.add(message);
-                  } else {
-                    // Insert at correct position
-                    _archivedMessages.insert(insertIndex, message);
-                  }
-                }
-                _feedMessages.removeAt(index);
-              });
-
-              try {
-                await message.markAsArchived();
-              } catch (error) {
-                Courier.log('Failed to archive message: $error');
-                // Reset to original state on error
-                setState(() {
-                  _feedMessages = originalFeedMessages;
-                  _archivedMessages = originalArchivedMessages;
-                });
-              }
-              
-              _dismissingMessageId = null;
-            },
+            onArchive: _handleMessageArchive,
+            listItemStates: _listItemStates,
           ),
         ),
         CourierFooter(
@@ -337,7 +354,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     super.build(context);
     return ClipRect(
       child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
-        return _buildContent(context, isDarkMode);
+        final triggerPoint = constraints.maxHeight / 2;
+        return _buildContent(context, isDarkMode, triggerPoint);
       }),
     );
   }
@@ -374,6 +392,8 @@ class CourierInboxPage extends StatefulWidget {
   final Future<void> Function() onRefresh;
   final bool canSwipePages;
   final Function(InboxMessage, int)? onArchive;
+  final double triggerPoint;
+  final Map<String, GlobalKey<CourierInboxListItemState>> listItemStates;
 
   const CourierInboxPage({
     super.key,
@@ -390,6 +410,8 @@ class CourierInboxPage extends StatefulWidget {
     required this.onRefresh,
     required this.canSwipePages,
     required this.onArchive,
+    required this.triggerPoint,
+    required this.listItemStates,
   });
 
   @override
@@ -445,6 +467,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
   List<Widget> _buildTabViews() {
     return [
       CourierMessageList(
+        triggerPoint: widget.triggerPoint,
         messages: widget.feedMessages,
         theme: widget.theme,
         canPaginate: widget.canPaginateFeed,
@@ -456,8 +479,10 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
         feed: InboxFeed.feed,
         canSwipeItems: !widget.canSwipePages,
         onArchive: widget.onArchive,
+        listItemStates: widget.listItemStates,
       ),
-      CourierMessageList(
+      CourierMessageList( 
+        triggerPoint: widget.triggerPoint,
         messages: widget.archivedMessages,
         theme: widget.theme,
         canPaginate: widget.canPaginateArchived,
@@ -469,6 +494,7 @@ class _CourierInboxPageState extends State<CourierInboxPage> with SingleTickerPr
         feed: InboxFeed.archived,
         canSwipeItems: !widget.canSwipePages,
         onArchive: widget.onArchive,
+        listItemStates: widget.listItemStates,
       ),
     ];
   }
@@ -485,6 +511,7 @@ class CourierMessageList extends StatefulWidget {
   final List<InboxMessage> messages;
   final CourierInboxTheme theme;
   final bool canPaginate;
+  final double triggerPoint;
   final ScrollController scrollController;
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
@@ -493,12 +520,14 @@ class CourierMessageList extends StatefulWidget {
   final InboxFeed feed;
   final bool canSwipeItems;
   final Function(InboxMessage, int)? onArchive;
+  final Map<String, GlobalKey<CourierInboxListItemState>> listItemStates;
 
   const CourierMessageList({
     super.key,
     required this.messages,
     required this.theme,
     required this.canPaginate,
+    required this.triggerPoint,
     required this.scrollController,
     required this.onMessageClick,
     required this.onMessageLongPress,
@@ -507,6 +536,7 @@ class CourierMessageList extends StatefulWidget {
     required this.feed,
     required this.canSwipeItems,
     required this.onArchive,
+    required this.listItemStates,
   });
 
   @override
@@ -514,25 +544,28 @@ class CourierMessageList extends StatefulWidget {
 }
 
 class _CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
- 
-  double _triggerPoint = 0;
-
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    widget.scrollController?.addListener(_scrollListener);
+    widget.scrollController.addListener(_scrollListener);
   }
 
   void _scrollListener() {
-    // Pagination logic here if needed
+    // Trigger the pagination
+    if (widget.scrollController.offset >= widget.scrollController.position.maxScrollExtent - widget.triggerPoint) {
+      Courier.shared.fetchNextInboxPage(feed: widget.feed).then((messages) {
+        Courier.log('New Messages Fetched. Count: ${messages.length}');
+      });
+    }
   }
 
   Widget _buildListItem(BuildContext context, int index) {
     if (index < widget.messages.length) {
       final message = widget.messages[index];
+      widget.listItemStates[message.messageId] = widget.listItemStates[message.messageId] ?? GlobalKey<CourierInboxListItemState>();
       Widget listItem = Column(
         children: [
           if (index > 0) widget.theme.separator ?? const SizedBox(),
@@ -546,69 +579,34 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
               }
             },
             child: CourierInboxListItem(
+              key: widget.listItemStates[message.messageId],
               theme: widget.theme,
               message: message,
+              canPerformGestures: widget.canSwipeItems,
+              onArchive: (message) => widget.onArchive?.call(message, index),
               onMessageClick: (message) {
                 message.markAsClicked();
                 widget.onMessageClick?.call(message, index);
               },
-              onMessageLongPress: (message) {
+              onMessageLongPress: widget.onMessageLongPress != null ? (message) {
                 widget.onMessageLongPress?.call(message, index);
-              },
+              } : null,
               onActionClick: (action) => widget.onActionClick?.call(action, message, index),
             ),
           ),
         ],
       );
 
-      if (widget.canSwipeItems && widget.feed == InboxFeed.feed) {
-        listItem = Dismissible(
-          key: Key(message.messageId),
-          direction: DismissDirection.horizontal,
-          movementDuration: const Duration(milliseconds: 150),
-          confirmDismiss: (direction) async {
-            HapticFeedback.mediumImpact();
-            if (direction == DismissDirection.startToEnd) {
-              // Left to right swipe - toggle read status
-              if (message.isRead) {
-                message.markAsUnread();
-              } else {
-                message.markAsRead();
-              }
-              return false; // Don't dismiss
-            }
-            return true; // Allow dismiss for right to left (archive)
-          },
-          background: Container( // Left to right background
-            color: Colors.blue,
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(left: 24.0),
-            child: Icon(
-              message.isRead ? Icons.mark_email_unread : Icons.mark_email_read,
-              color: Colors.white
-            ),
-          ),
-          secondaryBackground: Container( // Right to left background
-            color: Colors.red,
-            alignment: Alignment.centerRight, 
-            padding: const EdgeInsets.only(right: 24.0),
-            child: const Icon(Icons.archive, color: Colors.white),
-          ),
-          onDismissed: (direction) {
-            if (direction == DismissDirection.endToStart) {
-              widget.onArchive?.call(message, index);
-            }
-          },
-          child: listItem,
-        );
-      }
-
-      return listItem;
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return listItem;
+        },
+      );
     } else if (index == widget.messages.length && widget.canPaginate) {
       return Container(
         alignment: Alignment.center,
         child: Padding(
-          padding: EdgeInsets.only(top: 24, bottom: _triggerPoint),
+          padding: EdgeInsets.only(top: 24, bottom: widget.triggerPoint),
           child: SizedBox(
             height: 24,
             width: 24,
@@ -628,28 +626,30 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
-    if (widget.messages.isEmpty) {
-      return Center(
-        child: Text(
-          style: widget.theme.getInfoViewTitleStyle(context),
-          'No messages found',
-        ),
-      );
-    }
 
-    return RefreshIndicator(
-      color: widget.theme.getLoadingColor(context),
-      onRefresh: widget.onRefresh,
-      child: Scrollbar(
-        controller: widget.scrollController,
-        child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: widget.scrollController,
-          itemCount: widget.messages.length + (widget.canPaginate ? 1 : 0),
-          itemBuilder: (context, index) => _buildListItem(context, index),
+    return Stack(
+      children: [
+        RefreshIndicator(
+          color: widget.theme.getLoadingColor(context),
+          onRefresh: widget.onRefresh,
+          child: Scrollbar(
+            controller: widget.scrollController,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: widget.scrollController,
+              itemCount: widget.messages.length + (widget.canPaginate ? 1 : 0),
+              itemBuilder: (context, index) => _buildListItem(context, index),
+            ),
+          ),
         ),
-      ),
+        if (widget.messages.isEmpty)
+          Center(
+            child: Text(
+              style: widget.theme.getInfoViewTitleStyle(context),
+              'No messages found',
+            ),
+          ),
+      ],
     );
   }
 

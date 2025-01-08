@@ -56,7 +56,8 @@ class Courier extends CourierChannelManager {
         }
         case 'inbox.listener_loading': {
           String? listenerId = call.arguments['id'];
-          _inboxListeners[listenerId]?.onLoading?.call();
+          bool isRefresh = call.arguments['isRefresh'];
+          _inboxListeners[listenerId]?.onLoading?.call(isRefresh);
           break;
         }
         case 'inbox.listener_error': {
@@ -368,16 +369,16 @@ class Courier extends CourierChannelManager {
   }
 
   @override
-  Future<InboxMessageSet> fetchNextInboxPage({required InboxFeed feed}) async {
-    dynamic json = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page', {
+  Future<List<InboxMessage>> fetchNextInboxPage({required InboxFeed feed}) async {
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page', {
       'feed': feed.value,
     });
-    return InboxMessageSet.fromJson(jsonDecode(json));
+    return messages.map((message) => InboxMessage.fromJson(message)).toList();
   }
 
   @override
   Future<CourierInboxListener> addInboxListener({
-    Function? onLoading,
+    Function(bool isRefresh)? onLoading,
     Function(String error)? onError,
     Function(int unreadCount)? onUnreadCountChanged, 
     Function(InboxMessageSet messageSet)? onFeedChanged,
@@ -555,12 +556,12 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('refreshInbox() has not been implemented.');
   }
 
-  Future<InboxMessageSet> fetchNextInboxPage({required InboxFeed feed}) async {
+  Future<List<InboxMessage>> fetchNextInboxPage({required InboxFeed feed}) async {
     throw UnimplementedError('fetchNextInboxPage() has not been implemented.');
   }
 
   Future<CourierInboxListener> addInboxListener({
-    Function? onLoading,
+    Function(bool isRefresh)? onLoading,
     Function(String error)? onError,
     Function(int unreadCount)? onUnreadCountChanged, 
     Function(InboxMessageSet messageSet)? onFeedChanged,

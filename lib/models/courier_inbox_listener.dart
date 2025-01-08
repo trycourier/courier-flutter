@@ -4,7 +4,7 @@ import 'package:courier_flutter/models/inbox_message_set.dart';
 
 class CourierInboxListener {
   String listenerId;
-  Function? onLoading;
+  Function(bool isRefresh)? onLoading;
   Function(String error)? onError;
   Function(int unreadCount)? onUnreadCountChanged;
   Function(InboxMessageSet messageSet)? onFeedChanged;
