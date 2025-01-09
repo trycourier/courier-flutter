@@ -2,14 +2,16 @@ import 'package:courier_flutter/models/inbox_action.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
+import 'package:courier_flutter/ui/inbox/swipable_container.dart';
 import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class CourierInboxListItem extends StatefulWidget {
   final CourierInboxTheme theme;
   final InboxMessage message;
   final bool canPerformGestures;
+  final Function() onMessageIsVisible;
   final Function(InboxMessage) onMessageClick;
   final Function(InboxMessage)? onMessageLongPress;
   final Function(InboxAction) onActionClick;
@@ -28,6 +30,7 @@ class CourierInboxListItem extends StatefulWidget {
     required this.onArchiveButtonTrigger,
     required this.onSwipeArchiveTrigger,
     required this.onSwipeArchiveComplete,
+    required this.onMessageIsVisible,
   });
 
   @override
@@ -38,7 +41,6 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   late InboxMessage _message;
   bool get _showDotIndicator => widget.theme.unreadIndicatorStyle.indicator == CourierInboxUnreadIndicator.dot;
 
-  late final SlidableController _slideController;
   final _dismissDuration = const Duration(milliseconds: 200);
   late final AnimationController _indicatorController;
   late final Animation<double> _indicatorAnimation;
@@ -47,7 +49,6 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   void initState() {
     super.initState();
     _message = widget.message;
-    _slideController = SlidableController(this);
     _indicatorController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
@@ -61,25 +62,20 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
 
   @override 
   void dispose() {
-    _slideController.dispose();
     _indicatorController.dispose();
     super.dispose();
   }
 
   Future<void> refresh(InboxMessage newMessage) async {
-    setState(() {
-      _message = newMessage;
-    });
+    print('refresh');
   }
 
-  Future<void> dismiss({ bool shouldOpen = false }) async {
-    if (shouldOpen) {
-      await _slideController.openTo(-1, duration: _dismissDuration);
-    }
+  Future<void> enter() async {
+    print('enter');
+  }
 
-    await _slideController.dismiss(ResizeRequest(_dismissDuration, () {
-      widget.onSwipeArchiveComplete(_message);
-    }));
+  Future<void> exit() async {
+    print('exit');
   }
 
   List<Widget> _buildContent(BuildContext context, bool showUnreadStyle) {
@@ -165,46 +161,73 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   @override
   Widget build(BuildContext context) {
     final isDone = _message.isRead || _message.isArchived;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => widget.onMessageClick(_message),
-        onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
-        child: Stack(
-          children: [
-            !_showDotIndicator ? Positioned(
-              left: 2,
-              top: 2,
-              bottom: 2,
-              width: 3.0,
-              child: FadeTransition(
-                opacity: _indicatorAnimation,
-                child: Container(
-                  color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
-                ),
-              ),
-            ) : const SizedBox(),
-            Padding(
-              padding: EdgeInsets.only(
-                left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
-                right: CourierTheme.margin,
-                top: CourierTheme.margin * 0.75,
-                bottom: CourierTheme.margin * 0.75
-              ),
-              child: Row(
+    return VisibilityDetector(
+      key: Key(_message.messageId),
+      onVisibilityChanged: (VisibilityInfo info) {
+        if (info.visibleFraction > 0 && !_message.isOpened) {
+          widget.onMessageIsVisible();
+        }
+      },
+      child: SwipableContainer(
+        canPerformGestures: widget.canPerformGestures,
+        isRead: isDone,
+        readIcon: Icons.mark_email_read,
+        unreadIcon: Icons.mark_email_unread,
+        readColor: Colors.blueGrey,
+        unreadColor: Colors.blue,
+        archiveIcon: Icons.archive,
+        archiveColor: Colors.red,
+        onLeftToRightAction: () {
+          print('left to right');
+        },
+        onRightToLeftAction: () {
+          print('right to left');
+        },
+        child: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => widget.onMessageClick(_message),
+              onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
+              child: Stack(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: _buildContent(context, isDone).addSeparator(() {
-                        return const SizedBox(height: 2.0);
-                      }),
+                  !_showDotIndicator ? Positioned(
+                    left: 2,
+                    top: 2,
+                    bottom: 2,
+                    width: 3.0,
+                    child: FadeTransition(
+                      opacity: _indicatorAnimation,
+                      child: Container(
+                        color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
+                      ),
+                    ),
+                  ) : const SizedBox(),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
+                      right: CourierTheme.margin,
+                      top: CourierTheme.margin * 0.75,
+                      bottom: CourierTheme.margin * 0.75
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: _buildContent(context, isDone).addSeparator(() {
+                              return const SizedBox(height: 2.0);
+                            }),
+                          ),
+                        )
+                      ],
                     ),
                   )
                 ],
               ),
-            )
-          ],
+            ),
+          ),
         ),
       ),
     );

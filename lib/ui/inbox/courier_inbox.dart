@@ -4,6 +4,7 @@ import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_feed.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox_pagination_item.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -130,34 +131,35 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     }
   }
 
-  Future<void> addMessageAtIndex(GlobalKey<AnimatedListState> listKey, InboxMessage message, int index) async {
-    await listKey.currentState?.insertItemAwaitable(index, duration: const Duration(milliseconds: 400));
-    setState(() {});
-  }
+  // Future<void> addMessageAtIndex(GlobalKey<AnimatedListState> listKey, InboxMessage message, int index) async {
+  //   await listKey.currentState?.insertItemAwaitable(index, duration: const Duration(milliseconds: 400));
+  //   setState(() {});
+  // }
 
-  Future<void> removeMessageAtIndex(GlobalKey<AnimatedListState> listKey, InboxMessage message, int index) async {
-    Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-    final isDarkMode = currentBrightness == Brightness.dark;
-    await listKey.currentState?.removeItemAwaitable(index, (context, animation) {
-      return SizeTransition(
-        sizeFactor: animation.drive(
-          CurveTween(curve: Curves.easeInOutCubic),
-        ),
-        child: CourierInboxListItem(
-          theme: getTheme(isDarkMode),
-          message: message,
-          canPerformGestures: false,
-          onMessageClick: (message) {},
-          onMessageLongPress: null,
-          onActionClick: (action) => {},
-          onSwipeArchiveTrigger: (message) => {},
-          onSwipeArchiveComplete: (message) => {},
-          onArchiveButtonTrigger: (message) => {},
-        ),
-      );
-    }, duration: const Duration(milliseconds: 300));
-    setState(() {});
-  }
+  // Future<void> removeMessageAtIndex(GlobalKey<AnimatedListState> listKey, InboxMessage message, int index) async {
+  //   Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
+  //   final isDarkMode = currentBrightness == Brightness.dark;
+  //   await listKey.currentState?.removeItemAwaitable(index, (context, animation) {
+  //     return SizeTransition(
+  //       sizeFactor: animation.drive(
+  //         CurveTween(curve: Curves.easeInOutCubic),
+  //       ),
+  //       child: CourierInboxListItem(
+  //         theme: getTheme(isDarkMode),
+  //         message: message,
+  //         canPerformGestures: false,
+  //         onMessageIsVisible: () {},
+  //         onMessageClick: (message) {},
+  //         onMessageLongPress: null,
+  //         onActionClick: (action) => {},
+  //         onSwipeArchiveTrigger: (message) => {},
+  //         onSwipeArchiveComplete: (message) => {},
+  //         onArchiveButtonTrigger: (message) => {},
+  //       ),
+  //     );
+  //   }, duration: const Duration(milliseconds: 300));
+  //   setState(() {});
+  // }
 
   Future _start() async {
     if (mounted) {
@@ -230,57 +232,57 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         }
       },
       onMessageChanged: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          if (feed == InboxFeed.feed) {
-            if (index >= 0 && index < _feedMessages.length) {
-              setState(() {
-                _feedMessages[index] = message;
-              });
-            }
-          } else {
-            if (index >= 0 && index < _archivedMessages.length) {
-              setState(() {
-                _archivedMessages[index] = message;
-              });
-            }
-          }
-        }
+        // if (mounted && message.messageId != _dismissingMessageId) {
+        //   if (feed == InboxFeed.feed) {
+        //     if (index >= 0 && index < _feedMessages.length) {
+        //       setState(() {
+        //         _feedMessages[index] = message;
+        //       });
+        //     }
+        //   } else {
+        //     if (index >= 0 && index < _archivedMessages.length) {
+        //       setState(() {
+        //         _archivedMessages[index] = message;
+        //       });
+        //     }
+        //   }
+        // }
       },
       onMessageAdded: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          if (feed == InboxFeed.feed) {
-            if (index >= 0 && index <= _feedMessages.length) {
-              _feedMessages.insert(index, message);
-              await addMessageAtIndex(_feedListKey, message, index);
-            } else {
-              _feedMessages.insert(0, message);
-              await addMessageAtIndex(_feedListKey, message, 0);
-            }
-          } else {
-            if (index >= 0 && index <= _archivedMessages.length) {
-              _archivedMessages.insert(index, message);
-              await addMessageAtIndex(_archivedListKey, message, index);
-            } else {
-              _archivedMessages.insert(0, message);
-              await addMessageAtIndex(_archivedListKey, message, 0);
-            }
-          }
-        }
+        // if (mounted && message.messageId != _dismissingMessageId) {
+        //   if (feed == InboxFeed.feed) {
+        //     if (index >= 0 && index <= _feedMessages.length) {
+        //       _feedMessages.insert(index, message);
+        //       await addMessageAtIndex(_feedListKey, message, index);
+        //     } else {
+        //       _feedMessages.insert(0, message);
+        //       await addMessageAtIndex(_feedListKey, message, 0);
+        //     }
+        //   } else {
+        //     if (index >= 0 && index <= _archivedMessages.length) {
+        //       _archivedMessages.insert(index, message);
+        //       await addMessageAtIndex(_archivedListKey, message, index);
+        //     } else {
+        //       _archivedMessages.insert(0, message);
+        //       await addMessageAtIndex(_archivedListKey, message, 0);
+        //     }
+        //   }
+        // }
       },
       onMessageRemoved: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          if (feed == InboxFeed.feed) {
-            if (index >= 0 && index < _feedMessages.length) {
-              _feedMessages.removeAt(index);
-              await removeMessageAtIndex(_feedListKey, message, index);
-            }
-          } else {
-            if (index >= 0 && index < _archivedMessages.length) {
-              _archivedMessages.removeAt(index);
-              await removeMessageAtIndex(_archivedListKey, message, index);
-            }
-          }
-        }
+        // if (mounted && message.messageId != _dismissingMessageId) {
+        //   if (feed == InboxFeed.feed) {
+        //     if (index >= 0 && index < _feedMessages.length) {
+        //       _feedMessages.removeAt(index);
+        //       await removeMessageAtIndex(_feedListKey, message, index);
+        //     }
+        //   } else {
+        //     if (index >= 0 && index < _archivedMessages.length) {
+        //       _archivedMessages.removeAt(index);
+        //       await removeMessageAtIndex(_archivedListKey, message, index);
+        //     }
+        //   }
+        // }
       },
     );
   }
@@ -562,15 +564,9 @@ class CourierMessageList extends StatefulWidget {
 }
 
 class _CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
-  bool _paginationItemVisible = false;
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Widget _buildMessageItem(BuildContext context, InboxMessage message, int index) {
     // final sizeAnimation = CurvedAnimation(
@@ -586,34 +582,25 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
     return Column(
       children: [
         if (index > 0) widget.theme.separator ?? const SizedBox(),
-        VisibilityDetector(
-          key: Key(message.messageId),
-          onVisibilityChanged: (VisibilityInfo info) {
-            if (info.visibleFraction > 0 && !message.isOpened) {
-              message.markAsOpened().then((value) {
-                Courier.log('Message opened: ${message.messageId}');
-              });
-            }
+        CourierInboxListItem(
+          theme: widget.theme,
+          message: message,
+          canPerformGestures: widget.canSwipeItems,
+          onMessageIsVisible: () {
+            message.markAsOpened().then((value) {
+              Courier.log('Message opened: ${message.messageId}');
+            });
           },
-          child: CourierInboxListItem(
-            theme: widget.theme,
-            message: message,
-            canPerformGestures: widget.canSwipeItems,
-            onMessageClick: (message) {
-              message.markAsClicked();
-              widget.onMessageClick?.call(message, index);
-            },
-            onMessageLongPress: widget.onMessageLongPress != null 
-                ? (message) {
-                    widget.onMessageLongPress?.call(message, index);
-                  } 
-                : null,
-            onActionClick: (action) => widget.onActionClick?.call(action, message, index),
-            onSwipeArchiveTrigger: (message) => widget.onSwipeArchiveTrigger(message, index),
-            onSwipeArchiveComplete: (message) => widget.onSwipeArchiveComplete(message, index),
-            onArchiveButtonTrigger: (message) => widget.onArchiveButtonTrigger(message, index),
-          ),
-        ),
+          onMessageClick: (message) {
+            message.markAsClicked();
+            widget.onMessageClick?.call(message, index);
+          },
+          onMessageLongPress: widget.onMessageLongPress != null ? (message) => widget.onMessageLongPress?.call(message, index) : null,
+          onActionClick: (action) => widget.onActionClick?.call(action, message, index),
+          onSwipeArchiveTrigger: (message) => widget.onSwipeArchiveTrigger(message, index),
+          onSwipeArchiveComplete: (message) => widget.onSwipeArchiveComplete(message, index),
+          onArchiveButtonTrigger: (message) => widget.onArchiveButtonTrigger(message, index),
+        )
       ],
     );
   }
@@ -622,31 +609,12 @@ class _CourierMessageListState extends State<CourierMessageList> with AutomaticK
     if (index < widget.messages.length) {
       return _buildMessageItem(context, widget.messages[index], index);
     } else if (index == widget.messages.length && widget.canPaginate) {
-      return VisibilityDetector(
-        key: const Key('pagination-item'),
-        onVisibilityChanged: (VisibilityInfo info) {
-          if (info.visibleFraction > 0 && !_paginationItemVisible && !widget.isPaginating && widget.canPaginate) {
-            _paginationItemVisible = true;
-            widget.onPaginationTriggered();
-          } else if (info.visibleFraction == 0) {
-            _paginationItemVisible = false;
-          }
-        },
-        child: Container(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: EdgeInsets.only(top: 24, bottom: widget.triggerPoint),
-            child: SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    widget.theme.getLoadingColor(context)),
-              ),
-            ),
-          ),
-        ),
+      return CourierInboxPaginationItem(
+        isPaginating: widget.isPaginating,
+        canPaginate: widget.canPaginate,
+        onPaginationTriggered: widget.onPaginationTriggered,
+        triggerPoint: widget.triggerPoint,
+        loadingColor: widget.theme.getLoadingColor(context),
       );
     } else {
       return const SizedBox.shrink();
