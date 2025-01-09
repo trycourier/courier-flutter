@@ -44,6 +44,8 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   final _dismissDuration = const Duration(milliseconds: 200);
   late final AnimationController _indicatorController;
   late final Animation<double> _indicatorAnimation;
+  final GlobalKey<SwipableContainerState> _swipableContainerKey = GlobalKey<SwipableContainerState>();
+
 
   @override
   void initState() {
@@ -169,6 +171,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
         }
       },
       child: SwipableContainer(
+        key: _swipableContainerKey,
         canPerformGestures: widget.canPerformGestures,
         isRead: isDone,
         readIcon: Icons.mark_email_read,
@@ -179,8 +182,10 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
         archiveColor: Colors.red,
         onLeftToRightAction: () {
           print('left to right');
+          // _controller.create();
         },
-        onRightToLeftAction: () {
+        onRightToLeftAction: () async {
+          // await _swipableContainerKey.currentState?.simulateRightToLeftSwipe();
           print('right to left');
         },
         child: Container(
@@ -188,7 +193,10 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => widget.onMessageClick(_message),
+              // onTap: () => widget.onMessageClick(_message),
+              onTap: () async {
+                await _swipableContainerKey.currentState?.simulateRightToLeftSwipe();
+              },
               onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
               child: Stack(
                 children: [

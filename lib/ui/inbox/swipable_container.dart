@@ -16,6 +16,7 @@ class SwipableContainer extends StatefulWidget {
   final Function() onLeftToRightAction;
   final Function() onRightToLeftAction;
   final Duration animationDuration;
+  final Duration swipeOutDuration;
 
   const SwipableContainer({
     super.key,
@@ -32,16 +33,17 @@ class SwipableContainer extends StatefulWidget {
     required this.onRightToLeftAction,
     this.actionThreshold = 0.25,
     this.animationDuration = const Duration(milliseconds: 200),
+    this.swipeOutDuration = const Duration(milliseconds: 200),
   });
 
   @override
-  State<SwipableContainer> createState() => _SwipableContainerState();
+  State<SwipableContainer> createState() => SwipableContainerState();
 }
 
-class _SwipableContainerState extends State<SwipableContainer> with TickerProviderStateMixin {
+class SwipableContainerState extends State<SwipableContainer> with TickerProviderStateMixin {
   late AnimationController _gestureController;
   late AnimationController _bounceController;
-  late Animation<Offset> _animation;
+  late Animation<Offset> _gestureAnimation;
   late Animation<double> _bounceAnimation;
   double _actionWidth = 0;
   double _dragExtent = 0;
@@ -64,7 +66,7 @@ class _SwipableContainerState extends State<SwipableContainer> with TickerProvid
       duration: const Duration(milliseconds: 200),
     );
 
-    _animation = Tween<Offset>(
+    _gestureAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: Offset.zero,
     ).animate(_gestureController);
@@ -79,10 +81,11 @@ class _SwipableContainerState extends State<SwipableContainer> with TickerProvid
       final size = context.size;
       if (size == null) return;
       setState(() {
-        _actionWidth = size.width * _animation.value.dx.abs();
+        _actionWidth = size.width * _gestureAnimation.value.dx.abs();
         _thresholdWidth = size.width * widget.actionThreshold;
       });
     });
+    
   }
 
   @override
@@ -99,6 +102,35 @@ class _SwipableContainerState extends State<SwipableContainer> with TickerProvid
     _gestureController.stop();
     _dragExtent = 0;
     _iconScale = 0;
+  }
+
+  Future<void> simulateRightToLeftSwipe({Duration? duration}) async {
+    final size = context.size;
+    if (size == null) return;
+    final width = size.width;
+
+    _dragUnderway = true;
+    _hasTriggeredHaptic = false;
+    _gestureController.stop();
+    _dragExtent = -width; // Animate to full width
+    _iconScale = 1.0;
+
+    setState(() {
+      _gestureAnimation = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(-1.0, 0), // Move full width to the left
+      ).animate(CurvedAnimation(
+        parent: _gestureController,
+        curve: Curves.easeInOut,
+      ));
+    });
+
+    await _gestureController.animateTo(1.0, duration: duration ?? widget.swipeOutDuration);
+
+    if (!_hasTriggeredHaptic) {
+      didReachThreshold();
+      _hasTriggeredHaptic = true;
+    }
   }
 
   void didReachThreshold() {
@@ -137,7 +169,7 @@ class _SwipableContainerState extends State<SwipableContainer> with TickerProvid
     _iconScale = _iconScale.clamp(0.0, 1.0);
     
     setState(() {
-      _animation = Tween<Offset>(
+      _gestureAnimation = Tween<Offset>(
         begin: Offset.zero,
         end: Offset(_dragExtent / width, 0),
       ).animate(CurvedAnimation(
@@ -160,22 +192,51 @@ class _SwipableContainerState extends State<SwipableContainer> with TickerProvid
     if (_dragExtent.abs() > threshold) {
       if (_dragExtent > 0) {
         widget.onLeftToRightAction();
+        setState(() {
+          _gestureAnimation = Tween<Offset>(
+            begin: Offset(_dragExtent / width, 0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _gestureController,
+            curve: Curves.easeOut,
+          ));
+        });
+        _gestureController.forward(from: 0);
       } else if (_dragExtent < 0) {
-        widget.onRightToLeftAction();
+        // Calculate duration based on velocity
+        final velocity = details.primaryVelocity?.abs() ?? 0;
+        final baseDuration = widget.swipeOutDuration.inMilliseconds;
+        final velocityAdjustedDuration = velocity > 0 
+          ? (baseDuration * (1000 / velocity)).clamp(100, baseDuration).toInt()
+          : baseDuration;
+          
+        setState(() {
+          _gestureAnimation = Tween<Offset>(
+            begin: Offset(_dragExtent / width, 0),
+            end: const Offset(-1.0, 0),
+          ).animate(CurvedAnimation(
+            parent: _gestureController,
+            curve: Curves.linear,
+          ));
+        });
+
+        _gestureController.duration = Duration(milliseconds: velocityAdjustedDuration);
+        _gestureController.forward(from: 0).then((_) {
+          widget.onRightToLeftAction();
+        });
       }
+    } else {
+      setState(() {
+        _gestureAnimation = Tween<Offset>(
+          begin: Offset(_dragExtent / width, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: _gestureController,
+          curve: Curves.easeOut,
+        ));
+      });
+      _gestureController.forward(from: 0);
     }
-
-    setState(() {
-      _animation = Tween<Offset>(
-        begin: Offset(_dragExtent / width, 0),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: _gestureController,
-        curve: Curves.easeOut,
-      ));
-    });
-
-    _gestureController.forward(from: 0);
   }
 
   @override
@@ -240,7 +301,7 @@ class _SwipableContainerState extends State<SwipableContainer> with TickerProvid
           onHorizontalDragUpdate: widget.canPerformGestures ? _handleDragUpdate : null,
           onHorizontalDragEnd: widget.canPerformGestures ? _handleDragEnd : null,
           child: SlideTransition(
-            position: _animation,
+            position: _gestureAnimation,
             child: widget.child,
           ),
         ),
