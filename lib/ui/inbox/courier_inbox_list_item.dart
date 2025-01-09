@@ -4,7 +4,6 @@ import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class CourierInboxListItem extends StatefulWidget {
@@ -166,94 +165,138 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   @override
   Widget build(BuildContext context) {
     final isDone = _message.isRead || _message.isArchived;
-    return Slidable(
-      key: Key(_message.messageId),
-      enabled: widget.canPerformGestures,
-      controller: _slideController,
-      startActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          SlidableAction(
-            onPressed: (_) => widget.onMessageClick(_message),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            icon: isDone ? Icons.mark_email_read : Icons.mark_email_unread,
-            label: isDone ? 'Mark Read' : 'Mark Unread',
-          ),
-        ],
-      ),
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        dismissible: DismissiblePane(
-          dismissalDuration: _dismissDuration,
-          confirmDismiss: () async {
-            HapticFeedback.mediumImpact();
-            widget.onSwipeArchiveTrigger(_message);
-            return true;
-          },
-          onDismissed: () {
-            widget.onSwipeArchiveComplete(_message);
-          },
-        ),
-        children: [
-          SlidableAction(
-            autoClose: false,
-            onPressed: (_) async {
-              HapticFeedback.mediumImpact();
-              await _slideController.openTo(-1, duration: _dismissDuration);
-              widget.onArchiveButtonTrigger(_message);
-            },
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            icon: Icons.archive,
-            label: 'Archive',
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => widget.onMessageClick(_message),
-          onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
-          child: Stack(
-            children: [
-              !_showDotIndicator ? Positioned(
-                left: 2,
-                top: 2,
-                bottom: 2,
-                width: 3.0,
-                child: FadeTransition(
-                  opacity: _indicatorAnimation,
-                  child: Container(
-                    color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
-                  ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => widget.onMessageClick(_message),
+        onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
+        child: Stack(
+          children: [
+            !_showDotIndicator ? Positioned(
+              left: 2,
+              top: 2,
+              bottom: 2,
+              width: 3.0,
+              child: FadeTransition(
+                opacity: _indicatorAnimation,
+                child: Container(
+                  color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
                 ),
-              ) : const SizedBox(),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
-                  right: CourierTheme.margin,
-                  top: CourierTheme.margin * 0.75,
-                  bottom: CourierTheme.margin * 0.75
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: _buildContent(context, isDone).addSeparator(() {
-                          return const SizedBox(height: 2.0);
-                        }),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
+              ),
+            ) : const SizedBox(),
+            Padding(
+              padding: EdgeInsets.only(
+                left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
+                right: CourierTheme.margin,
+                top: CourierTheme.margin * 0.75,
+                bottom: CourierTheme.margin * 0.75
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: _buildContent(context, isDone).addSeparator(() {
+                        return const SizedBox(height: 2.0);
+                      }),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
+
+    // return Slidable(
+    //   key: Key(_message.messageId),
+    //   enabled: widget.canPerformGestures,
+    //   controller: _slideController,
+    //   startActionPane: ActionPane(
+    //     motion: const ScrollMotion(),
+    //     children: [
+    //       SlidableAction(
+    //         onPressed: (_) => widget.onMessageClick(_message),
+    //         backgroundColor: Colors.blue,
+    //         foregroundColor: Colors.white,
+    //         icon: isDone ? Icons.mark_email_read : Icons.mark_email_unread,
+    //         label: isDone ? 'Mark Read' : 'Mark Unread',
+    //       ),
+    //     ],
+    //   ),
+    //   endActionPane: ActionPane(
+    //     motion: const ScrollMotion(),
+    //     dismissible: DismissiblePane(
+    //       dismissalDuration: _dismissDuration,
+    //       confirmDismiss: () async {
+    //         HapticFeedback.mediumImpact();
+    //         widget.onSwipeArchiveTrigger(_message);
+    //         return true;
+    //       },
+    //       onDismissed: () {
+    //         widget.onSwipeArchiveComplete(_message);
+    //       },
+    //     ),
+    //     children: [
+    //       SlidableAction(
+    //         autoClose: false,
+    //         onPressed: (_) async {
+    //           HapticFeedback.mediumImpact();
+    //           await _slideController.openTo(-1, duration: _dismissDuration);
+    //           widget.onArchiveButtonTrigger(_message);
+    //         },
+    //         backgroundColor: Colors.red,
+    //         foregroundColor: Colors.white,
+    //         icon: Icons.archive,
+    //         label: 'Archive',
+    //       ),
+    //     ],
+    //   ),
+    //   child: Material(
+    //     color: Colors.transparent,
+    //     child: InkWell(
+    //       onTap: () => widget.onMessageClick(_message),
+    //       onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
+    //       child: Stack(
+    //         children: [
+    //           !_showDotIndicator ? Positioned(
+    //             left: 2,
+    //             top: 2,
+    //             bottom: 2,
+    //             width: 3.0,
+    //             child: FadeTransition(
+    //               opacity: _indicatorAnimation,
+    //               child: Container(
+    //                 color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
+    //               ),
+    //             ),
+    //           ) : const SizedBox(),
+    //           Padding(
+    //             padding: EdgeInsets.only(
+    //               left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
+    //               right: CourierTheme.margin,
+    //               top: CourierTheme.margin * 0.75,
+    //               bottom: CourierTheme.margin * 0.75
+    //             ),
+    //             child: Row(
+    //               children: [
+    //                 Expanded(
+    //                   child: Column(
+    //                     crossAxisAlignment: CrossAxisAlignment.stretch,
+    //                     children: _buildContent(context, isDone).addSeparator(() {
+    //                       return const SizedBox(height: 2.0);
+    //                     }),
+    //                   ),
+    //                 )
+    //               ],
+    //             ),
+    //           )
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
 

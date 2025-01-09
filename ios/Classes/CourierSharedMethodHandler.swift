@@ -244,9 +244,9 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let inboxFeed: InboxMessageFeed = feed == "archived" ? .archived : .feed
                     
-                    let messages = try await Courier.shared.fetchNextInboxPage(inboxFeed)
+                    let messageSet = try await Courier.shared.fetchNextInboxPage(inboxFeed)
                     
-                    let json = try messages.map { try $0.toJson() ?? "" }
+                    let json = try messageSet.map { try $0.toJson() ?? "" }
                     
                     result(json)
                     

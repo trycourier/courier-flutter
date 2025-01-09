@@ -369,11 +369,15 @@ class Courier extends CourierChannelManager {
   }
 
   @override
-  Future<InboxMessageSet> fetchNextInboxPage({required InboxFeed feed}) async {
+  Future<InboxMessageSet?> fetchNextInboxPage({required InboxFeed feed}) async {
     dynamic json = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page', {
       'feed': feed.value,
     });
-    return InboxMessageSet.fromJson(jsonDecode(json));
+    try {
+      return InboxMessageSet.fromJson(jsonDecode(json));
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -556,7 +560,7 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('refreshInbox() has not been implemented.');
   }
 
-  Future<InboxMessageSet> fetchNextInboxPage({required InboxFeed feed}) async {
+  Future<InboxMessageSet?> fetchNextInboxPage({required InboxFeed feed}) async {
     throw UnimplementedError('fetchNextInboxPage() has not been implemented.');
   }
 
