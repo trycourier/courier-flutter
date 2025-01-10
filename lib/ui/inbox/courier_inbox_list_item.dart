@@ -15,9 +15,8 @@ class CourierInboxListItem extends StatefulWidget {
   final Function(InboxMessage) onMessageClick;
   final Function(InboxMessage)? onMessageLongPress;
   final Function(InboxAction) onActionClick;
-  final Function(InboxMessage) onSwipeArchiveTrigger;
-  final Function(InboxMessage) onSwipeArchiveComplete;
-  final Function(InboxMessage) onArchiveButtonTrigger;
+  final Function(InboxMessage) onReadGesture;
+  final Function(InboxMessage) onArchiveGesture;
 
   const CourierInboxListItem({
     super.key,
@@ -27,10 +26,9 @@ class CourierInboxListItem extends StatefulWidget {
     required this.onMessageLongPress,
     required this.onActionClick,
     required this.canPerformGestures,
-    required this.onArchiveButtonTrigger,
-    required this.onSwipeArchiveTrigger,
-    required this.onSwipeArchiveComplete,
     required this.onMessageIsVisible,
+    required this.onReadGesture,
+    required this.onArchiveGesture,
   });
 
   @override
@@ -41,43 +39,106 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   late InboxMessage _message;
   bool get _showDotIndicator => widget.theme.unreadIndicatorStyle.indicator == CourierInboxUnreadIndicator.dot;
 
-  final _dismissDuration = const Duration(milliseconds: 200);
   late final AnimationController _indicatorController;
   late final Animation<double> _indicatorAnimation;
+  late final AnimationController _enterController;
+  late final Animation<double> _enterSizeAnimation;
+  late final Animation<double> _enterSlideAnimation;
+  late final AnimationController _exitController; 
+  late final Animation<double> _exitSizeAnimation;
   final GlobalKey<SwipableContainerState> _swipableContainerKey = GlobalKey<SwipableContainerState>();
 
+  static const _exitDuration = Duration(milliseconds: 200);
+  static const _enterDuration = Duration(milliseconds: 400);
+  static const _indicatorDuration = Duration(milliseconds: 100);
 
   @override
   void initState() {
     super.initState();
     _message = widget.message;
+    
+    // Initialize indicator animation
     _indicatorController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: _indicatorDuration,
       value: 1.0,
     );
     _indicatorAnimation = CurvedAnimation(
       parent: _indicatorController,
       curve: Curves.easeInOut,
     );
+
+    // Initialize enter animation
+    _enterController = AnimationController(
+      vsync: this, 
+      duration: _enterDuration,
+      value: 1.0,
+    );
+    
+    // First half of animation - size change
+    _enterSizeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _enterController,
+      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+    ));
+
+    // Second half of animation - slide in
+    _enterSlideAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _enterController,
+      curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+    ));
+
+    // Initialize exit animation
+    _exitController = AnimationController(
+      vsync: this,
+      duration: _exitDuration,
+    );
+    
+    // Exit animation - size change (opposite of enter animation)
+    _exitSizeAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _exitController,
+      curve: Curves.easeIn,
+    ));
+    
   }
 
   @override 
   void dispose() {
     _indicatorController.dispose();
+    _enterController.dispose();
+    _exitController.dispose();
     super.dispose();
   }
 
   Future<void> refresh(InboxMessage newMessage) async {
-    print('refresh');
+    setState(() {
+      _message = newMessage;
+    });
   }
 
   Future<void> enter() async {
-    print('enter');
+    _enterController.value = 0.0;
+    return _enterController.forward();
+  }
+
+  Future<void> dismiss() async {
+    _exitController.value = 0.0;
+    return _exitController.forward();
   }
 
   Future<void> exit() async {
-    print('exit');
+    await Future.wait([
+      _swipableContainerKey.currentState?.simulateRightToLeftSwipe() ?? Future.value(),
+      dismiss()
+    ]);
   }
 
   List<Widget> _buildContent(BuildContext context, bool showUnreadStyle) {
@@ -163,176 +224,90 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   @override
   Widget build(BuildContext context) {
     final isDone = _message.isRead || _message.isArchived;
-    return VisibilityDetector(
-      key: Key(_message.messageId),
-      onVisibilityChanged: (VisibilityInfo info) {
-        if (info.visibleFraction > 0 && !_message.isOpened) {
-          widget.onMessageIsVisible();
-        }
-      },
-      child: SwipableContainer(
-        key: _swipableContainerKey,
-        canPerformGestures: widget.canPerformGestures,
-        isRead: isDone,
-        readIcon: Icons.mark_email_read,
-        unreadIcon: Icons.mark_email_unread,
-        readColor: Colors.blueGrey,
-        unreadColor: Colors.blue,
-        archiveIcon: Icons.archive,
-        archiveColor: Colors.red,
-        onLeftToRightAction: () {
-          print('left to right');
-          // _controller.create();
-        },
-        onRightToLeftAction: () async {
-          // await _swipableContainerKey.currentState?.simulateRightToLeftSwipe();
-          print('right to left');
-        },
-        child: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              // onTap: () => widget.onMessageClick(_message),
-              onTap: () async {
-                await _swipableContainerKey.currentState?.simulateRightToLeftSwipe();
-              },
-              onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
-              child: Stack(
-                children: [
-                  !_showDotIndicator ? Positioned(
-                    left: 2,
-                    top: 2,
-                    bottom: 2,
-                    width: 3.0,
-                    child: FadeTransition(
-                      opacity: _indicatorAnimation,
-                      child: Container(
-                        color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
+    return AnimatedBuilder(
+      animation: Listenable.merge([_enterSizeAnimation, _enterSlideAnimation, _exitSizeAnimation]),
+      builder: (context, child) {
+        return SizeTransition(
+          sizeFactor: _exitSizeAnimation,
+          child: SizeTransition(
+            sizeFactor: _enterSizeAnimation,
+            axisAlignment: 1.0,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset.zero,
+                end: const Offset(1.0, 0.0),
+              ).animate(_enterSlideAnimation),
+              child: VisibilityDetector(
+                key: Key(_message.messageId),
+                onVisibilityChanged: (VisibilityInfo info) {
+                  if (info.visibleFraction > 0 && !_message.isOpened) {
+                    widget.onMessageIsVisible();
+                  }
+                },
+                child: SwipableContainer(
+                  key: _swipableContainerKey,
+                  canPerformGestures: widget.canPerformGestures,
+                  isRead: isDone,
+                  readIcon: Icons.mark_email_read,
+                  unreadIcon: Icons.mark_email_unread,
+                  readColor: Colors.blueGrey,
+                  unreadColor: Colors.blue,
+                  archiveIcon: Icons.archive,
+                  archiveColor: Colors.red,
+                  onLeftToRightAction: () => widget.onReadGesture(_message),
+                  onRightToLeftAction: () => widget.onArchiveGesture(_message),
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => widget.onMessageClick(_message),
+                        onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
+                        child: Stack(
+                          children: [
+                            !_showDotIndicator ? Positioned(
+                              left: 2,
+                              top: 2,
+                              bottom: 2,
+                              width: 3.0,
+                              child: FadeTransition(
+                                opacity: _indicatorAnimation,
+                                child: Container(
+                                  color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
+                                ),
+                              ),
+                            ) : const SizedBox(),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
+                                right: CourierTheme.margin,
+                                top: CourierTheme.margin * 0.75,
+                                bottom: CourierTheme.margin * 0.75
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: _buildContent(context, isDone).addSeparator(() {
+                                        return const SizedBox(height: 2.0);
+                                      }),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ) : const SizedBox(),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
-                      right: CourierTheme.margin,
-                      top: CourierTheme.margin * 0.75,
-                      bottom: CourierTheme.margin * 0.75
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: _buildContent(context, isDone).addSeparator(() {
-                              return const SizedBox(height: 2.0);
-                            }),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }
     );
-
-    // return Slidable(
-    //   key: Key(_message.messageId),
-    //   enabled: widget.canPerformGestures,
-    //   controller: _slideController,
-    //   startActionPane: ActionPane(
-    //     motion: const ScrollMotion(),
-    //     children: [
-    //       SlidableAction(
-    //         onPressed: (_) => widget.onMessageClick(_message),
-    //         backgroundColor: Colors.blue,
-    //         foregroundColor: Colors.white,
-    //         icon: isDone ? Icons.mark_email_read : Icons.mark_email_unread,
-    //         label: isDone ? 'Mark Read' : 'Mark Unread',
-    //       ),
-    //     ],
-    //   ),
-    //   endActionPane: ActionPane(
-    //     motion: const ScrollMotion(),
-    //     dismissible: DismissiblePane(
-    //       dismissalDuration: _dismissDuration,
-    //       confirmDismiss: () async {
-    //         HapticFeedback.mediumImpact();
-    //         widget.onSwipeArchiveTrigger(_message);
-    //         return true;
-    //       },
-    //       onDismissed: () {
-    //         widget.onSwipeArchiveComplete(_message);
-    //       },
-    //     ),
-    //     children: [
-    //       SlidableAction(
-    //         autoClose: false,
-    //         onPressed: (_) async {
-    //           HapticFeedback.mediumImpact();
-    //           await _slideController.openTo(-1, duration: _dismissDuration);
-    //           widget.onArchiveButtonTrigger(_message);
-    //         },
-    //         backgroundColor: Colors.red,
-    //         foregroundColor: Colors.white,
-    //         icon: Icons.archive,
-    //         label: 'Archive',
-    //       ),
-    //     ],
-    //   ),
-    //   child: Material(
-    //     color: Colors.transparent,
-    //     child: InkWell(
-    //       onTap: () => widget.onMessageClick(_message),
-    //       onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
-    //       child: Stack(
-    //         children: [
-    //           !_showDotIndicator ? Positioned(
-    //             left: 2,
-    //             top: 2,
-    //             bottom: 2,
-    //             width: 3.0,
-    //             child: FadeTransition(
-    //               opacity: _indicatorAnimation,
-    //               child: Container(
-    //                 color: isDone ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context)
-    //               ),
-    //             ),
-    //           ) : const SizedBox(),
-    //           Padding(
-    //             padding: EdgeInsets.only(
-    //               left: !_showDotIndicator ? CourierTheme.margin : CourierTheme.margin * 1.5,
-    //               right: CourierTheme.margin,
-    //               top: CourierTheme.margin * 0.75,
-    //               bottom: CourierTheme.margin * 0.75
-    //             ),
-    //             child: Row(
-    //               children: [
-    //                 Expanded(
-    //                   child: Column(
-    //                     crossAxisAlignment: CrossAxisAlignment.stretch,
-    //                     children: _buildContent(context, isDone).addSeparator(() {
-    //                       return const SizedBox(height: 2.0);
-    //                     }),
-    //                   ),
-    //                 )
-    //               ],
-    //             ),
-    //           )
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
-}
-
-enum SlideDirection {
-  fromLeft,
-  fromRight,
-  fade,
 }
