@@ -17,6 +17,8 @@ class CourierInboxListItem extends StatefulWidget {
   final Function(InboxAction) onActionClick;
   final Function(InboxMessage) onReadGesture;
   final Function(InboxMessage) onArchiveGesture;
+  final bool shouldPerformEnterAnimationOnCreate;
+  final Function() onEnterAnimationFinished;
 
   const CourierInboxListItem({
     super.key,
@@ -29,6 +31,8 @@ class CourierInboxListItem extends StatefulWidget {
     required this.onMessageIsVisible,
     required this.onReadGesture,
     required this.onArchiveGesture,
+    required this.shouldPerformEnterAnimationOnCreate,
+    required this.onEnterAnimationFinished,
   });
 
   @override
@@ -72,7 +76,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
     _enterController = AnimationController(
       vsync: this, 
       duration: _enterDuration,
-      value: 1.0,
+      value: widget.shouldPerformEnterAnimationOnCreate ? 0.0 : 1.0,
     );
     
     // First half of animation - size change
@@ -107,6 +111,12 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       parent: _exitController,
       curve: Curves.easeIn,
     ));
+
+    if (widget.shouldPerformEnterAnimationOnCreate && mounted) {
+      enter().then((value) {
+        widget.onEnterAnimationFinished();
+      });
+    }
     
   }
 
@@ -119,24 +129,30 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   }
 
   Future<void> refresh(InboxMessage newMessage) async {
+    if (!mounted) return;
     setState(() {
       _message = newMessage;
     });
   }
 
-  Future<void> enter() async {
+  Future<void> enter({Duration duration = _enterDuration}) async {
+    if (!mounted) return;
+    _enterController.duration = duration;
     _enterController.value = 0.0;
     return _enterController.forward();
   }
 
-  Future<void> dismiss() async {
+  Future<void> dismiss({Duration duration = _exitDuration}) async {
+    if (!mounted) return;
+    _exitController.duration = duration;
     _exitController.value = 0.0;
     return _exitController.forward();
   }
 
   Future<void> exit() async {
+    if (!mounted) return;
     await Future.wait([
-      _swipableContainerKey.currentState?.simulateRightToLeftSwipe() ?? Future.value(),
+      _swipableContainerKey.currentState?.animateRightToLeft() ?? Future.value(),
       dismiss()
     ]);
   }

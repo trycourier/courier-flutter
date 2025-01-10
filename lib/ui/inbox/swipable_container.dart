@@ -16,7 +16,6 @@ class SwipableContainer extends StatefulWidget {
   final Function() onLeftToRightAction;
   final Function() onRightToLeftAction;
   final Duration animationDuration;
-  final Duration swipeOutDuration;
 
   const SwipableContainer({
     super.key,
@@ -33,7 +32,6 @@ class SwipableContainer extends StatefulWidget {
     required this.onRightToLeftAction,
     this.actionThreshold = 0.25,
     this.animationDuration = const Duration(milliseconds: 200),
-    this.swipeOutDuration = const Duration(milliseconds: 200),
   });
 
   @override
@@ -104,33 +102,27 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
     _iconScale = 0;
   }
 
-  Future<void> simulateRightToLeftSwipe({Duration? duration}) async {
+  Future<void> animateRightToLeft({Duration duration = const Duration(milliseconds: 200)}) async {
     final size = context.size;
     if (size == null) return;
     final width = size.width;
 
-    _dragUnderway = true;
-    _hasTriggeredHaptic = false;
     _gestureController.stop();
-    _dragExtent = -width; // Animate to full width
+    final currentOffset = _dragExtent / width;
     _iconScale = 1.0;
 
     setState(() {
       _gestureAnimation = Tween<Offset>(
-        begin: Offset.zero,
-        end: const Offset(-1.0, 0), // Move full width to the left
+        begin: Offset(currentOffset, 0),
+        end: const Offset(-1.0, 0),
       ).animate(CurvedAnimation(
         parent: _gestureController,
-        curve: Curves.easeInOut,
+        curve: Curves.easeOut,
       ));
     });
 
-    await _gestureController.animateTo(1.0, duration: duration ?? widget.swipeOutDuration);
-
-    if (!_hasTriggeredHaptic) {
-      didReachThreshold();
-      _hasTriggeredHaptic = true;
-    }
+    _gestureController.duration = duration;
+    await _gestureController.forward(from: 0);
   }
 
   void didReachThreshold() {
@@ -203,27 +195,7 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
         });
         _gestureController.forward(from: 0);
       } else if (_dragExtent < 0) {
-        // Calculate duration based on velocity
-        final velocity = details.primaryVelocity?.abs() ?? 0;
-        final baseDuration = widget.swipeOutDuration.inMilliseconds;
-        final velocityAdjustedDuration = velocity > 0 
-          ? (baseDuration * (1000 / velocity)).clamp(100, baseDuration).toInt()
-          : baseDuration;
-          
-        setState(() {
-          _gestureAnimation = Tween<Offset>(
-            begin: Offset(_dragExtent / width, 0),
-            end: const Offset(-1.0, 0),
-          ).animate(CurvedAnimation(
-            parent: _gestureController,
-            curve: Curves.linear,
-          ));
-        });
-
-        _gestureController.duration = Duration(milliseconds: velocityAdjustedDuration);
-        _gestureController.forward(from: 0).then((_) {
-          widget.onRightToLeftAction();
-        });
+        widget.onRightToLeftAction();
       }
     } else {
       setState(() {

@@ -8,10 +8,7 @@ import 'package:courier_flutter/ui/inbox/courier_inbox_pagination_item.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'courier_inbox_list_item.dart';
-import 'package:courier_flutter/utils.dart';
 
 class CourierInbox extends StatefulWidget {
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
@@ -551,23 +548,22 @@ class CourierMessageList extends StatefulWidget {
 
 class CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
   final Map<String, GlobalKey<CourierInboxListItemState>> _listItemKeys = {};
+  int? _newMessageIndex;
 
   @override
   bool get wantKeepAlive => true;
 
   Future<void> addMessageAtIndex(InboxMessage message, int index) async {
     setState(() {
+      _newMessageIndex = index;
       widget.messages.insert(index, message);
       _listItemKeys[message.messageId] = GlobalKey<CourierInboxListItemState>();
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _listItemKeys[message.messageId]?.currentState?.enter();
     });
   }
 
   Future<void> removeMessageAtIndex(int index) async {
     final message = widget.messages[index];
-    await _listItemKeys[message.messageId]?.currentState?.dismiss();
+    await _listItemKeys[message.messageId]?.currentState?.exit();
     setState(() {
       widget.messages.removeAt(index);
       _listItemKeys.remove(message.messageId);
@@ -581,9 +577,7 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
   }
 
   Widget _buildMessageItem(BuildContext context, InboxMessage message, int index) {
-    // Create key if it doesn't exist
     _listItemKeys.putIfAbsent(message.messageId, () => GlobalKey<CourierInboxListItemState>());
-
     return Column(
       children: [
         if (index > 0) widget.theme.separator ?? const SizedBox(),
@@ -592,6 +586,12 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
           theme: widget.theme,
           message: message,
           canPerformGestures: widget.canSwipeItems,
+          shouldPerformEnterAnimationOnCreate: _newMessageIndex == index,
+          onEnterAnimationFinished: () {
+            setState(() {
+              _newMessageIndex = null;
+            });
+          },
           onMessageIsVisible: () {
             message.markAsOpened().then((value) {
               Courier.log('Message opened: ${message.messageId}');
