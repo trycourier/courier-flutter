@@ -102,7 +102,7 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
     _iconScale = 0;
   }
 
-  Future<void> animateRightToLeft({Duration duration = const Duration(milliseconds: 200)}) async {
+  Future<void> animateRightToLeft() async {
     final size = context.size;
     if (size == null) return;
     final width = size.width;
@@ -111,17 +111,23 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
     final currentOffset = _dragExtent / width;
     _iconScale = 1.0;
 
+    // Calculate velocity-based duration
+    const velocity = 2.0; // Pixels per millisecond
+    final distance = width * (1.0 + currentOffset); // Distance to travel
+    final velocityDuration = (distance / velocity).round();
+    final finalDuration = Duration(milliseconds: velocityDuration.clamp(100, 300));
+
     setState(() {
       _gestureAnimation = Tween<Offset>(
         begin: Offset(currentOffset, 0),
         end: const Offset(-1.0, 0),
       ).animate(CurvedAnimation(
         parent: _gestureController,
-        curve: Curves.easeOut,
+        curve: velocity < 1.5 ? Curves.easeInCubic : Curves.linear,
       ));
     });
 
-    _gestureController.duration = duration;
+    _gestureController.duration = finalDuration;
     await _gestureController.forward(from: 0);
   }
 

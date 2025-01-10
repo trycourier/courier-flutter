@@ -64,15 +64,15 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   bool _isLoading = true;
   String? _error;
   CourierBrand? _brand;
-  String? _dismissingMessageId;
   late TabController _tabController;
   late PageController _pageController;
   int _lastSelectedTab = 0;
   
   // Map to store list item states at the top level
-  final GlobalKey<CourierMessageListState> _feedListKey = GlobalKey<CourierMessageListState>();
-  final GlobalKey<CourierMessageListState> _archivedListKey = GlobalKey<CourierMessageListState>();
-  // final Map<String, GlobalKey<CourierInboxListItemState>> _listItemKeys = {};
+  final Map<InboxFeed, GlobalKey<_CourierMessageListState>> _listKeys = {
+    InboxFeed.feed: GlobalKey<_CourierMessageListState>(),
+    InboxFeed.archived: GlobalKey<_CourierMessageListState>(),
+  };
 
   @override
   void initState() {
@@ -81,82 +81,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     _pageController = PageController();
     _start();
   }
-
-  Future<void> _handleMessageArchive(InboxMessage message, int index) async {
-    _dismissingMessageId = message.messageId;
-    
-    // Store original state
-    final originalFeedMessages = List<InboxMessage>.from(_feedMessages);
-    final originalArchivedMessages = List<InboxMessage>.from(_archivedMessages);
-    
-    // Update messages
-    _insertArchivedMessage(message);
-    _feedMessages.removeAt(index);
-
-    // Perform archive
-    try {
-      await message.markAsArchived();
-      _dismissingMessageId = null;
-    } catch (error) {
-      Courier.log('Failed to archive message: $error');
-      setState(() {
-        _feedMessages = originalFeedMessages;
-        _archivedMessages = originalArchivedMessages;
-      });
-      _dismissingMessageId = null;
-      rethrow;
-    }
-
-  }
-
-  void _insertArchivedMessage(InboxMessage message) {
-    // Find index to insert archived message based on timestamp
-    if (message.createdAt == null) {
-      // If message has no timestamp, insert at beginning
-      _archivedMessages.insert(0, message);
-    } else {
-      int insertIndex = _archivedMessages.indexWhere(
-        (m) => m.createdAt?.isBefore(message.createdAt!) ?? false
-      );
-      if (insertIndex == -1) {
-        // If no earlier messages found, add to end
-        _archivedMessages.add(message);
-      } else {
-        // Insert at correct position
-        _archivedMessages.insert(insertIndex, message);
-      }
-    }
-  }
-
-  // Future<void> addMessageAtIndex(GlobalKey<AnimatedListState> listKey, InboxMessage message, int index) async {
-  //   await listKey.currentState?.insertItemAwaitable(index, duration: const Duration(milliseconds: 400));
-  //   setState(() {});
-  // }
-
-  // Future<void> removeMessageAtIndex(GlobalKey<AnimatedListState> listKey, InboxMessage message, int index) async {
-  //   Brightness currentBrightness = MediaQuery.of(context).platformBrightness;
-  //   final isDarkMode = currentBrightness == Brightness.dark;
-  //   await listKey.currentState?.removeItemAwaitable(index, (context, animation) {
-  //     return SizeTransition(
-  //       sizeFactor: animation.drive(
-  //         CurveTween(curve: Curves.easeInOutCubic),
-  //       ),
-  //       child: CourierInboxListItem(
-  //         theme: getTheme(isDarkMode),
-  //         message: message,
-  //         canPerformGestures: false,
-  //         onMessageIsVisible: () {},
-  //         onMessageClick: (message) {},
-  //         onMessageLongPress: null,
-  //         onActionClick: (action) => {},
-  //         onSwipeArchiveTrigger: (message) => {},
-  //         onSwipeArchiveComplete: (message) => {},
-  //         onArchiveButtonTrigger: (message) => {},
-  //       ),
-  //     );
-  //   }, duration: const Duration(milliseconds: 300));
-  //   setState(() {});
-  // }
 
   Future _start() async {
     if (mounted) {
@@ -209,64 +133,34 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
           });
         }
       },
-      onPageAdded: (feed, messageSet) {
+      onPageAdded: (feed, messageSet) async {
         if (mounted) {
-          if (feed == InboxFeed.feed) {
-            setState(() {
-              _feedMessages = [..._feedMessages, ...messageSet.messages];
-              _canPaginateFeed = messageSet.canPaginate;
+          setState(() {
+            if (feed == InboxFeed.feed) {
               _isFeedPaginating = false;
-            });
-          } else {
-            setState(() {
-              _archivedMessages = [..._archivedMessages, ...messageSet.messages];
+              _canPaginateFeed = messageSet.canPaginate;
+              _feedMessages.addAll(messageSet.messages);
+            } else {
+              _isArchivedPaginating = false; 
               _canPaginateArchived = messageSet.canPaginate;
-              _isArchivedPaginating = false;
-            });
-          }
+              _archivedMessages.addAll(messageSet.messages);
+            }
+          });
         }
       },
       onMessageChanged: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          if (feed == InboxFeed.feed) {
-            if (index >= 0 && index < _feedMessages.length) {
-              await _feedListKey.currentState?.reloadMessageAtIndex(message, index);
-            }
-          } else {
-            if (index >= 0 && index < _archivedMessages.length) {
-              await _archivedListKey.currentState?.reloadMessageAtIndex(message, index);
-            }
-          }
+        if (mounted) {
+          await _listKeys[feed]?.currentState?.reloadMessageAtIndex(message, index);
         }
       },
       onMessageAdded: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          if (feed == InboxFeed.feed) {
-            if (index >= 0 && index <= _feedMessages.length) {
-              await _feedListKey.currentState?.addMessageAtIndex(message, index);
-            } else {
-              await _feedListKey.currentState?.addMessageAtIndex(message, 0);
-            }
-          } else {
-            if (index >= 0 && index <= _archivedMessages.length) {
-              await _archivedListKey.currentState?.addMessageAtIndex(message, index);
-            } else {
-              await _archivedListKey.currentState?.addMessageAtIndex(message, 0);
-            }
-          }
+        if (mounted) {
+          await _listKeys[feed]?.currentState?.addMessageAtIndex(message, index);
         }
-      },
+      }, 
       onMessageRemoved: (feed, index, message) async {
-        if (mounted && message.messageId != _dismissingMessageId) {
-          if (feed == InboxFeed.feed) {
-            if (index >= 0 && index < _feedMessages.length) {
-              await _feedListKey.currentState?.removeMessageAtIndex(index);
-            }
-          } else {
-            if (index >= 0 && index < _archivedMessages.length) {
-              await _archivedListKey.currentState?.removeMessageAtIndex(index);
-            }
-          }
+        if (mounted) {
+          await _listKeys[feed]?.currentState?.removeMessageAtIndex(index);
         }
       },
     );
@@ -354,7 +248,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   List<Widget> _buildTabViews(bool isDarkMode, double triggerPoint) {
     return [
       CourierMessageList(
-        key: _feedListKey,
+        key: _listKeys[InboxFeed.feed],
         triggerPoint: triggerPoint,
         messages: _feedMessages,
         theme: getTheme(isDarkMode),
@@ -365,22 +259,12 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         onActionClick: widget.onActionClick,
         onRefresh: _refresh,
         feed: InboxFeed.feed,
-        canSwipeItems: !widget.canSwipePages,
-        onSwipeArchiveTrigger: _handleMessageArchive,
-        onSwipeArchiveComplete: (message, index) => setState(() {}),
-        onArchiveButtonTrigger: (message, index) async {
-          try {
-            await _handleMessageArchive(message, index);
-            // await _listItemKeys[message.messageId]?.currentState?.dismiss();
-          } catch (error) {
-            Courier.log('Failed to archive message: $error');
-          }
-        },
+        canPerformGestures: !widget.canSwipePages,
         isPaginating: _isFeedPaginating,
         onPaginationTriggered: () => _fetchNextPage(InboxFeed.feed),
       ),
       CourierMessageList(
-        key: _archivedListKey,
+        key: _listKeys[InboxFeed.archived],
         triggerPoint: triggerPoint,
         messages: _archivedMessages,
         theme: getTheme(isDarkMode),
@@ -391,17 +275,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         onActionClick: widget.onActionClick,
         onRefresh: _refresh,
         feed: InboxFeed.archived,
-        canSwipeItems: !widget.canSwipePages,
-        onSwipeArchiveTrigger: _handleMessageArchive,
-        onSwipeArchiveComplete: (message, index) => setState(() {}),
-        onArchiveButtonTrigger: (message, index) async {
-          try {
-            await _handleMessageArchive(message, index);
-            // await _listItemKeys[message.messageId]?.currentState?.dismiss();
-          } catch (error) {
-            Courier.log('Failed to archive message: $error');
-          }
-        },
+        canPerformGestures: false,
         isPaginating: _isArchivedPaginating,
         onPaginationTriggered: () => _fetchNextPage(InboxFeed.archived),
       ),
@@ -515,10 +389,7 @@ class CourierMessageList extends StatefulWidget {
   final Function(InboxAction, InboxMessage, int)? onActionClick;
   final Future<void> Function() onRefresh;
   final InboxFeed feed;
-  final bool canSwipeItems;
-  final Function(InboxMessage, int) onSwipeArchiveTrigger;
-  final Function(InboxMessage, int) onSwipeArchiveComplete;
-  final Function(InboxMessage, int) onArchiveButtonTrigger;
+  final bool canPerformGestures;
   final bool isPaginating;
   final Function() onPaginationTriggered;
 
@@ -534,21 +405,19 @@ class CourierMessageList extends StatefulWidget {
     required this.onActionClick,
     required this.onRefresh,
     required this.feed,
-    required this.canSwipeItems,
-    required this.onSwipeArchiveTrigger,
-    required this.onSwipeArchiveComplete,
-    required this.onArchiveButtonTrigger,
+    required this.canPerformGestures,
     required this.isPaginating,
     required this.onPaginationTriggered,
   });
 
   @override
-  State<CourierMessageList> createState() => CourierMessageListState();
+  State<CourierMessageList> createState() => _CourierMessageListState();
 }
 
-class CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
+class _CourierMessageListState extends State<CourierMessageList> with AutomaticKeepAliveClientMixin {
   final Map<String, GlobalKey<CourierInboxListItemState>> _listItemKeys = {};
   int? _newMessageIndex;
+  String? _dismissedMessageId;
 
   @override
   bool get wantKeepAlive => true;
@@ -563,10 +432,11 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
 
   Future<void> removeMessageAtIndex(int index) async {
     final message = widget.messages[index];
-    await _listItemKeys[message.messageId]?.currentState?.exit();
+    await _listItemKeys[message.messageId]?.currentState?.remove(shouldFadeOut: _dismissedMessageId != message.messageId);
     setState(() {
       widget.messages.removeAt(index);
       _listItemKeys.remove(message.messageId);
+      _dismissedMessageId = null;
     });
   }
 
@@ -585,7 +455,7 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
           key: _listItemKeys[message.messageId],
           theme: widget.theme,
           message: message,
-          canPerformGestures: widget.canSwipeItems,
+          canPerformGestures: widget.canPerformGestures,
           shouldPerformEnterAnimationOnCreate: _newMessageIndex == index,
           onEnterAnimationFinished: () {
             setState(() {
@@ -607,6 +477,8 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
             message.isRead ? message.markAsUnread() : message.markAsRead();
           },
           onArchiveGesture: (message) {
+            _listItemKeys[message.messageId]?.currentState?.exitStageLeft();
+            _dismissedMessageId = message.messageId;
             message.markAsArchived();
           },
         )
