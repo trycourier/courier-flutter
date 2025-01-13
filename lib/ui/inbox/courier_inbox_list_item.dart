@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:courier_flutter/models/inbox_action.dart';
+import 'package:courier_flutter/models/inbox_feed.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
@@ -9,24 +12,26 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class CourierInboxListItem extends StatefulWidget {
   final CourierInboxTheme theme;
+  final InboxFeed feed;
   final InboxMessage message;
+  final int index;
   final bool canPerformGestures;
+  final bool shouldAnimateOnLoad;
   final Function() onMessageIsVisible;
   final Function(InboxMessage) onMessageClick;
   final Function(InboxMessage)? onMessageLongPress;
   final Function(InboxAction) onActionClick;
   final Function(InboxMessage) onReadGesture;
   final Function(InboxMessage) onArchiveGesture;
-  final Function()? onDidEnter;
-  final Function()? onDidUpdate;
-  final Function()? onDidExit;
-  final Function()? onDidDismiss;
-  final Function(CourierInboxListItemState) onStateReady;
+  final Function(InboxMessage) onMessageAdded;
 
   const CourierInboxListItem({
     super.key,
     required this.theme,
+    required this.feed,
     required this.message,
+    required this.index,
+    required this.shouldAnimateOnLoad,
     required this.onMessageClick,
     required this.onMessageLongPress,
     required this.onActionClick,
@@ -34,22 +39,18 @@ class CourierInboxListItem extends StatefulWidget {
     required this.onMessageIsVisible,
     required this.onReadGesture,
     required this.onArchiveGesture,
-    this.onDidEnter,
-    this.onDidUpdate,
-    this.onDidExit,
-    this.onDidDismiss,
-    required this.onStateReady,
+    required this.onMessageAdded,
   });
 
   @override
   CourierInboxListItemState createState() => CourierInboxListItemState();
 }
+
 class CourierInboxListItemState extends State<CourierInboxListItem> with TickerProviderStateMixin {
-  // State
   late InboxMessage _message;
+
+  // State
   SwipableContainerState? _swipableContainerState;
-  bool _shouldFadeOut = true;
-  bool _shouldDismiss = false;
 
   // Animation durations
   static const _enterDuration = Duration(milliseconds: 400);
@@ -72,17 +73,16 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   void initState() {
     super.initState();
 
-    widget.onStateReady(this);
-
+    // Set initial message
     _message = widget.message;
 
     // Initialize enter animation
     _enterController = AnimationController(
       vsync: this, 
       duration: _enterDuration,
-      value: widget.onDidEnter != null ? 0.0 : 1.0,
+      value: widget.shouldAnimateOnLoad ? 0.0 : 1.0,
     );
-    
+
     // First half of animation - size change
     _enterSizeAnimation = Tween<double>(
       begin: 0.0,
@@ -123,56 +123,37 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       parent: _exitController,
       curve: const Interval(0.0, 0.5, curve: Curves.easeInOutCubic),
     ));
-    
+
+    _animateOnLoad();
   }
 
-  // @override
-  // void didUpdateWidget(CourierInboxListItem oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-
-  //   if (widget.onDidEnter != null && oldWidget.onDidEnter == null) {
-  //     enter().then((value) {
-  //       widget.onDidEnter!();
-  //     });
-  //   }
-    
-  //   if (widget.onDidUpdate != null && oldWidget.onDidUpdate == null) {
-  //     refresh(widget.message).then((_) {
-  //       widget.onDidUpdate!();
-  //     });
-  //   }
-
-  //   if (widget.onDidExit != null && oldWidget.onDidExit == null) {
-  //     remove().then((_) {
-  //       widget.onDidExit!(); 
-  //     });
-  //   }
-
-  //   if (widget.onDidDismiss != null && oldWidget.onDidDismiss == null) {
-  //     _shouldDismiss = true;
-  //     // widget.onDidDismiss!();
-  //   }
-  // }
+  Future<void> _animateOnLoad() async {
+    if (!mounted) return;
+    if (widget.shouldAnimateOnLoad) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _enterController.forward();
+        if (mounted) {
+          widget.onMessageAdded(widget.message);
+        }
+      });
+    } else {
+      widget.onMessageAdded(widget.message);
+    }
+  }
 
   @override 
   void dispose() {
-    _enterController.dispose();
     _exitController.dispose();
+    _enterController.dispose();
     super.dispose();
   }
 
   Future<void> refresh(InboxMessage newMessage) async {
     if (!mounted) return;
-    // setState(() {
-    //   _message = newMessage;
-    // });
-  }
-
-  Future<void> enter({Duration duration = _enterDuration}) async {
-    if (!mounted) return;
-    _enterController.duration = duration;
-    _enterController.value = 0.0;
-    return _enterController.forward();
+    setState(() {
+      _message = newMessage;
+    });
+    await Future.delayed(const Duration(milliseconds: 200));
   }
 
   Future<void> dismiss() async {
@@ -180,12 +161,18 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
     return _swipableContainerState?.animateRightToLeft();
   }
 
-  Future<void> exit({Duration duration = _exitDuration, bool shouldFadeOut = true}) async {
+  Future<void> remove({Duration duration = _exitDuration}) async {
     if (!mounted) return;
     _exitController.duration = duration;
     _exitController.value = 0.0;
-    _shouldFadeOut = shouldFadeOut;
     return _exitController.forward();
+  }
+
+  Future<void> exit() async {
+    await Future.wait([
+      dismiss(),
+      remove(),
+    ]);
   }
 
   List<Widget> _buildContent(BuildContext context, bool showUnreadStyle) {
@@ -236,12 +223,12 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       items.add(
         Text(
           style: widget.theme.getBodyStyle(context, showUnreadStyle),
-          _message.subtitle!,
+          widget.message.subtitle!,
         ),
       );
     }
 
-    final actions = _message.actions ?? [];
+    final actions = widget.message.actions ?? [];
 
     if (actions.isNotEmpty) {
       items.add(
@@ -274,7 +261,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
         return SizeTransition(
           sizeFactor: _exitSizeAnimation,
           child: FadeTransition(
-            opacity: _shouldFadeOut ? _exitFadeAnimation : const AlwaysStoppedAnimation(1.0),
+            opacity: false ? _exitFadeAnimation : const AlwaysStoppedAnimation(1.0), // TODO: Fix this later
             child: SizeTransition(
               sizeFactor: _enterSizeAnimation,
               axisAlignment: 1.0,
@@ -307,8 +294,8 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: () => widget.onMessageClick(_message),
-                          onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(_message) : null,
+                          onTap: () => widget.onMessageClick(widget.message),
+                          onLongPress: widget.onMessageLongPress != null ? () => widget.onMessageLongPress!(widget.message) : null,
                           child: Stack(
                             children: [
                               !_showDotIndicator ? Positioned(
@@ -354,4 +341,5 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       }
     );
   }
+
 }
