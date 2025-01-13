@@ -153,7 +153,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
     setState(() {
       _message = newMessage;
     });
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 300));
   }
 
   Future<void> dismiss() async {
