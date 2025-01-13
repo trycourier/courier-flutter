@@ -432,7 +432,6 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
 
   final Map<String, GlobalKey<CourierInboxListItemState>> _listItemRefs = {};
   final List<String> _messagesToAdd = [];
-  String? _dismissedMessageId;
   
   @override
   bool get wantKeepAlive => true;
@@ -468,7 +467,6 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
       setState(() {
         widget.messages.removeAt(index);
         _listItemRefs.remove(itemId);
-        _dismissedMessageId = null;
       });
     } catch (e) {
       Courier.log('Error removing message: $e');
@@ -511,7 +509,6 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
             message.isRead ? message.markAsUnread() : message.markAsRead();
           },
           onArchiveGesture: (message) async {
-            _dismissedMessageId = message.messageId;
             await _listItemRefs[message.messageId]?.currentState?.dismiss();
             message.markAsArchived();
           },
