@@ -15,7 +15,7 @@ class SwipableContainer extends StatefulWidget {
   final double actionThreshold;
   final Function() onLeftToRightAction;
   final Function() onRightToLeftAction;
-  final Duration animationDuration;
+  final Function(SwipableContainerState) onStateReady;
 
   const SwipableContainer({
     super.key,
@@ -31,7 +31,7 @@ class SwipableContainer extends StatefulWidget {
     required this.onLeftToRightAction,
     required this.onRightToLeftAction,
     this.actionThreshold = 0.25,
-    this.animationDuration = const Duration(milliseconds: 200),
+    required this.onStateReady,
   });
 
   @override
@@ -54,9 +54,11 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
   void initState() {
     super.initState();
 
+    widget.onStateReady(this);
+
     _gestureController = AnimationController(
       vsync: this,
-      duration: widget.animationDuration,
+      duration: const Duration(milliseconds: 200),
     );
 
     _bounceController = AnimationController(
@@ -202,6 +204,7 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
         _gestureController.forward(from: 0);
       } else if (_dragExtent < 0) {
         widget.onRightToLeftAction();
+        animateRightToLeft();
       }
     } else {
       setState(() {

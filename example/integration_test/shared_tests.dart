@@ -306,8 +306,8 @@ void main() {
 
       await UserBuilder.build(userId: userId);
 
-      final messages = await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
-      expect(messages.messages, []);
+      final messageSet = await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
+      expect(messageSet?.messages, []);
 
     });
 

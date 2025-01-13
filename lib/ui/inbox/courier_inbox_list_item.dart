@@ -17,8 +17,11 @@ class CourierInboxListItem extends StatefulWidget {
   final Function(InboxAction) onActionClick;
   final Function(InboxMessage) onReadGesture;
   final Function(InboxMessage) onArchiveGesture;
-  final bool shouldPerformEnterAnimationOnCreate;
-  final Function() onEnterAnimationFinished;
+  final Function()? onDidEnter;
+  final Function()? onDidUpdate;
+  final Function()? onDidExit;
+  final Function()? onDidDismiss;
+  final Function(CourierInboxListItemState) onStateReady;
 
   const CourierInboxListItem({
     super.key,
@@ -31,41 +34,53 @@ class CourierInboxListItem extends StatefulWidget {
     required this.onMessageIsVisible,
     required this.onReadGesture,
     required this.onArchiveGesture,
-    required this.shouldPerformEnterAnimationOnCreate,
-    required this.onEnterAnimationFinished,
+    this.onDidEnter,
+    this.onDidUpdate,
+    this.onDidExit,
+    this.onDidDismiss,
+    required this.onStateReady,
   });
 
   @override
   CourierInboxListItemState createState() => CourierInboxListItemState();
 }
-
 class CourierInboxListItemState extends State<CourierInboxListItem> with TickerProviderStateMixin {
+  // State
   late InboxMessage _message;
-  bool get _showDotIndicator => widget.theme.unreadIndicatorStyle.indicator == CourierInboxUnreadIndicator.dot;
+  SwipableContainerState? _swipableContainerState;
+  bool _shouldFadeOut = true;
+  bool _shouldDismiss = false;
 
+  // Animation durations
+  static const _enterDuration = Duration(milliseconds: 400);
+  static const _exitDuration = Duration(milliseconds: 200);
+
+  // Enter animations
   late final AnimationController _enterController;
   late final Animation<double> _enterSizeAnimation;
   late final Animation<double> _enterSlideAnimation;
-  late final AnimationController _exitController; 
+
+  // Exit animations
+  late final AnimationController _exitController;
   late final Animation<double> _exitSizeAnimation;
   late final Animation<double> _exitFadeAnimation;
-  final GlobalKey<SwipableContainerState> _swipableContainerKey = GlobalKey<SwipableContainerState>();
 
-  static const _exitDuration = Duration(milliseconds: 200);
-  static const _enterDuration = Duration(milliseconds: 400);
-
-  bool _shouldFadeOut = true;
+  // Computed properties
+  bool get _showDotIndicator => widget.theme.unreadIndicatorStyle.indicator == CourierInboxUnreadIndicator.dot;
 
   @override
   void initState() {
     super.initState();
+
+    widget.onStateReady(this);
+
     _message = widget.message;
 
     // Initialize enter animation
     _enterController = AnimationController(
       vsync: this, 
       duration: _enterDuration,
-      value: widget.shouldPerformEnterAnimationOnCreate ? 0.0 : 1.0,
+      value: widget.onDidEnter != null ? 0.0 : 1.0,
     );
     
     // First half of animation - size change
@@ -74,7 +89,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _enterController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
+      curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
     ));
 
     // Second half of animation - slide in
@@ -108,14 +123,36 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       parent: _exitController,
       curve: const Interval(0.0, 0.5, curve: Curves.easeInOutCubic),
     ));
-
-    if (widget.shouldPerformEnterAnimationOnCreate && mounted) {
-      enter().then((value) {
-        widget.onEnterAnimationFinished();
-      });
-    }
     
   }
+
+  // @override
+  // void didUpdateWidget(CourierInboxListItem oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+
+  //   if (widget.onDidEnter != null && oldWidget.onDidEnter == null) {
+  //     enter().then((value) {
+  //       widget.onDidEnter!();
+  //     });
+  //   }
+    
+  //   if (widget.onDidUpdate != null && oldWidget.onDidUpdate == null) {
+  //     refresh(widget.message).then((_) {
+  //       widget.onDidUpdate!();
+  //     });
+  //   }
+
+  //   if (widget.onDidExit != null && oldWidget.onDidExit == null) {
+  //     remove().then((_) {
+  //       widget.onDidExit!(); 
+  //     });
+  //   }
+
+  //   if (widget.onDidDismiss != null && oldWidget.onDidDismiss == null) {
+  //     _shouldDismiss = true;
+  //     // widget.onDidDismiss!();
+  //   }
+  // }
 
   @override 
   void dispose() {
@@ -126,9 +163,9 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
 
   Future<void> refresh(InboxMessage newMessage) async {
     if (!mounted) return;
-    setState(() {
-      _message = newMessage;
-    });
+    // setState(() {
+    //   _message = newMessage;
+    // });
   }
 
   Future<void> enter({Duration duration = _enterDuration}) async {
@@ -138,25 +175,17 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
     return _enterController.forward();
   }
 
-  Future<void> remove({Duration duration = _exitDuration, bool shouldFadeOut = true}) async {
+  Future<void> dismiss() async {
+    if (!mounted) return;
+    return _swipableContainerState?.animateRightToLeft();
+  }
+
+  Future<void> exit({Duration duration = _exitDuration, bool shouldFadeOut = true}) async {
     if (!mounted) return;
     _exitController.duration = duration;
     _exitController.value = 0.0;
     _shouldFadeOut = shouldFadeOut;
     return _exitController.forward();
-  }
-
-  Future<void> exitStageLeft() async {
-    if (!mounted) return;
-    await _swipableContainerKey.currentState?.animateRightToLeft();
-  }
-
-  Future<void> exit() async {
-    if (!mounted) return;
-    await Future.wait([
-      exitStageLeft(),
-      remove()
-    ]);
   }
 
   List<Widget> _buildContent(BuildContext context, bool showUnreadStyle) {
@@ -262,7 +291,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
                     }
                   },
                   child: SwipableContainer(
-                    key: _swipableContainerKey,
+                    onStateReady: (state) => _swipableContainerState = state,
                     canPerformGestures: widget.canPerformGestures,
                     isRead: isDone,
                     readIcon: Icons.mark_email_read,
