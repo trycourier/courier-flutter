@@ -1,5 +1,4 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/inbox_action.dart';
 import 'package:intl/intl.dart';
 
 class InboxMessage {
@@ -43,6 +42,25 @@ class InboxMessage {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'messageId': messageId,
+      'title': title,
+      'body': body, 
+      'preview': preview,
+      'created': created,
+      'archived': archived,
+      'read': read,
+      'opened': opened,
+      'actions': actions?.map((action) => {
+        'content': action.content,
+        'href': action.href,
+        'data': action.data,
+      }).toList(),
+      'data': data,
+    };
+  }
+
   String? get subtitle => body ?? preview;
 
   bool get isRead => read != null;
@@ -50,6 +68,15 @@ class InboxMessage {
   bool get isOpened => opened != null;
 
   bool get isArchived => archived != null;
+
+  DateTime? get createdAt {
+    if (created == null) return null;
+    try {
+      return DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').parseUtc(created!).toLocal();
+    } catch (e) {
+      return null;
+    }
+  }
 
   void setRead() {
     read = DateTime.now().toIso8601String();

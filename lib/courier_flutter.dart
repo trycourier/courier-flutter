@@ -8,7 +8,9 @@ import 'package:courier_flutter/ios_foreground_notification_presentation_options
 import 'package:courier_flutter/models/courier_authentication_listener.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
+import 'package:courier_flutter/models/inbox_feed.dart';
 import 'package:courier_flutter/models/inbox_message.dart';
+import 'package:courier_flutter/models/inbox_message_set.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:uuid/uuid.dart';
@@ -36,9 +38,8 @@ class Courier extends CourierChannelManager {
       switch (call.method) {
         case 'auth.state_changed': {
           String? userId = call.arguments['userId'];
-          _authenticationListeners.forEach((key, listener) {
-            listener.onUserStateChanged(userId);
-          });
+          String? listenerId = call.arguments['id'];
+          _authenticationListeners[listenerId]?.onUserStateChanged(userId);
           break;
         }
         case 'push.clicked': {
@@ -54,35 +55,69 @@ class Courier extends CourierChannelManager {
           break;
         }
         case 'inbox.listener_loading': {
-          _inboxListeners.forEach((key, listener) {
-            listener.onInitialLoad?.call();
-          });
+          String? listenerId = call.arguments['id'];
+          bool isRefresh = call.arguments['isRefresh'];
+          _inboxListeners[listenerId]?.onLoading?.call(isRefresh);
           break;
         }
         case 'inbox.listener_error': {
-          _inboxListeners.forEach((key, listener) {
-            listener.onError?.call(call.arguments['error']);
-          });
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onError?.call(call.arguments['error']);
           break;
         }
-        case 'inbox.listener_messages_changed': {
-
-          List<dynamic>? messages = call.arguments['messages'];
-          List<InboxMessage>? inboxMessages = messages?.map((message) {
-            final Map<String, dynamic> map = json.decode(message);
-            return InboxMessage.fromJson(map);
-          }).toList();
-
-          // Call the callback
-          _inboxListeners.forEach((key, listener) {
-            listener.onMessagesChanged?.call(
-              inboxMessages ??= [],
-              call.arguments['unreadMessageCount'] ??= 0,
-              call.arguments['totalMessageCount'] ??= 0,
-              call.arguments['canPaginate'] ??= false,
-            );
-          });
-
+        case 'inbox.listener_unread_count_changed': {
+          final count = call.arguments['count'];
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onUnreadCountChanged?.call(count);
+          break;
+        }
+        case 'inbox.listener_feed_changed': {
+          final json = jsonDecode(call.arguments['messageSet']);
+          final messageSet = InboxMessageSet.fromJson(json);
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onFeedChanged?.call(messageSet);
+          break;
+        }
+        case 'inbox.listener_archive_changed': {
+          final json = jsonDecode(call.arguments['messageSet']);
+          final messageSet = InboxMessageSet.fromJson(json);
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onArchiveChanged?.call(messageSet);
+          break;
+        }
+        case 'inbox.listener_page_added': {
+          final feed = InboxFeed.fromValue(call.arguments['feed']);
+          final json = jsonDecode(call.arguments['page']);
+          final page = InboxMessageSet.fromJson(json);
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onPageAdded?.call(feed, page);
+          break;
+        }
+        case 'inbox.listener_message_changed': {
+          final feed = InboxFeed.fromValue(call.arguments['feed']);
+          final index = call.arguments['index'];
+          final json = jsonDecode(call.arguments['message']);
+          final message = InboxMessage.fromJson(json);
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onMessageChanged?.call(feed, index, message);
+          break;
+        }
+        case 'inbox.listener_message_added': {
+          final feed = InboxFeed.fromValue(call.arguments['feed']);
+          final index = call.arguments['index'];
+          final json = jsonDecode(call.arguments['message']);
+          final message = InboxMessage.fromJson(json);
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onMessageAdded?.call(feed, index, message);
+          break;
+        }
+        case 'inbox.listener_message_removed': {
+          final feed = InboxFeed.fromValue(call.arguments['feed']);
+          final index = call.arguments['index'];
+          final json = jsonDecode(call.arguments['message']);
+          final message = InboxMessage.fromJson(json);
+          String? listenerId = call.arguments['id'];
+          _inboxListeners[listenerId]?.onMessageRemoved?.call(feed, index, message);
           break;
         }
       }
@@ -315,8 +350,15 @@ class Courier extends CourierChannelManager {
   }
 
   @override
-  Future<List<InboxMessage>> get inboxMessages async {
-    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_messages');
+  Future<List<InboxMessage>> get feedMessages async {
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_feed_messages');
+    List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
+    return inboxMessages;
+  }
+
+  @override
+  Future<List<InboxMessage>> get archivedMessages async {
+    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.get_archived_messages');
     List<InboxMessage>? inboxMessages = messages.map((message) => InboxMessage.fromJson(message)).toList();
     return inboxMessages;
   }
@@ -327,25 +369,44 @@ class Courier extends CourierChannelManager {
   }
 
   @override
-  Future<List<InboxMessage>> fetchNextInboxPage() async {
-    List<dynamic> messages = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page');
-    return messages.map((message) {
-      final Map<String, dynamic> map = json.decode(message);
-      return InboxMessage.fromJson(map);
-    }).toList();
+  Future<InboxMessageSet?> fetchNextInboxPage({required InboxFeed feed}) async {
+    dynamic json = await CourierFlutterChannels.shared.invokeMethod('inbox.fetch_next_page', {
+      'feed': feed.value,
+    });
+    try {
+      return InboxMessageSet.fromJson(jsonDecode(json));
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
-  Future<CourierInboxListener> addInboxListener({required Function? onInitialLoad, required Function(String error)? onError, required Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged}) async {
+  Future<CourierInboxListener> addInboxListener({
+    Function(bool isRefresh)? onLoading,
+    Function(String error)? onError,
+    Function(int unreadCount)? onUnreadCountChanged, 
+    Function(InboxMessageSet messageSet)? onFeedChanged,
+    Function(InboxMessageSet messageSet)? onArchiveChanged,
+    Function(InboxFeed feed, InboxMessageSet page)? onPageAdded,
+    Function(InboxFeed feed, int index, InboxMessage message)? onMessageChanged,
+    Function(InboxFeed feed, int index, InboxMessage message)? onMessageAdded,
+    Function(InboxFeed feed, int index, InboxMessage message)? onMessageRemoved,
+  }) async {
 
     final listenerId = const Uuid().v4();
 
     // Create flutter listener
     final listener = CourierInboxListener(
         listenerId: listenerId,
-        onInitialLoad: onInitialLoad,
+        onLoading: onLoading,
         onError: onError,
-        onMessagesChanged: onMessagesChanged
+        onUnreadCountChanged: onUnreadCountChanged,
+        onFeedChanged: onFeedChanged,
+        onArchiveChanged: onArchiveChanged,
+        onPageAdded: onPageAdded,
+        onMessageChanged: onMessageChanged,
+        onMessageAdded: onMessageAdded,
+        onMessageRemoved: onMessageRemoved,
     );
 
     // Hold reference
@@ -492,17 +553,28 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('setInboxPaginationLimit() has not been implemented.');
   }
 
-  Future<List<InboxMessage>> get inboxMessages => throw UnimplementedError('inboxMessages has not been implemented.');
+  Future<List<InboxMessage>> get feedMessages => throw UnimplementedError('feedMessages has not been implemented.');
+  Future<List<InboxMessage>> get archivedMessages => throw UnimplementedError('archivedMessages has not been implemented.');
 
   Future refreshInbox() async {
     throw UnimplementedError('refreshInbox() has not been implemented.');
   }
 
-  Future<List<InboxMessage>> fetchNextInboxPage() async {
+  Future<InboxMessageSet?> fetchNextInboxPage({required InboxFeed feed}) async {
     throw UnimplementedError('fetchNextInboxPage() has not been implemented.');
   }
 
-  Future<CourierInboxListener> addInboxListener({required Function? onInitialLoad, required Function(String error)? onError, required Function(List<InboxMessage> messages, int unreadMessageCount, int totalMessageCount, bool canPaginate)? onMessagesChanged}) async {
+  Future<CourierInboxListener> addInboxListener({
+    Function(bool isRefresh)? onLoading,
+    Function(String error)? onError,
+    Function(int unreadCount)? onUnreadCountChanged, 
+    Function(InboxMessageSet messageSet)? onFeedChanged,
+    Function(InboxMessageSet messageSet)? onArchiveChanged,
+    Function(InboxFeed feed, InboxMessageSet page)? onPageAdded,
+    Function(InboxFeed feed, int index, InboxMessage message)? onMessageChanged,
+    Function(InboxFeed feed, int index, InboxMessage message)? onMessageAdded,
+    Function(InboxFeed feed, int index, InboxMessage message)? onMessageRemoved,
+  }) async {
     throw UnimplementedError('addInboxListener() has not been implemented.');
   }
 

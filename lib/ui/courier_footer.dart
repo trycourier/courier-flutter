@@ -37,24 +37,27 @@ class CourierFooter extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  launchCourierURL();
-                },
-                child: const Text('Go to Courier'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-            ],
+        return SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    launchCourierURL();
+                  },
+                  child: const Text('Go to Courier'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ),
           ),
         );
       },

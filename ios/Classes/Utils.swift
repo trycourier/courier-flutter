@@ -149,7 +149,7 @@ internal extension Error {
     
     func toFlutterError() -> FlutterError {
         
-        let code: String
+//        let code: String
         let message: String
         
         switch self {

@@ -39,3 +39,21 @@ void launchCourierURL() async {
     print('Could not launch $url');
   }
 }
+
+extension AnimatedListStateExtensions on AnimatedListState {
+
+  Future<void> insertItemAwaitable(int index, {Duration duration = const Duration(milliseconds: 300)}) async {
+    await Future.wait([
+      Future.delayed(duration),
+      Future(() => insertItem(index, duration: duration))
+    ]);
+  }
+
+  Future<void> removeItemAwaitable(int index, AnimatedRemovedItemBuilder builder, { Duration duration = const Duration(milliseconds: 300) }) async {
+    await Future.wait([
+      Future.delayed(duration),
+      Future(() => removeItem(index, builder, duration: duration))
+    ]);
+  }
+
+}

@@ -100,12 +100,8 @@ class _MyAppState extends State<MyApp> {
     await _refreshJwt();
 
     _inboxListener = await Courier.shared.addInboxListener(
-      onInitialLoad: null,
-      onError: (error) {
-        setState(() => _unreadMessageCount = 0);
-      },
-      onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
-        setState(() => _unreadMessageCount = unreadMessageCount);
+      onUnreadCountChanged: (unreadCount) {
+        setState(() => _unreadMessageCount = unreadCount);
       }
     );
 

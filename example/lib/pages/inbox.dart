@@ -1,5 +1,4 @@
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter_sample/env.dart';
@@ -15,14 +14,48 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
-  final ScrollController _customScrollController = ScrollController();
+  final ScrollController _feedScrollController = ScrollController();
+  final ScrollController _archivedScrollController = ScrollController();
   TabController? _tabController;
 
   final customTheme = CourierInboxTheme(
-    brandId: Env.brandId,
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
       indicator: CourierInboxUnreadIndicator.dot,
       color: AppTheme.primaryColor,
+    ),
+    loadingIndicatorColor: AppTheme.primaryColor,
+    tabIndicatorColor: AppTheme.primaryColor,
+    tabStyle: CourierInboxTabStyle(
+      selected: CourierInboxTabItemStyle(
+        font: AppTheme.unreadTitleText.copyWith(color: AppTheme.primaryColor),
+        indicator: CourierInboxTabIndicatorStyle(
+          color: AppTheme.primaryColor,
+          font: AppTheme.bodyText.copyWith(color: Colors.white),
+        ),
+      ),
+      unselected: CourierInboxTabItemStyle(
+        font: AppTheme.titleText.copyWith(color: AppTheme.secondaryColor),
+        indicator: CourierInboxTabIndicatorStyle(
+          color: AppTheme.secondaryColor,
+          font: AppTheme.bodyText.copyWith(color: Colors.white),
+        ),
+      ),
+    ),
+    readingSwipeActionStyle: CourierInboxReadingSwipeActionStyle(
+      read: const CourierInboxSwipeActionStyle(
+        icon: Icons.drafts,
+        color: AppTheme.primaryColor,
+      ),
+      unread: CourierInboxSwipeActionStyle(
+        icon: Icons.mark_email_read,
+        color: AppTheme.primaryColor.withOpacity(0.5),
+      ),
+    ),
+    archivingSwipeActionStyle: const CourierInboxArchivingSwipeActionStyle(
+      archive: CourierInboxSwipeActionStyle(
+        icon: Icons.inbox,
+        color: Colors.red,
+      ),
     ),
     titleStyle: CourierInboxTextStyle(
       read: AppTheme.titleText,
@@ -53,17 +86,74 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
         print(action);
       },
     ),
+    'Branded': CourierInbox(
+      keepAlive: true,
+      lightTheme: CourierInboxTheme(
+        brandId: Env.brandId,
+      ),
+      darkTheme: CourierInboxTheme(
+        brandId: Env.brandId,
+      ),
+      onMessageClick: (message, index) {
+        message.isRead ? message.markAsUnread() : message.markAsRead();
+      },
+    ),
     'Styled': CourierInbox(
       keepAlive: true,
       lightTheme: customTheme,
       darkTheme: customTheme,
-      scrollController: _customScrollController,
+      feedScrollController: _feedScrollController,
+      archivedScrollController: _archivedScrollController,
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
       },
+      onMessageLongPress: (message, index) {
+        showModalBottomSheet(
+          context: context,
+          clipBehavior: Clip.hardEdge,
+          builder: (BuildContext context) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(message.isRead ? 'Mark as unread' : 'Mark as read'),
+                      onTap: () {
+                        message.isRead ? message.markAsUnread() : message.markAsRead();
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Archive'),
+                      onTap: () {
+                        message.markAsArchived();
+                        Navigator.pop(context);
+                      },
+                    ),
+                    // ListTile(
+                    //   title: const Text('Scroll to top'),
+                    //   onTap: () {
+                    //     _feedScrollController.jumpTo(0);
+                    //     Navigator.pop(context);
+                    //   },
+                    // ),
+                    ListTile(
+                      title: const Text('Cancel'),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
       onActionClick: (action, message, index) {
         print(action);
-        _customScrollController.jumpTo(0);
       },
     ),
     'Custom': const CustomInboxPage(),
@@ -78,7 +168,8 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _tabController?.dispose();
-    _customScrollController.dispose();
+    _feedScrollController.dispose();
+    _archivedScrollController.dispose();
     super.dispose();
   }
 
@@ -101,6 +192,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       ),
       body: TabBarView(
         controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
         children: pages.values.toList(),
       ),
     );

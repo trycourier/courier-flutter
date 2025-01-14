@@ -167,9 +167,11 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let paginationLimit = params["paginationLimit"] as? Int
                     let startCursor = params["startCursor"] as? String
+                    
+                    let limit = await Courier.shared.inboxPaginationLimit
 
                     let res = try await client.inbox.getMessages(
-                        paginationLimit: paginationLimit ?? Courier.shared.inboxPaginationLimit,
+                        paginationLimit: paginationLimit ?? limit,
                         startCursor: startCursor
                     )
 
@@ -182,9 +184,11 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let paginationLimit = params["paginationLimit"] as? Int
                     let startCursor = params["startCursor"] as? String
+                    
+                    let limit = await Courier.shared.inboxPaginationLimit
 
                     let res = try await client.inbox.getArchivedMessages(
-                        paginationLimit: paginationLimit ?? Courier.shared.inboxPaginationLimit,
+                        paginationLimit: paginationLimit ?? limit,
                         startCursor: startCursor
                     )
 

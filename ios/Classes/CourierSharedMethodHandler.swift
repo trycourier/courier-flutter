@@ -5,7 +5,7 @@
 //  Created by Michael Miller on 8/7/24.
 //
 
-import Courier_iOS
+@preconcurrency import Courier_iOS
 
 internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     
@@ -36,7 +36,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "client.get_options":
                     
-                    guard let options = Courier.shared.client?.options else {
+                    guard let options = await Courier.shared.client?.options else {
                         result(nil)
                         return
                     }
@@ -56,15 +56,15 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "auth.user_id":
                     
-                    result(Courier.shared.userId)
+                    result(await Courier.shared.userId)
                     
                 case "auth.tenant_id":
                     
-                    result(Courier.shared.tenantId)
+                    result(await Courier.shared.tenantId)
                     
                 case "auth.is_user_signed_in":
                     
-                    result(Courier.shared.isUserSignedIn)
+                    result(await Courier.shared.isUserSignedIn)
                     
                 case "auth.sign_in":
                     
@@ -103,12 +103,15 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     let listenerId: String = try params.extract("listenerId")
                     
                     // Create the listener
-                    let listener = Courier.shared.addAuthenticationListener { userId in
+                    let listener = await Courier.shared.addAuthenticationListener { userId in
                         
                         // Call the event function
-                        CourierFlutterChannel.events.channel?.invokeMethod("auth.state_changed", arguments: [
-                            "userId": userId
-                        ])
+                        DispatchQueue.main.async {
+                            CourierFlutterChannel.events.channel?.invokeMethod("auth.state_changed", arguments: [
+                                "userId": userId,
+                                "id": listenerId
+                            ])
+                        }
                         
                     }
                     
@@ -193,7 +196,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "inbox.get_pagination_limit":
                     
-                    let limit = Courier.shared.inboxPaginationLimit
+                    let limit = await Courier.shared.inboxPaginationLimit
                     
                     result(limit)
                     
@@ -205,13 +208,21 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let limit: Int = try params.extract("limit")
                     
-                    Courier.shared.inboxPaginationLimit = limit
+                    await Courier.shared.setPaginationLimit(limit)
                     
                     result(nil)
                     
-                case "inbox.get_messages":
+                case "inbox.get_feed_messages":
                     
-                    let messages = await Courier.shared.inboxMessages
+                    let messages = await Courier.shared.feedMessages
+                    
+                    let json = try messages.map { try $0.toJson() ?? "" }
+                    
+                    result(json)
+                    
+                case "inbox.get_archived_messages":
+                    
+                    let messages = await Courier.shared.archivedMessages
                     
                     let json = try messages.map { try $0.toJson() ?? "" }
                     
@@ -225,9 +236,17 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "inbox.fetch_next_page":
                     
-                    let messages = try await Courier.shared.fetchNextInboxPage()
+                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                        throw CourierFlutterError.missingParameter(value: "params")
+                    }
                     
-                    let json = try messages.map { try $0.toJson() ?? "" }
+                    let feed: String = try params.extract("feed")
+                    
+                    let inboxFeed: InboxMessageFeed = feed == "archived" ? .archived : .feed
+                    
+                    let messageSet = try await Courier.shared.fetchNextInboxPage(inboxFeed)
+                    
+                    let json = try messageSet.map { try $0.toJson() ?? "" }
                     
                     result(json)
                     
@@ -237,30 +256,114 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
+                    let client = await Courier.shared.client
+                    
                     let listenerId: String = try params.extract("listenerId")
                     
                     // Create the listener
-                    let listener = Courier.shared.addInboxListener(
-                        onInitialLoad: {
-                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: nil)
+                    let listener = await Courier.shared.addInboxListener(
+                        onLoading: { isRefresh in
+                            DispatchQueue.main.async {
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: [
+                                    "id": listenerId,
+                                    "isRefresh": isRefresh
+                                ])
+                            }
                         },
                         onError: { error in
-                            let courierError = CourierError(from: error)
-                            CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_error", arguments: [
-                                "error": courierError.message
-                            ])
+                            DispatchQueue.main.async {
+                                let courierError = CourierError(from: error)
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_error", arguments: [
+                                    "error": courierError.message,
+                                    "id": listenerId
+                                ])
+                            }
                         },
-                        onMessagesChanged: { messages, unreadMessageCount, totalMessageCount, canPaginate in
-                            do {
-                                let json: [String: Any] = [
-                                    "messages": try messages.map { try $0.toJson() ?? "" },
-                                    "unreadMessageCount": unreadMessageCount,
-                                    "totalMessageCount": totalMessageCount,
-                                    "canPaginate": canPaginate
-                                ]
-                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_messages_changed", arguments: json)
-                            } catch {
-                                Courier.shared.client?.error(error.localizedDescription)
+                        onUnreadCountChanged: { count in
+                            DispatchQueue.main.async {
+                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_unread_count_changed", arguments: [
+                                    "count": count,
+                                    "id": listenerId
+                                ])
+                            }
+                        },
+                        onFeedChanged: { messageSet in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_feed_changed", arguments: [
+                                        "messageSet": try messageSet.toJson(),
+                                        "id": listenerId
+                                    ])
+                                } catch {
+                                    client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onArchiveChanged: { messageSet in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_archive_changed", arguments: [
+                                        "messageSet": try messageSet.toJson(),
+                                        "id": listenerId
+                                    ])
+                                } catch {
+                                    client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onPageAdded: { feed, page in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_page_added", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "page": try page.toJson(),
+                                        "id": listenerId
+                                    ])
+                                } catch {
+                                    client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onMessageChanged: { feed, index, message in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_changed", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "index": index,
+                                        "message": try message.toJson() ?? "",
+                                        "id": listenerId
+                                    ])
+                                } catch {
+                                    client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onMessageAdded: { feed, index, message in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_added", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "index": index,
+                                        "message": try message.toJson() ?? "",
+                                        "id": listenerId
+                                    ])
+                                } catch {
+                                    client?.log(error.localizedDescription)
+                                }
+                            }
+                        },
+                        onMessageRemoved: { feed, index, message in
+                            DispatchQueue.main.async {
+                                do {
+                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_removed", arguments: [
+                                        "feed": feed == .archived ? "archived" : "feed",
+                                        "index": index,
+                                        "message": try message.toJson() ?? "",
+                                        "id": listenerId
+                                    ])
+                                } catch {
+                                    client?.log(error.localizedDescription)
+                                }
                             }
                         }
                     )
