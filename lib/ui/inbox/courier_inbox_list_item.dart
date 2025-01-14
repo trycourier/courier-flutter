@@ -150,10 +150,11 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
 
   Future<void> refresh(InboxMessage newMessage) async {
     if (!mounted) return;
+    await Future.delayed(const Duration(milliseconds: 200));
     setState(() {
       _message = newMessage;
     });
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 100));
   }
 
   Future<void> dismiss() async {
@@ -261,7 +262,8 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
         return SizeTransition(
           sizeFactor: _exitSizeAnimation,
           child: FadeTransition(
-            opacity: false ? _exitFadeAnimation : const AlwaysStoppedAnimation(1.0), // TODO: Fix this later
+            // opacity: false ? _exitFadeAnimation : const AlwaysStoppedAnimation(1.0), // TODO: Fix this later
+            opacity: const AlwaysStoppedAnimation(1.0),
             child: SizeTransition(
               sizeFactor: _enterSizeAnimation,
               axisAlignment: 1.0,
@@ -281,12 +283,12 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
                     onStateReady: (state) => _swipableContainerState = state,
                     canPerformGestures: widget.canPerformGestures,
                     isRead: isDone,
-                    readIcon: Icons.mark_email_read,
-                    unreadIcon: Icons.mark_email_unread,
-                    readColor: Colors.blueGrey,
-                    unreadColor: Colors.blue,
-                    archiveIcon: Icons.archive,
-                    archiveColor: Colors.red,
+                    readIcon: widget.theme.readingSwipeActionStyle.read.icon ?? Icons.mark_email_read,
+                    unreadIcon: widget.theme.readingSwipeActionStyle.unread.icon ?? Icons.mark_email_unread,
+                    readColor: widget.theme.getReadSwipeActionColor(context),
+                    unreadColor: widget.theme.getUnreadSwipeActionColor(context),
+                    archiveIcon: widget.theme.archivingSwipeActionStyle.archive.icon ?? Icons.archive,
+                    archiveColor: widget.theme.getArchiveSwipeActionColor(context),
                     onLeftToRightAction: () => widget.onReadGesture(_message),
                     onRightToLeftAction: () => widget.onArchiveGesture(_message),
                     child: Container(
