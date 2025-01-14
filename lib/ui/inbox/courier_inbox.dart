@@ -449,9 +449,11 @@ class CourierTabContentState extends State<CourierTabContent> with SingleTickerP
     if (widget.canShowUnreadCount && _inboxListener == null) {
       _inboxListener = await Courier.shared.addInboxListener(
         onUnreadCountChanged: (newUnreadCount) {
-          setState(() {
-            _unreadCount = newUnreadCount;
-          });
+          if (mounted) {
+            setState(() {
+              _unreadCount = newUnreadCount;
+            });
+          }
         },
       );
     }
@@ -566,10 +568,12 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
 
   Future<void> addMessageAtIndex(InboxMessage newMessage, int index) async {
     try {
-      setState(() {
-        widget.messages.insert(index, newMessage);
-        _messagesToAdd.add(newMessage.messageId);
-      });
+      if (mounted) {
+        setState(() {
+          widget.messages.insert(index, newMessage);
+          _messagesToAdd.add(newMessage.messageId);
+        });
+      }
     } catch (e) {
       Courier.log('Error adding message: $e');
     }
@@ -577,7 +581,7 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
 
   Future<void> refreshMessageAtIndex(InboxMessage updatedMessage, int index) async {
     try {
-      if (!updatedMessage.isArchived) {
+      if (!updatedMessage.isArchived && mounted) {
         await _listItemRefs[getItemId(updatedMessage)]?.currentState?.refresh(updatedMessage);
         setState(() {
           widget.messages[index] = updatedMessage;
@@ -592,10 +596,12 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
     final itemId = getItemId(message);
     try {
       await _listItemRefs[itemId]?.currentState?.remove();
-      setState(() {
-        widget.messages.removeAt(index);
-        _listItemRefs.remove(itemId);
-      });
+      if (mounted) {
+        setState(() {
+          widget.messages.removeAt(index);
+          _listItemRefs.remove(itemId);
+        });
+      }
     } catch (e) {
       Courier.log('Error removing message: $e');
     }
