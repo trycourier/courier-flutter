@@ -47,7 +47,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
         color: AppTheme.primaryColor,
       ),
       unread: CourierInboxSwipeActionStyle(
-        icon: Icons.email,
+        icon: Icons.mark_email_read,
         color: AppTheme.primaryColor.withOpacity(0.5),
       ),
     ),
