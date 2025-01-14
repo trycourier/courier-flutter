@@ -81,15 +81,15 @@ class CourierInboxTheme {
   }
 
   Color getReadSwipeActionColor(BuildContext context) {
-    return readingSwipeActionStyle.read.color ?? _brandColor ?? Theme.of(context).primaryColor.withOpacity(0.7);
+    return readingSwipeActionStyle.read.color ?? _brandColor ?? Theme.of(context).primaryColor;
   }
 
   Color getUnreadSwipeActionColor(BuildContext context) {
-    return readingSwipeActionStyle.unread.color ?? _brandColor ?? Theme.of(context).primaryColor;
+    return readingSwipeActionStyle.unread.color ?? _brandColor?.withOpacity(0.7) ?? Theme.of(context).primaryColor.withOpacity(0.7);
   }
 
   Color getArchiveSwipeActionColor(BuildContext context) {
-    return archivingSwipeActionStyle.archive.color ?? _brandColor ?? Theme.of(context).colorScheme.error;
+    return archivingSwipeActionStyle.archive.color ?? Theme.of(context).colorScheme.error;
   }
 
   Color getTabIndicatorColor(BuildContext context) {
@@ -97,7 +97,7 @@ class CourierInboxTheme {
   }
 
   TextStyle? getSelectedTabTextStyle(BuildContext context) {
-    return tabStyle.selected.font ?? Theme.of(context).tabBarTheme.labelStyle;
+    return tabStyle.selected.font ?? (_brandColor != null ? TextStyle(color: _brandColor) : Theme.of(context).tabBarTheme.labelStyle);
   }
 
   TextStyle? getUnselectedTabTextStyle(BuildContext context) {
@@ -113,11 +113,11 @@ class CourierInboxTheme {
   }
 
   TextStyle? getSelectedIndicatorTabTextStyle(BuildContext context) {
-    return tabStyle.selected.font ?? const TextStyle(color: Colors.white);
+    return tabStyle.selected.indicator.font ?? const TextStyle(color: Colors.white);
   }
 
   TextStyle? getUnselectedIndicatorTabTextStyle(BuildContext context) {
-    return tabStyle.unselected.font ?? Theme.of(context).tabBarTheme.unselectedLabelStyle;
+    return tabStyle.unselected.indicator.font ?? Theme.of(context).tabBarTheme.unselectedLabelStyle;
   }
 
   TextStyle? getTitleStyle(BuildContext context, bool isRead) {

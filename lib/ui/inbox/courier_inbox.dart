@@ -71,7 +71,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   late TabController _tabController;
   late PageController _pageController;
   int _currentTab = 0;
-  int _unreadCount = 0;
+  int _lastTab = 0;
   final feedKey = const Uuid().v4();
   final archivedKey = const Uuid().v4();
   
@@ -121,15 +121,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             _brand = brand;
             _isLoading = false;
             _error = error;
-          });
-        }
-      },
-      onUnreadCountChanged: (count) {
-        if (mounted) {
-          Future.delayed(const Duration(milliseconds: 300), () {
-            setState(() {
-              _unreadCount = count;
-            });
           });
         }
       },
@@ -350,7 +341,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
               child: CourierTabContent(
                 text: 'Notifications',
                 textStyle: _currentTab == 0 ? getTheme(isDarkMode).getSelectedTabTextStyle(context) : getTheme(isDarkMode).getUnselectedTabTextStyle(context),
-                unreadCount: _unreadCount,
+                canShowUnreadCount: true,
                 theme: getTheme(isDarkMode),
                 isActive: _currentTab == 0,
               ),
@@ -365,7 +356,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             ),
           ],
           onTap: (index) {
-            if (index == _currentTab) {
+            if (index == _lastTab) {
               final controller = index == 0 ? widget.feedScrollController : widget.archivedScrollController;
               if (controller.hasClients) {
                 controller.animateTo(
@@ -376,7 +367,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
               }
               return;
             }
-            _currentTab = index;
+            _lastTab = index;
           },
         ),
         Expanded(
@@ -424,14 +415,63 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   }
 }
 
-class CourierTabContent extends StatelessWidget {
+class CourierTabContent extends StatefulWidget {
   final String text;
   final TextStyle? textStyle;
-  final int unreadCount;
   final CourierInboxTheme theme;
   final bool isActive;
-  
-  const CourierTabContent({super.key, required this.text, required this.textStyle, this.unreadCount = 0, required this.theme, required this.isActive});
+  final bool canShowUnreadCount;
+
+  const CourierTabContent({
+    super.key,
+    required this.text,
+    required this.textStyle,
+    required this.theme,
+    required this.isActive,
+    this.canShowUnreadCount = false,
+  });
+
+  @override
+  CourierTabContentState createState() => CourierTabContentState();
+}
+
+class CourierTabContentState extends State<CourierTabContent> with SingleTickerProviderStateMixin {
+  int _unreadCount = 0;
+  CourierInboxListener? _inboxListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _addInboxListener();
+  }
+
+  Future<void> _addInboxListener() async {
+    if (widget.canShowUnreadCount && _inboxListener == null) {
+      _inboxListener = await Courier.shared.addInboxListener(
+        onUnreadCountChanged: (newUnreadCount) {
+          setState(() {
+            _unreadCount = newUnreadCount;
+          });
+        },
+      );
+    }
+  }
+
+  void _removeInboxListener() {
+    if (_inboxListener != null) {
+      _inboxListener!.remove().then((_) {
+        _inboxListener = null;
+      }).catchError((error) {
+        Courier.log('Failed to remove inbox listener: $error');
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeInboxListener();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -439,13 +479,17 @@ class CourierTabContent extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(text, style: textStyle),
-          if (unreadCount > 0) ...[
+          Text(widget.text, style: widget.textStyle),
+          if (_unreadCount > 0) ...[
             const SizedBox(width: 8.0),
             UnreadCountIndicator(
-              unreadCount: unreadCount,
-              backgroundColor: isActive ? theme.getSelectedTabIndicatorBackgroundColor(context) : theme.getUnselectedTabIndicatorBackgroundColor(context),
-              textStyle: isActive ? theme.getSelectedIndicatorTabTextStyle(context) : theme.getUnselectedIndicatorTabTextStyle(context),
+              unreadCount: _unreadCount,
+              backgroundColor: widget.isActive
+                  ? widget.theme.getSelectedTabIndicatorBackgroundColor(context)
+                  : widget.theme.getUnselectedTabIndicatorBackgroundColor(context),
+              textStyle: widget.isActive
+                  ? widget.theme.getSelectedIndicatorTabTextStyle(context)
+                  : widget.theme.getUnselectedIndicatorTabTextStyle(context),
             ),
           ],
         ],

@@ -257,7 +257,7 @@ class SwipableContainerState extends State<SwipableContainer> with TickerProvide
             width: math.max(_thresholdWidth, _actionWidth),
             left: 0,
             child: Container(
-              color: widget.isRead ? widget.readColor : widget.unreadColor,
+              color: !widget.isRead ? widget.readColor : widget.unreadColor,
               child: Center(
                 child: AnimatedBuilder(
                   animation: _bounceAnimation,

@@ -19,10 +19,43 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
   final customTheme = CourierInboxTheme(
-    brandId: Env.brandId,
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
       indicator: CourierInboxUnreadIndicator.dot,
       color: AppTheme.primaryColor,
+    ),
+    loadingIndicatorColor: AppTheme.primaryColor,
+    tabIndicatorColor: AppTheme.primaryColor,
+    tabStyle: CourierInboxTabStyle(
+      selected: CourierInboxTabItemStyle(
+        font: AppTheme.unreadTitleText.copyWith(color: AppTheme.primaryColor),
+        indicator: CourierInboxTabIndicatorStyle(
+          color: AppTheme.primaryColor,
+          font: AppTheme.bodyText.copyWith(color: Colors.white),
+        ),
+      ),
+      unselected: CourierInboxTabItemStyle(
+        font: AppTheme.titleText.copyWith(color: AppTheme.secondaryColor),
+        indicator: CourierInboxTabIndicatorStyle(
+          color: AppTheme.secondaryColor,
+          font: AppTheme.bodyText.copyWith(color: Colors.white),
+        ),
+      ),
+    ),
+    readingSwipeActionStyle: CourierInboxReadingSwipeActionStyle(
+      read: const CourierInboxSwipeActionStyle(
+        icon: Icons.drafts,
+        color: AppTheme.primaryColor,
+      ),
+      unread: CourierInboxSwipeActionStyle(
+        icon: Icons.email,
+        color: AppTheme.primaryColor.withOpacity(0.5),
+      ),
+    ),
+    archivingSwipeActionStyle: const CourierInboxArchivingSwipeActionStyle(
+      archive: CourierInboxSwipeActionStyle(
+        icon: Icons.inbox,
+        color: Colors.red,
+      ),
     ),
     titleStyle: CourierInboxTextStyle(
       read: AppTheme.titleText,
@@ -53,11 +86,22 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
         print(action);
       },
     ),
+    'Branded': CourierInbox(
+      keepAlive: true,
+      lightTheme: CourierInboxTheme(
+        brandId: Env.brandId,
+      ),
+      darkTheme: CourierInboxTheme(
+        brandId: Env.brandId,
+      ),
+      onMessageClick: (message, index) {
+        message.isRead ? message.markAsUnread() : message.markAsRead();
+      },
+    ),
     'Styled': CourierInbox(
       keepAlive: true,
       lightTheme: customTheme,
       darkTheme: customTheme,
-      canSwipePages: true,
       feedScrollController: _feedScrollController,
       archivedScrollController: _archivedScrollController,
       onMessageClick: (message, index) {
