@@ -22,6 +22,9 @@ class CourierInbox extends StatefulWidget {
   final CourierInboxTheme _lightTheme;
   final CourierInboxTheme _darkTheme;
 
+  // Item Builder
+  final Widget Function(InboxMessage, int)? itemBuilder;
+
   // Actions
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
@@ -41,6 +44,7 @@ class CourierInbox extends StatefulWidget {
     CourierInboxTheme? darkTheme,
     ScrollController? feedScrollController,
     ScrollController? archivedScrollController,
+    this.itemBuilder,
     this.onMessageClick,
     this.onMessageLongPress,
     this.onActionClick,
@@ -280,6 +284,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         canPerformGestures: !widget.canSwipePages,
         isPaginating: _isFeedPaginating,
         onPaginationTriggered: () => _fetchNextPage(InboxFeed.feed),
+        itemBuilder: widget.itemBuilder,
       ),
       CourierMessageList(
         listId: archivedKey,
@@ -297,6 +302,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         canPerformGestures: false,
         isPaginating: _isArchivedPaginating,
         onPaginationTriggered: () => _fetchNextPage(InboxFeed.archived),
+        itemBuilder: widget.itemBuilder,
       ),
     ];
   }
@@ -530,6 +536,7 @@ class CourierMessageList extends StatefulWidget {
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
   final Function(InboxAction, InboxMessage, int)? onActionClick;
+  final Widget Function(InboxMessage, int)? itemBuilder;
   final Future<void> Function() onRefresh;
   final InboxFeed feed;
   final bool canPerformGestures;
@@ -552,6 +559,7 @@ class CourierMessageList extends StatefulWidget {
     required this.canPerformGestures,
     required this.isPaginating,
     required this.onPaginationTriggered,
+    this.itemBuilder,
   });
 
   @override
@@ -653,7 +661,9 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
 
   Widget _buildListItem(BuildContext context, int index) {
     if (index < widget.messages.length) {
-      return _buildMessageItem(context, widget.messages[index], index);
+      return widget.itemBuilder != null
+          ? widget.itemBuilder!(widget.messages[index], index)
+          : _buildMessageItem(context, widget.messages[index], index);
     } else if (index == widget.messages.length && widget.canPaginate) {
       return CourierInboxPaginationItem(
         isPaginating: widget.isPaginating,

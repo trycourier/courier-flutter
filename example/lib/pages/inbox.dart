@@ -79,6 +79,23 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   late final Map<String, Widget> pages = {
     'Default': CourierInbox(
       keepAlive: true,
+      itemBuilder: (message, index) {
+        return ListTile(
+          leading: message.isRead ? null : const Icon(Icons.brightness_1, color: AppTheme.primaryColor, size: 12.0),
+          title: Text(
+            message.title ?? '',
+            style: message.isRead ? AppTheme.bodyText : AppTheme.unreadTitleText,
+          ),
+          subtitle: Text(
+            message.subtitle ?? '',
+            style: message.isRead ? AppTheme.bodyText : AppTheme.unreadBodyText,
+          ),
+          trailing: Icon(
+            message.isRead ? Icons.mark_email_read : Icons.mark_email_unread,
+            color: AppTheme.secondaryColor,
+          ),
+        );
+      },
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
       },
