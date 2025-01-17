@@ -78,7 +78,6 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
 
   late final Map<String, Widget> pages = {
     'Default': CourierInbox(
-      keepAlive: true,
       itemBuilder: (message, index) {
         return ListTile(
           leading: message.isRead ? null : const Icon(Icons.brightness_1, color: AppTheme.primaryColor, size: 12.0),
@@ -95,13 +94,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
             color: AppTheme.secondaryColor,
           ),
         );
-      },
-      onMessageClick: (message, index) {
-        message.isRead ? message.markAsUnread() : message.markAsRead();
-      },
-      onActionClick: (action, message, index) {
-        print(action);
-      },
+      }
     ),
     'Branded': CourierInbox(
       keepAlive: true,
