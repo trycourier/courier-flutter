@@ -89,54 +89,63 @@ The styles you can use to quickly customize the `CourierInbox`.
 
 
 ```dart
-final theme = CourierInboxTheme(
-  brandId: 'ASDF...', // Optional
-  loadingIndicatorColor: Colors.purple,
-  unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
-    indicator: CourierInboxUnreadIndicator.dot,
-    color: Colors.pink,
-  ),
-  titleStyle: CourierInboxTextStyle(
-    read: GoogleFonts.notoSans().copyWith(
-      fontWeight: FontWeight.normal,
-      fontSize: 18,
+final customTheme = CourierInboxTheme(
+    brandId: 'YOUR_BRAND_ID', // Optional
+    unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
+      indicator: CourierInboxUnreadIndicator.dot,
+      color: AppTheme.primaryColor,
     ),
-    unread: GoogleFonts.notoSans().copyWith(
-      fontWeight: FontWeight.bold,
-      fontSize: 18,
+    loadingIndicatorColor: AppTheme.primaryColor,
+    tabIndicatorColor: AppTheme.primaryColor,
+    tabStyle: CourierInboxTabStyle(
+      selected: CourierInboxTabItemStyle(
+        font: AppTheme.unreadTitleText.copyWith(color: AppTheme.primaryColor),
+        indicator: CourierInboxTabIndicatorStyle(
+          color: AppTheme.primaryColor,
+          font: AppTheme.bodyText.copyWith(color: Colors.white),
+        ),
+      ),
+      unselected: CourierInboxTabItemStyle(
+        font: AppTheme.titleText.copyWith(color: AppTheme.secondaryColor),
+        indicator: CourierInboxTabIndicatorStyle(
+          color: AppTheme.secondaryColor,
+          font: AppTheme.bodyText.copyWith(color: Colors.white),
+        ),
+      ),
     ),
-  ),
-  timeStyle: CourierInboxTextStyle(
-    read: GoogleFonts.notoSans().copyWith(
-      fontWeight: FontWeight.normal,
-      fontSize: 16,
+    readingSwipeActionStyle: CourierInboxReadingSwipeActionStyle(
+      read: const CourierInboxSwipeActionStyle(
+        icon: Icons.drafts,
+        color: AppTheme.primaryColor,
+      ),
+      unread: CourierInboxSwipeActionStyle(
+        icon: Icons.mark_email_read,
+        color: AppTheme.primaryColor.withOpacity(0.5),
+      ),
     ),
-    unread: GoogleFonts.notoSans().copyWith(
-      fontWeight: FontWeight.normal,
-      fontSize: 16,
+    archivingSwipeActionStyle: const CourierInboxArchivingSwipeActionStyle(
+      archive: CourierInboxSwipeActionStyle(
+        icon: Icons.inbox,
+        color: Colors.red,
+      ),
     ),
-  ),
-  bodyStyle: CourierInboxTextStyle(
-    read: GoogleFonts.notoSans().copyWith(
-      fontWeight: FontWeight.normal,
-      fontSize: 16,
+    titleStyle: CourierInboxTextStyle(
+      read: AppTheme.titleText,
+      unread: AppTheme.unreadTitleText,
     ),
-    unread: GoogleFonts.notoSans().copyWith(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
+    timeStyle: CourierInboxTextStyle(
+      read: AppTheme.bodyText,
+      unread: AppTheme.unreadBodyText,
     ),
-  ),
-  buttonStyle: CourierInboxButtonStyle(
-    read: FilledButton.styleFrom(
-      backgroundColor: Colors.grey,
-      foregroundColor: Colors.white,
+    bodyStyle: CourierInboxTextStyle(
+      read: AppTheme.bodyText,
+      unread: AppTheme.unreadBodyText,
     ),
-    unread: FilledButton.styleFrom(
-      backgroundColor: Colors.purple,
-      foregroundColor: Colors.white,
+    buttonStyle: CourierInboxButtonStyle(
+      read: AppTheme.buttonStyle,
+      unread: AppTheme.unreadButtonStyle,
     ),
-  ),
-  separator: null,
+    separator: null,
 );
 
 // Pass the theme to the inbox
@@ -152,6 +161,9 @@ CourierInbox(
     print(action);
     _customScrollController.jumpTo(0);
   },
+  onMessageLongPress: (message, index) {
+    ...
+  }
 )
 ...
 ```
