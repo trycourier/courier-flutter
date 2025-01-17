@@ -53,7 +53,8 @@ If you are using JWT authentication, be sure to enable JWT support on the Courie
 
 The default `CourierInbox` styles.
 
-<img width="415" alt="item" src="https://github.com/trycourier/courier-flutter/assets/6370613/979c38aa-b2f0-4c56-bc34-516bacdfb823">
+<img width="390" alt="default-inbox-styles" src="https://github.com/user-attachments/assets/f889cc24-b50a-4e3a-be4a-29a6c3d02921">
+<img width="410" alt="android-default-inbox-styles" src="https://github.com/user-attachments/assets/b7eb7c74-fc37-4d71-b351-bb5e584a7a63">
 
 ```swift
 CourierInbox(
