@@ -178,13 +178,13 @@ The raw data you can use to build whatever UI you'd like.
 
 ```dart
 late CourierInboxListener _inboxListener;
-
 bool _isLoading = true;
 String? _error;
 List<InboxMessage> _messages = [];
+bool _canLoadMore = false;
 
 _inboxListener = await Courier.shared.addInboxListener(
-  onInitialLoad: () {
+  onLoading: (isRefresh) {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -196,12 +196,45 @@ _inboxListener = await Courier.shared.addInboxListener(
       _error = error;
     });
   },
-  onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+  onUnreadCountChanged: (unreadCount) {
+    print('unreadCount: $unreadCount');
+  },
+  onFeedChanged: (messageSet) {
     setState(() {
-      _messages = messages;
+      _messages = messageSet.messages;
       _isLoading = false;
       _error = null;
+      _canLoadMore = messageSet.canPaginate;
     });
+  },
+  onMessageChanged: (feed, index, message) {
+    if (feed == InboxFeed.feed) {
+      setState(() {
+        _messages[index] = message;
+      });
+    }
+  },
+  onMessageAdded: (feed, index, message) {
+    if (feed == InboxFeed.feed) {
+      setState(() {
+        _messages.insert(index, message);
+      });
+    }
+  },
+  onMessageRemoved: (feed, index, message) {
+    if (feed == InboxFeed.feed) {
+      setState(() {
+        _messages.removeAt(index);
+      });
+    }
+  },
+  onPageAdded: (feed, page) {
+    if (feed == InboxFeed.feed) {
+      setState(() {
+        _messages += page.messages;
+        _canLoadMore = page.canPaginate;
+      });
+    }
   },
 );
 
@@ -285,13 +318,28 @@ await message.markAsArchived();
 
 // Listener
 final inboxListener = await Courier.shared.addInboxListener(
-  onInitialLoad: () {
-   
+  onLoading: (isRefresh) {
+    
   },
   onError: (error) {
     
   },
-  onMessagesChanged: (messages, unreadMessageCount, totalMessageCount, canPaginate) {
+  onUnreadCountChanged: (unreadCount) {
+    
+  },
+  onFeedChanged: (messageSet) {
+    
+  },
+  onMessageChanged: (feed, index, message) {
+    
+  },
+  onMessageAdded: (feed, index, message) {
+    
+  },
+  onMessageRemoved: (feed, index, message) {
+    
+  },
+  onPageAdded: (feed, page) {
     
   },
 );
