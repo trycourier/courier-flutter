@@ -89,38 +89,53 @@ The styles you can use to quickly customize the `CourierInbox`.
 
 
 ```dart
-final customTheme = CourierInboxTheme(
-    brandId: 'YOUR_BRAND_ID', // Optional
+final theme = CourierInboxTheme(
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
       indicator: CourierInboxUnreadIndicator.dot,
-      color: AppTheme.primaryColor,
+      color: Color(0xFF9747FF),
     ),
-    loadingIndicatorColor: AppTheme.primaryColor,
-    tabIndicatorColor: AppTheme.primaryColor,
+    loadingIndicatorColor: Color(0xFF9747FF),
+    tabIndicatorColor: Color(0xFF9747FF),
     tabStyle: CourierInboxTabStyle(
       selected: CourierInboxTabItemStyle(
-        font: AppTheme.unreadTitleText.copyWith(color: AppTheme.primaryColor),
+        font: GoogleFonts.sen().copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Color(0xFF9747FF),
+        ),
         indicator: CourierInboxTabIndicatorStyle(
-          color: AppTheme.primaryColor,
-          font: AppTheme.bodyText.copyWith(color: Colors.white),
+          color: Color(0xFF9747FF),
+          font: GoogleFonts.sen().copyWith(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+            color: Colors.white,
+          ),
         ),
       ),
       unselected: CourierInboxTabItemStyle(
-        font: AppTheme.titleText.copyWith(color: AppTheme.secondaryColor),
+        font: GoogleFonts.sen().copyWith(
+          fontWeight: FontWeight.normal,
+          fontSize: 18,
+          color: Colors.black45,
+        ),
         indicator: CourierInboxTabIndicatorStyle(
-          color: AppTheme.secondaryColor,
-          font: AppTheme.bodyText.copyWith(color: Colors.white),
+          color: Colors.black45,
+          font: GoogleFonts.sen().copyWith(
+            fontWeight: FontWeight.normal,
+            fontSize: 16,
+            color: Colors.white,
+          ),
         ),
       ),
     ),
     readingSwipeActionStyle: CourierInboxReadingSwipeActionStyle(
       read: const CourierInboxSwipeActionStyle(
         icon: Icons.drafts,
-        color: AppTheme.primaryColor,
+        color: Color(0xFF9747FF),
       ),
       unread: CourierInboxSwipeActionStyle(
         icon: Icons.mark_email_read,
-        color: AppTheme.primaryColor.withOpacity(0.5),
+        color: Color(0xFF9747FF).withOpacity(0.5),
       ),
     ),
     archivingSwipeActionStyle: const CourierInboxArchivingSwipeActionStyle(
@@ -130,20 +145,52 @@ final customTheme = CourierInboxTheme(
       ),
     ),
     titleStyle: CourierInboxTextStyle(
-      read: AppTheme.titleText,
-      unread: AppTheme.unreadTitleText,
+      read: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 18,
+      ),
+      unread: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
     ),
     timeStyle: CourierInboxTextStyle(
-      read: AppTheme.bodyText,
-      unread: AppTheme.unreadBodyText,
+      read: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+      unread: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
     ),
     bodyStyle: CourierInboxTextStyle(
-      read: AppTheme.bodyText,
-      unread: AppTheme.unreadBodyText,
+      read: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+      unread: GoogleFonts.sen().copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
     ),
     buttonStyle: CourierInboxButtonStyle(
-      read: AppTheme.buttonStyle,
-      unread: AppTheme.unreadButtonStyle,
+      read: FilledButton.styleFrom(
+        backgroundColor: Colors.grey,
+        foregroundColor: Colors.white,
+        textStyle: GoogleFonts.sen().copyWith(
+          fontWeight: FontWeight.normal,
+          fontSize: 16,
+        ),
+      ),
+      unread: FilledButton.styleFrom(
+        backgroundColor: Color(0xFF9747FF),
+        foregroundColor: Colors.white,
+        textStyle: GoogleFonts.sen().copyWith(
+          fontWeight: FontWeight.normal,
+          fontSize: 16,
+        ),
+      ),
     ),
     separator: null,
 );
@@ -151,6 +198,7 @@ final customTheme = CourierInboxTheme(
 // Pass the theme to the inbox
 // This example will use the same theme for light and dark mode
 CourierInbox(
+  canSwipePages: true,
   lightTheme: theme,
   darkTheme: theme,
   scrollController: _customScrollController,
