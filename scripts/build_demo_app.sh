@@ -27,19 +27,19 @@ echo "Navigated to the example directory."
 # Increment Flutter build number
 increment_build_number
 
-# Build Android app bundle
-echo "🤖 Building Android app bundle..."
-flutter build appbundle
+# # Build Android app bundle
+# echo "🤖 Building Android app bundle..."
+# flutter build appbundle
 
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to build Android app bundle."
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "❌ Failed to build Android app bundle."
+#     exit 1
+# fi
 
-echo "✅ Android app bundle built successfully."
+# echo "✅ Android app bundle built successfully."
 
-# Open the Android build folder in Finder
-open build/app/outputs/bundle/release
+# # Open the Android build folder in Finder
+# open build/app/outputs/bundle/release
 
 # Build iOS app bundle
 echo "🍎 Building iOS app bundle..."

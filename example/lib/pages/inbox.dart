@@ -5,6 +5,7 @@ import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:courier_flutter_sample/pages/full_inbox_page.dart'; // Import the full inbox page
 
 class InboxPage extends StatefulWidget {
   const InboxPage({super.key});
@@ -183,6 +184,16 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
             tooltip: 'Read All Messages',
             icon: const Icon(Icons.mark_email_read), // Example icon for the button
             onPressed: () => Courier.shared.readAllInboxMessages(),
+          ),
+          IconButton(
+            tooltip: 'Open Full Inbox',
+            icon: const Icon(Icons.open_in_new), // Example icon for the button
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FullInboxPage()),
+              );
+            },
           ),
         ],
         bottom: TabBar(
