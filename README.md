@@ -23,7 +23,7 @@
         <tr width="600px">
             <td align="left">Minimum iOS SDK Version</td>
             <td align="center">
-                <code>13.0</code>
+                <code>15.0</code>
             </td>
         </tr>
         <tr width="600px">
@@ -49,11 +49,11 @@ flutter pub add courier_flutter
 
 ## **iOS Setup**
 
-### 1. Support iOS 13.0+ in your Project
+### 1. Support iOS 15.0+ in your Project
 
-<img width="512" alt="Screenshot 2023-11-17 at 11 26 01 AM" src="https://github.com/trycourier/courier-flutter/assets/6370613/3a00d399-6de7-44fe-810e-b87f8d48841a">
+<img width="470" alt="Screenshot 2025-01-21 at 12 55 34 PM" src="https://github.com/user-attachments/assets/ee7722b2-ce6a-4dc4-8b30-94f42494d80a" />
 
-Update your deployment target to iOS 13
+Update your deployment target to iOS 15
 
 ### 2. Install the Cocoapod
 
