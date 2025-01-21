@@ -28,6 +28,8 @@ apply plugin: 'kotlin-android'
 
 android {
 
+    namespace 'com.courier.courier_flutter'
+
     compileSdk 34
 
     defaultConfig {
