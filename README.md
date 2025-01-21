@@ -91,7 +91,9 @@ targetSdkVersion 33+
 compileSdkVersion 33+
 ```
 
-### 3. Run Gradle Sync
+### 3. Gradle Sync
+
+Your app must support at least gradle `8.4`
 
 &emsp;
 
