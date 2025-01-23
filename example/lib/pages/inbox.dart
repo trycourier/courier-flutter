@@ -5,6 +5,7 @@ import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class InboxPage extends StatefulWidget {
   const InboxPage({super.key});
@@ -195,16 +196,50 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
             onPressed: () => Courier.shared.readAllInboxMessages(),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: pages.keys.map((String title) => Tab(text: title)).toList(),
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: pages.values.toList(),
+      body: CourierInbox(
+        itemBuilder: (message, index) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage('https://app.courier.com/_next/image?url=%2Ficons%2Fcourier-logos%2Fenterprise-dark.png&w=256&q=75'),
+                  radius: 20,
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(message.time, style: AppTheme.bodyText),
+                      SizedBox(height: 4),
+                      Text(message.title ?? '', style: GoogleFonts.sen().copyWith(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 18,
+                      )),
+                      SizedBox(height: 4),
+                      Text(message.subtitle ?? '', style: AppTheme.bodyText),
+                      Text(message.data['imageUrl'] ?? 'None'),
+                    ],
+                  ),
+                ),
+                if (!message.isRead)
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue,
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 }
+
