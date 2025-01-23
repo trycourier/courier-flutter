@@ -14,7 +14,7 @@ public class CourierFlutterMethodHandler: NSObject {
         
         // Set the flutter ios user agent
         // This ensures all the requests are tagged with this agent
-        Courier.agent = CourierAgent.flutterIOS("4.0.2")
+        Courier.agent = CourierAgent.flutterIOS("4.0.3")
         
     }
     
