@@ -59,41 +59,46 @@ class _CustomInboxPageState extends State<CustomInboxPage>
       onUnreadCountChanged: (unreadCount) {
         print('unreadCount: $unreadCount');
       },
-      onFeedChanged: (messageSet) {
-        setState(() {
-          _messages = messageSet.messages;
-          _isLoading = false;
-          _error = null;
-          _canLoadMore = messageSet.canPaginate;
-        });
+      onTotalCountChanged: (feed, totalCount) {
+        print('totalCount: $totalCount');
       },
-      onMessageChanged: (feed, index, message) {
+      onMessagesChanged: (messages, canPaginate, feed) {
         if (feed == InboxFeed.feed) {
           setState(() {
-            _messages[index] = message;
+            _messages = messages;
+            _isLoading = false;
+            _error = null;
+            _canLoadMore = canPaginate;
           });
         }
       },
-      onMessageAdded: (feed, index, message) {
-        if (feed == InboxFeed.feed) {
+      onPageAdded: (messages, canPaginate, isFirstPage, feed) {
+        if (feed == InboxFeed.feed && !isFirstPage) {
           setState(() {
-            _messages.insert(index, message);
+            _messages = messages;
+            _isLoading = false;
+            _error = null;
+            _canLoadMore = canPaginate;
           });
         }
       },
-      onMessageRemoved: (feed, index, message) {
-        if (feed == InboxFeed.feed) {
-          setState(() {
-            _messages.removeAt(index);
-          });
-        }
-      },
-      onPageAdded: (feed, page) {
-        if (feed == InboxFeed.feed) {
-          setState(() {
-            _messages += page.messages;
-            _canLoadMore = page.canPaginate;
-          });
+      onMessageEvent: (message, index, feed, event) {
+        switch (event) {
+          case InboxMessageEvent.added:
+            setState(() {
+              _messages.insert(index, message);
+            });
+            break;
+          case InboxMessageEvent.changed:
+            setState(() {
+              _messages[index] = message;
+            });
+            break;
+          case InboxMessageEvent.removed:
+            setState(() {
+              _messages.removeAt(index);
+            });
+            break;
         }
       },
     );

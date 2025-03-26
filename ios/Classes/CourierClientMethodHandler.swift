@@ -5,8 +5,8 @@
 //  Created by Michael Miller on 8/2/24.
 //
 
+@preconcurrency import Courier_iOS
 import Foundation
-import Courier_iOS
 
 internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     

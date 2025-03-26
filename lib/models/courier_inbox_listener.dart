@@ -1,30 +1,50 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/inbox_feed.dart';
-import 'package:courier_flutter/models/inbox_message_set.dart';
+
+enum InboxMessageEvent {
+  added(value: "added"),
+  changed(value: "changed"), 
+  removed(value: "removed");
+
+  final String value;
+
+  const InboxMessageEvent({
+    required this.value,
+  });
+
+  static InboxMessageEvent fromString(String value) {
+    switch (value) {
+      case "added":
+        return InboxMessageEvent.added;
+      case "changed":
+        return InboxMessageEvent.changed;
+      case "removed":
+        return InboxMessageEvent.removed;
+      default:
+        throw ArgumentError("Invalid InboxMessageEvent value: $value");
+    }
+  }
+}
 
 class CourierInboxListener {
   String listenerId;
   Function(bool isRefresh)? onLoading;
   Function(String error)? onError;
   Function(int unreadCount)? onUnreadCountChanged;
-  Function(InboxMessageSet messageSet)? onFeedChanged;
-  Function(InboxMessageSet messageSet)? onArchiveChanged;
-  Function(InboxFeed feed, InboxMessageSet page)? onPageAdded;
-  Function(InboxFeed feed, int index, InboxMessage message)? onMessageChanged;
-  Function(InboxFeed feed, int index, InboxMessage message)? onMessageAdded;
-  Function(InboxFeed feed, int index, InboxMessage message)? onMessageRemoved;
+  Function(InboxFeed feed, int totalCount)? onTotalCountChanged;
+  Function(List<InboxMessage> messages, bool canPaginate, InboxFeed feed)? onMessagesChanged;
+  Function(List<InboxMessage> messages, bool canPaginate, bool isFirstPage, InboxFeed feed)? onPageAdded;
+  Function(InboxMessage message, int index, InboxFeed feed, InboxMessageEvent event)? onMessageEvent;
 
   CourierInboxListener({
     required this.listenerId,
     this.onLoading,
     this.onError,
     this.onUnreadCountChanged,
-    this.onFeedChanged,
-    this.onArchiveChanged,
+    this.onTotalCountChanged,
+    this.onMessagesChanged,
     this.onPageAdded,
-    this.onMessageChanged,
-    this.onMessageAdded,
-    this.onMessageRemoved,
+    this.onMessageEvent,
   });
 
   Future remove() => Courier.shared.removeInboxListener(listenerId: listenerId);

@@ -6,11 +6,15 @@
 //
 
 @preconcurrency import Courier_iOS
+import Foundation
 
 internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
     
     static func getChannel(with registrar: FlutterPluginRegistrar) -> FlutterMethodChannel {
-        return FlutterMethodChannel(name: CourierFlutterChannel.shared.rawValue, binaryMessenger: registrar.messenger())
+        return FlutterMethodChannel(
+            name: CourierFlutterChannel.shared.rawValue,
+            binaryMessenger: registrar.messenger()
+        )
     }
     
     static func register(with registrar: any FlutterPluginRegistrar) {
@@ -27,15 +31,12 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
         Task {
-            
             do {
-                
                 switch call.method {
                     
-                    // MARK: Client
+                    // MARK: - Client
                     
                 case "client.get_options":
-                    
                     guard let options = await Courier.shared.client?.options else {
                         result(nil)
                         return
@@ -47,28 +48,25 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                         "userId": options.userId,
                         "connectionId": options.connectionId,
                         "tenantId": options.tenantId,
-                        "showLogs": options.showLogs,
+                        "showLogs": options.showLogs
                     ]
                     
-                    result(dict)
+                    result(dict.compactMapValues { $0 })
                     
-                    // MARK: Authentication
+                    // MARK: - Authentication
                     
                 case "auth.user_id":
-                    
                     result(await Courier.shared.userId)
                     
                 case "auth.tenant_id":
-                    
                     result(await Courier.shared.tenantId)
                     
                 case "auth.is_user_signed_in":
-                    
+                    // Return bool directly to Dart
                     result(await Courier.shared.isUserSignedIn)
                     
                 case "auth.sign_in":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
@@ -89,14 +87,11 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     result(nil)
                     
                 case "auth.sign_out":
-                    
                     await Courier.shared.signOut()
-                    
                     result(nil)
                     
                 case "auth.add_authentication_listener":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
@@ -104,384 +99,318 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     // Create the listener
                     let listener = await Courier.shared.addAuthenticationListener { userId in
-                        
-                        // Call the event function
                         DispatchQueue.main.async {
-                            CourierFlutterChannel.events.channel?.invokeMethod("auth.state_changed", arguments: [
-                                "userId": userId,
-                                "id": listenerId
-                            ])
+                            // Fire the event
+                            CourierFlutterChannel.events.channel?.invokeMethod(
+                                "auth.state_changed",
+                                arguments: [
+                                    "userId": userId,
+                                    "id": listenerId
+                                ]
+                            )
                         }
-                        
                     }
                     
                     // Hold reference to the auth listeners
                     authenticationListeners[listenerId] = listener
-                    
-                    // Return the id of the listener
                     result(listenerId)
                     
                 case "auth.remove_authentication_listener":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let listenerId: String = try params.extract("listenerId")
-                    
-                    // Get and remove the listener
                     guard let listener = authenticationListeners[listenerId] else {
                         throw CourierFlutterError.invalidParameter(value: "listenerId")
                     }
                     
                     listener.remove()
+                    authenticationListeners.removeValue(forKey: listenerId)
                     
                     result(nil)
                     
                 case "auth.remove_all_authentication_listeners":
-                    
                     for value in authenticationListeners.values {
                         value.remove()
                     }
-                    
                     authenticationListeners.removeAll()
-                    
                     result(nil)
                     
-                    // MARK: Push
-                    
-                case "tokens.get_apns_token":
-                    
-                    let token = await Courier.shared.apnsToken
-                    
-                    result(token?.string)
+                    // MARK: - Push (Tokens)
                     
                 case "tokens.get_all_tokens":
-                    
                     let tokens = await Courier.shared.tokens
-                    
                     result(tokens)
                     
                 case "tokens.set_token":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let token: String = try params.extract("token")
                     let provider: String = try params.extract("provider")
                     
-                    try await Courier.shared.setToken(
-                        for: provider,
-                        token: token
-                    )
-                    
+                    try await Courier.shared.setToken(for: provider, token: token)
                     result(nil)
                     
                 case "tokens.get_token":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let provider: String = try params.extract("provider")
-                    
-                    let token = await Courier.shared.getToken(
-                        for: provider
-                    )
-                    
+                    let token = await Courier.shared.getToken(for: provider)
                     result(token)
                     
-                    // MARK: Inbox
+                // If you still need to expose get_apns_token, keep it. Otherwise remove it:
+                case "tokens.get_apns_token":
+                    let token = await Courier.shared.apnsToken
+                    result(token?.string)
+                    
+                    // MARK: - Inbox
                     
                 case "inbox.get_pagination_limit":
-                    
                     let limit = await Courier.shared.inboxPaginationLimit
-                    
                     result(limit)
                     
                 case "inbox.set_pagination_limit":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let limit: Int = try params.extract("limit")
-                    
                     await Courier.shared.setPaginationLimit(limit)
                     
                     result(nil)
                     
-                case "inbox.get_feed_messages":
-                    
-                    let messages = await Courier.shared.feedMessages
-                    
-                    let json = try messages.map { try $0.toJson() ?? "" }
-                    
-                    result(json)
-                    
-                case "inbox.get_archived_messages":
-                    
-                    let messages = await Courier.shared.archivedMessages
-                    
-                    let json = try messages.map { try $0.toJson() ?? "" }
-                    
-                    result(json)
-                    
                 case "inbox.refresh":
-                    
                     await Courier.shared.refreshInbox()
-                    
                     result(nil)
                     
                 case "inbox.fetch_next_page":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
-                    let feed: String = try params.extract("feed")
+                    let feedParam: String = try params.extract("feed")  // "archive" or "feed"
                     
-                    let inboxFeed: InboxMessageFeed = feed == "archived" ? .archived : .feed
+                    // If the new library's enum is `.archive` / `.feed`
+                    let inboxFeed: InboxMessageFeed = (feedParam == "archive") ? .archive : .feed
                     
                     let messageSet = try await Courier.shared.fetchNextInboxPage(inboxFeed)
                     
-                    let json = try messageSet.map { try $0.toJson() ?? "" }
+                    let messagesJson = try messageSet?.messages.map { try $0.toJson() ?? "" }
                     
-                    result(json)
+                    result([
+                        "messages": messagesJson ?? [],
+                        "totalCount": messageSet?.totalCount ?? 0,
+                        "canPaginate": messageSet?.canPaginate ?? false,
+                        "paginationCursor": messageSet?.paginationCursor ?? ""
+                    ])
                     
                 case "inbox.add_listener":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let client = await Courier.shared.client
-                    
                     let listenerId: String = try params.extract("listenerId")
                     
                     // Create the listener
                     let listener = await Courier.shared.addInboxListener(
                         onLoading: { isRefresh in
                             DispatchQueue.main.async {
-                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_loading", arguments: [
-                                    "id": listenerId,
-                                    "isRefresh": isRefresh
-                                ])
+                                CourierFlutterChannel.events.channel?.invokeMethod(
+                                    "inbox.listener_loading",
+                                    arguments: [
+                                        "id": listenerId,
+                                        "isRefresh": isRefresh
+                                    ]
+                                )
                             }
                         },
                         onError: { error in
                             DispatchQueue.main.async {
                                 let courierError = CourierError(from: error)
-                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_error", arguments: [
-                                    "error": courierError.message,
-                                    "id": listenerId
-                                ])
+                                CourierFlutterChannel.events.channel?.invokeMethod(
+                                    "inbox.listener_error",
+                                    arguments: [
+                                        "id": listenerId,
+                                        "error": courierError.message
+                                    ]
+                                )
                             }
                         },
-                        onUnreadCountChanged: { count in
+                        onUnreadCountChanged: { unreadCount in
                             DispatchQueue.main.async {
-                                CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_unread_count_changed", arguments: [
-                                    "count": count,
-                                    "id": listenerId
-                                ])
+                                CourierFlutterChannel.events.channel?.invokeMethod(
+                                    "inbox.listener_unread_count_changed",
+                                    arguments: [
+                                        "id": listenerId,
+                                        "count": unreadCount
+                                    ]
+                                )
                             }
                         },
-                        onFeedChanged: { messageSet in
+                        // NEW in the latest code
+                        onTotalCountChanged: { totalCount, feed in
+                            DispatchQueue.main.async {
+                                let feedName = (feed == .archive) ? "archive" : "feed"
+                                CourierFlutterChannel.events.channel?.invokeMethod(
+                                    "inbox.listener_total_count_changed",
+                                    arguments: [
+                                        "id": listenerId,
+                                        "feed": feedName,
+                                        "totalCount": totalCount
+                                    ]
+                                )
+                            }
+                        },
+                        // Unified feed/archived callback => onMessagesChanged
+                        onMessagesChanged: { messages, canPaginate, feed in
                             DispatchQueue.main.async {
                                 do {
-                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_feed_changed", arguments: [
-                                        "messageSet": try messageSet.toJson(),
-                                        "id": listenerId
-                                    ])
+                                    let feedName = (feed == .archive) ? "archive" : "feed"
+                                    let jsonMessages = try messages.map { try $0.toJson() ?? "" }
+                                    CourierFlutterChannel.events.channel?.invokeMethod(
+                                        "inbox.listener_messages_changed",
+                                        arguments: [
+                                            "id": listenerId,
+                                            "feed": feedName,
+                                            "canPaginate": canPaginate,
+                                            "messages": jsonMessages
+                                        ]
+                                    )
                                 } catch {
-                                    client?.log(error.localizedDescription)
+                                    client?.error(error.localizedDescription)
                                 }
                             }
                         },
-                        onArchiveChanged: { messageSet in
+                        // Supports isFirstPage
+                        onPageAdded: { messages, canPaginate, isFirstPage, feed in
                             DispatchQueue.main.async {
                                 do {
-                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_archive_changed", arguments: [
-                                        "messageSet": try messageSet.toJson(),
-                                        "id": listenerId
-                                    ])
+                                    let feedName = (feed == .archive) ? "archive" : "feed"
+                                    let jsonMessages = try messages.map { try $0.toJson() ?? "" }
+                                    CourierFlutterChannel.events.channel?.invokeMethod(
+                                        "inbox.listener_page_added",
+                                        arguments: [
+                                            "id": listenerId,
+                                            "feed": feedName,
+                                            "canPaginate": canPaginate,
+                                            "isFirstPage": isFirstPage,
+                                            "messages": jsonMessages
+                                        ]
+                                    )
                                 } catch {
-                                    client?.log(error.localizedDescription)
+                                    client?.error(error.localizedDescription)
                                 }
                             }
                         },
-                        onPageAdded: { feed, page in
+                        // Single message event => added, changed, removed, etc.
+                        onMessageEvent: { message, index, feed, event in
                             DispatchQueue.main.async {
                                 do {
-                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_page_added", arguments: [
-                                        "feed": feed == .archived ? "archived" : "feed",
-                                        "page": try page.toJson(),
-                                        "id": listenerId
-                                    ])
+                                    let feedName = (feed == .archive) ? "archive" : "feed"
+                                    let messageJson = try message.toJson() ?? ""
+                                    let eventName = event.rawValue  // e.g. "added", "changed", "removed"
+                                    CourierFlutterChannel.events.channel?.invokeMethod(
+                                        "inbox.listener_message_event",
+                                        arguments: [
+                                            "id": listenerId,
+                                            "feed": feedName,
+                                            "event": eventName,
+                                            "index": index,
+                                            "message": messageJson
+                                        ]
+                                    )
                                 } catch {
-                                    client?.log(error.localizedDescription)
-                                }
-                            }
-                        },
-                        onMessageChanged: { feed, index, message in
-                            DispatchQueue.main.async {
-                                do {
-                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_changed", arguments: [
-                                        "feed": feed == .archived ? "archived" : "feed",
-                                        "index": index,
-                                        "message": try message.toJson() ?? "",
-                                        "id": listenerId
-                                    ])
-                                } catch {
-                                    client?.log(error.localizedDescription)
-                                }
-                            }
-                        },
-                        onMessageAdded: { feed, index, message in
-                            DispatchQueue.main.async {
-                                do {
-                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_added", arguments: [
-                                        "feed": feed == .archived ? "archived" : "feed",
-                                        "index": index,
-                                        "message": try message.toJson() ?? "",
-                                        "id": listenerId
-                                    ])
-                                } catch {
-                                    client?.log(error.localizedDescription)
-                                }
-                            }
-                        },
-                        onMessageRemoved: { feed, index, message in
-                            DispatchQueue.main.async {
-                                do {
-                                    CourierFlutterChannel.events.channel?.invokeMethod("inbox.listener_message_removed", arguments: [
-                                        "feed": feed == .archived ? "archived" : "feed",
-                                        "index": index,
-                                        "message": try message.toJson() ?? "",
-                                        "id": listenerId
-                                    ])
-                                } catch {
-                                    client?.log(error.localizedDescription)
+                                    client?.error(error.localizedDescription)
                                 }
                             }
                         }
                     )
                     
-                    // Hold reference to the auth listeners
+                    // Hold reference
                     inboxListeners[listenerId] = listener
-                    
-                    // Return the id of the listener
                     result(listenerId)
                     
                 case "inbox.remove_listener":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
                     
                     let listenerId: String = try params.extract("listenerId")
-                    
-                    // Get and remove the listener
                     guard let listener = inboxListeners[listenerId] else {
                         throw CourierFlutterError.invalidParameter(value: "listenerId")
                     }
                     
                     listener.remove()
+                    inboxListeners.removeValue(forKey: listenerId)
                     
                     result(nil)
                     
                 case "inbox.remove_all_listeners":
-                    
+                    // Fix the old bug that accidentally removed authentication listeners again.
                     for value in inboxListeners.values {
                         value.remove()
                     }
-                    
-                    authenticationListeners.removeAll()
+                    inboxListeners.removeAll()
                     
                     result(nil)
                     
                 case "inbox.open_message":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
-                    
                     let messageId: String = try params.extract("messageId")
-                    
                     try await Courier.shared.openMessage(messageId)
-                    
                     result(nil)
                     
                 case "inbox.read_message":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
-                    
                     let messageId: String = try params.extract("messageId")
-                    
                     try await Courier.shared.readMessage(messageId)
-                    
                     result(nil)
                     
                 case "inbox.unread_message":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
-                    
                     let messageId: String = try params.extract("messageId")
-                    
                     try await Courier.shared.unreadMessage(messageId)
-                    
                     result(nil)
                     
                 case "inbox.click_message":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
-                    
                     let messageId: String = try params.extract("messageId")
-                    
                     try await Courier.shared.clickMessage(messageId)
-                    
                     result(nil)
                     
                 case "inbox.archive_message":
-                    
-                    guard let params = call.arguments as? Dictionary<String, Any> else {
+                    guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")
                     }
-                    
                     let messageId: String = try params.extract("messageId")
-                    
                     try await Courier.shared.archiveMessage(messageId)
-                    
                     result(nil)
                     
                 case "inbox.read_all_messages":
-                    
                     try await Courier.shared.readAllInboxMessages()
-                    
                     result(nil)
-                
                     
                 default:
-                    
                     result(FlutterMethodNotImplemented)
-                    
                 }
                 
             } catch {
-                
                 result(error.toFlutterError())
-                
             }
-            
         }
-          
     }
-    
 }
