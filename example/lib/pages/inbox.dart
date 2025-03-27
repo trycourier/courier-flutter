@@ -173,9 +173,6 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: pages.length, vsync: this);
-    Future.delayed(const Duration(seconds: 10), () async {
-      await Courier.shared.signOut();
-    });
   }
 
   @override
