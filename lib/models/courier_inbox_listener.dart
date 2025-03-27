@@ -3,8 +3,11 @@ import 'package:courier_flutter/models/inbox_feed.dart';
 
 enum InboxMessageEvent {
   added(value: "added"),
-  changed(value: "changed"), 
-  removed(value: "removed");
+  read(value: "read"),
+  unread(value: "unread"), 
+  opened(value: "opened"),
+  archived(value: "archived"),
+  clicked(value: "clicked");
 
   final String value;
 
@@ -16,10 +19,16 @@ enum InboxMessageEvent {
     switch (value) {
       case "added":
         return InboxMessageEvent.added;
-      case "changed":
-        return InboxMessageEvent.changed;
-      case "removed":
-        return InboxMessageEvent.removed;
+      case "read":
+        return InboxMessageEvent.read;
+      case "unread":
+        return InboxMessageEvent.unread;
+      case "opened":
+        return InboxMessageEvent.opened;
+      case "archived":
+        return InboxMessageEvent.archived;
+      case "clicked":
+        return InboxMessageEvent.clicked;
       default:
         throw ArgumentError("Invalid InboxMessageEvent value: $value");
     }

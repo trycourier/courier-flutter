@@ -15,8 +15,7 @@ class CustomInboxPage extends StatefulWidget {
   State<CustomInboxPage> createState() => _CustomInboxPageState();
 }
 
-class _CustomInboxPageState extends State<CustomInboxPage>
-    with AutomaticKeepAliveClientMixin {
+class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -63,7 +62,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
         print('totalCount: $totalCount');
       },
       onMessagesChanged: (messages, canPaginate, feed) {
-        if (feed == InboxFeed.feed) {
+        if (feed == InboxFeed.archive) {
           setState(() {
             _messages = messages;
             _isLoading = false;
@@ -73,7 +72,7 @@ class _CustomInboxPageState extends State<CustomInboxPage>
         }
       },
       onPageAdded: (messages, canPaginate, isFirstPage, feed) {
-        if (feed == InboxFeed.feed && !isFirstPage) {
+        if (feed == InboxFeed.archive && !isFirstPage) {
           setState(() {
             _messages = messages;
             _isLoading = false;
@@ -89,14 +88,29 @@ class _CustomInboxPageState extends State<CustomInboxPage>
               _messages.insert(index, message);
             });
             break;
-          case InboxMessageEvent.changed:
+          case InboxMessageEvent.read:
             setState(() {
               _messages[index] = message;
             });
             break;
-          case InboxMessageEvent.removed:
+          case InboxMessageEvent.unread:
+            setState(() {
+              _messages[index] = message;
+            });
+            break;
+          case InboxMessageEvent.opened:
+            setState(() {
+              _messages[index] = message;
+            });
+            break;
+          case InboxMessageEvent.archived:
             setState(() {
               _messages.removeAt(index);
+            });
+            break;
+          case InboxMessageEvent.clicked:
+            setState(() {
+              _messages[index] = message;
             });
             break;
         }

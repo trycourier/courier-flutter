@@ -1,6 +1,6 @@
 enum InboxFeed {
   feed("feed"),
-  archived("archived");
+  archive("archive");
 
   final String value;
 

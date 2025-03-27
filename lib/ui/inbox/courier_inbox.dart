@@ -34,6 +34,9 @@ class CourierInbox extends StatefulWidget {
   // Swipe behavior
   final bool canSwipePages;
 
+  // Scroll animation duration
+  static const Duration _scrollAnimationDuration = Duration(milliseconds: 300);
+
   CourierInbox({
     super.key,
     this.keepAlive = false,
@@ -107,77 +110,78 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     _inboxListener = await Courier.shared.addInboxListener(
       onLoading: (isRefresh) {
-        if (mounted) {
-          setState(() {
-            _brand = brand;
-            if (!isRefresh) { _isLoading = true; }
-            _error = null;
-          });
-        }
+        if (!mounted) return;
+        setState(() {
+          _brand = brand;
+          if (!isRefresh) { _isLoading = true; }
+          _error = null;
+        });
       },
       onError: (error) {
-        if (mounted) {
-          setState(() {
-            _brand = brand;
-            _isLoading = false;
-            _error = error;
-          });
-        }
+        if (!mounted) return;
+        setState(() {
+          _brand = brand;
+          _isLoading = false;
+          _error = error;
+        });
       },
-      onFeedChanged: (messageSet) async {
-        if (mounted) {
-          setState(() {
-            _feedMessages = messageSet.messages;
-            _canPaginateFeed = messageSet.canPaginate;
-            _isLoading = false;
-            _error = null;
-          });
-        }
-      },
-      onArchiveChanged: (messageSet) {
-        if (mounted) {
-          setState(() {
-            _archivedMessages = messageSet.messages;
-            _canPaginateArchived = messageSet.canPaginate;
-            _isLoading = false;
-            _error = null;
-          });
-        }
-      },
-      onPageAdded: (feed, messageSet) async {
-        if (mounted) {
-          setState(() {
-            if (feed == InboxFeed.feed) {
-              _isFeedPaginating = false;
-              _canPaginateFeed = messageSet.canPaginate;
-              _feedMessages.addAll(messageSet.messages);
+      onPageAdded: (messages, canPaginate, isFirstPage, feed) {
+        if (!mounted) return;
+        setState(() {
+          if (feed == InboxFeed.feed) {
+            if (isFirstPage) {
+              _feedMessages = messages;
             } else {
-              _isArchivedPaginating = false; 
-              _canPaginateArchived = messageSet.canPaginate;
-              _archivedMessages.addAll(messageSet.messages);
+              _feedMessages.addAll(messages); 
             }
-          });
-        }
+            _canPaginateFeed = canPaginate;
+          } else {
+            if (isFirstPage) {
+              _archivedMessages = messages;
+            } else {
+              _archivedMessages.addAll(messages);
+            }
+            _canPaginateArchived = canPaginate;
+          }
+          _isLoading = false;
+          _error = null;
+        });
       },
-      onMessageChanged: (feed, index, message) async {
-        if (feed == InboxFeed.feed) {
-          await _listStates[feedKey]?.currentState?.refreshMessageAtIndex(message, index);
-        } else {
-          await _listStates[archivedKey]?.currentState?.refreshMessageAtIndex(message, index);
-        }
-      },
-      onMessageAdded: (feed, index, message) async {
-        if (feed == InboxFeed.feed) {
-          await _listStates[feedKey]?.currentState?.addMessageAtIndex(message, index);
-        } else {
-          await _listStates[archivedKey]?.currentState?.addMessageAtIndex(message, index);
-        }
-      }, 
-      onMessageRemoved: (feed, index, message) async {
-        if (feed == InboxFeed.feed) {
-          await _listStates[feedKey]?.currentState?.removeMessageAtIndex(message, index);
-        } else {
-          await _listStates[archivedKey]?.currentState?.removeMessageAtIndex(message, index);
+      onMessageEvent: (message, index, feed, event) async {
+        if (!mounted) return;
+        switch (event) {
+          case InboxMessageEvent.added:
+            if (feed == InboxFeed.feed) {
+              await _listStates[feedKey]?.currentState?.addMessageAtIndex(message, index);
+            } else {
+              await _listStates[archivedKey]?.currentState?.addMessageAtIndex(message, index);
+            }
+            break;
+          case InboxMessageEvent.read:
+            if (feed == InboxFeed.feed) {
+              await _listStates[feedKey]?.currentState?.refreshMessageAtIndex(message, index);
+            } else {
+              await _listStates[archivedKey]?.currentState?.refreshMessageAtIndex(message, index);
+            }
+            break;
+          case InboxMessageEvent.unread:
+            if (feed == InboxFeed.feed) {
+              await _listStates[feedKey]?.currentState?.refreshMessageAtIndex(message, index);
+            } else {
+              await _listStates[archivedKey]?.currentState?.refreshMessageAtIndex(message, index);
+            }
+            break;
+          case InboxMessageEvent.opened:
+            break;
+          case InboxMessageEvent.clicked:
+            break;
+          case InboxMessageEvent.archived:
+            if (feed == InboxFeed.feed) {
+              await _listStates[feedKey]?.currentState?.removeMessageAtIndex(message, index);
+            } else {
+              await _listStates[archivedKey]?.currentState?.removeMessageAtIndex(message, index);
+            }
+            break;
         }
       },
     );
@@ -215,7 +219,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   Future<void> _fetchNextPage(InboxFeed feed) async {
     // Check if already paginating for this feed
     if ((feed == InboxFeed.feed && _isFeedPaginating) || 
-        (feed == InboxFeed.archived && _isArchivedPaginating)) {
+        (feed == InboxFeed.archive && _isArchivedPaginating)) {
       return;
     }
 
@@ -293,10 +297,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         onMessageLongPress: widget.onMessageLongPress,
         onActionClick: widget.onActionClick,
         onRefresh: _refresh,
-        feed: InboxFeed.archived,
+        feed: InboxFeed.archive,
         canPerformGestures: false,
         isPaginating: _isArchivedPaginating,
-        onPaginationTriggered: () => _fetchNextPage(InboxFeed.archived),
+        onPaginationTriggered: () => _fetchNextPage(InboxFeed.archive),
       ),
     ];
   }
@@ -361,7 +365,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
               if (controller.hasClients) {
                 controller.animateTo(
                   0,
-                  duration: const Duration(milliseconds: 300),
+                  duration: CourierInbox._scrollAnimationDuration,
                   curve: Curves.easeInOut,
                 );
               }
@@ -582,7 +586,15 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
   Future<void> refreshMessageAtIndex(InboxMessage updatedMessage, int index) async {
     try {
       if (!updatedMessage.isArchived && mounted) {
-        await _listItemRefs[getItemId(updatedMessage)]?.currentState?.refresh(updatedMessage);
+        final itemId = getItemId(updatedMessage);
+        final listItemRef = _listItemRefs[itemId];
+        
+        // If the item is in view, animate the refresh
+        if (listItemRef?.currentState != null && listItemRef?.currentState?.mounted == true) {
+          await listItemRef?.currentState?.refresh(updatedMessage);
+        }
+        
+        // Update the state regardless
         setState(() {
           widget.messages[index] = updatedMessage;
         });

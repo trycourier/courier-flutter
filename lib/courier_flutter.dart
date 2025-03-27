@@ -60,7 +60,6 @@ class Courier extends CourierChannelManager {
         }
 
         // --- INBOX ---
-
         case 'inbox.listener_loading': {
           String? listenerId = call.arguments['id'];
           bool isRefresh = call.arguments['isRefresh'];
@@ -78,7 +77,6 @@ class Courier extends CourierChannelManager {
           _inboxListeners[listenerId]?.onUnreadCountChanged?.call(count);
           break;
         }
-        // NEW: totalCount callback
         case 'inbox.listener_total_count_changed': {
           String? listenerId = call.arguments['id'];
           final feedValue = call.arguments['feed'];
@@ -87,7 +85,6 @@ class Courier extends CourierChannelManager {
           _inboxListeners[listenerId]?.onTotalCountChanged?.call(feed, totalCount);
           break;
         }
-        // Unified feed/archived => onMessagesChanged
         case 'inbox.listener_messages_changed': {
           String? listenerId = call.arguments['id'];
           final feedValue = call.arguments['feed'];
@@ -99,7 +96,6 @@ class Courier extends CourierChannelManager {
           _inboxListeners[listenerId]?.onMessagesChanged?.call(messages, canPaginate, feed);
           break;
         }
-        // Updated pageAdded => includes isFirstPage
         case 'inbox.listener_page_added': {
           String? listenerId = call.arguments['id'];
           final feedValue = call.arguments['feed'];
@@ -112,7 +108,6 @@ class Courier extends CourierChannelManager {
           _inboxListeners[listenerId]?.onPageAdded?.call(messages, canPaginate, isFirstPage, feed);
           break;
         }
-        // Single message event => added/changed/removed/etc.
         case 'inbox.listener_message_event': {
           String? listenerId = call.arguments['id'];
           final feedValue = call.arguments['feed'];

@@ -149,8 +149,8 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
   }
 
   Future<void> refresh(InboxMessage newMessage) async {
-    if (!mounted) return;
     await Future.delayed(const Duration(milliseconds: 200));
+    if (!mounted) return;
     setState(() {
       _message = newMessage;
     });

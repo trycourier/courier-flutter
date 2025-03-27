@@ -253,7 +253,6 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                                 )
                             }
                         },
-                        // NEW in the latest code
                         onTotalCountChanged: { totalCount, feed in
                             DispatchQueue.main.async {
                                 let feedName = (feed == .archive) ? "archive" : "feed"
@@ -267,7 +266,6 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                                 )
                             }
                         },
-                        // Unified feed/archived callback => onMessagesChanged
                         onMessagesChanged: { messages, canPaginate, feed in
                             DispatchQueue.main.async {
                                 do {
@@ -287,7 +285,6 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                                 }
                             }
                         },
-                        // Supports isFirstPage
                         onPageAdded: { messages, canPaginate, isFirstPage, feed in
                             DispatchQueue.main.async {
                                 do {
@@ -308,7 +305,6 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                                 }
                             }
                         },
-                        // Single message event => added, changed, removed, etc.
                         onMessageEvent: { message, index, feed, event in
                             DispatchQueue.main.async {
                                 do {
