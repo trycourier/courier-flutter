@@ -10,14 +10,14 @@
       "type": "dart"
     },
     {
-      "name": "courier_flutter (profile mode)",
+      "name": "courier_flutter (profile mode)", 
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
       "name": "courier_flutter (release mode)",
-      "request": "launch",
+      "request": "launch", 
       "type": "dart",
       "flutterMode": "release"
     },
@@ -26,23 +26,26 @@
       "cwd": "example",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart"
+      "program": "lib/main.dart",
+      "deviceId": "${command:dart.promptForDeviceId}"
     },
     {
       "name": "example_app (profile mode)",
-      "cwd": "example",
+      "cwd": "example", 
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "lib/main.dart"
+      "program": "lib/main.dart",
+      "deviceId": "${command:dart.promptForDeviceId}"
     },
     {
       "name": "example_app (release mode)",
       "cwd": "example",
-      "request": "launch",
+      "request": "launch", 
       "type": "dart",
       "flutterMode": "release",
-      "program": "lib/main.dart"
+      "program": "lib/main.dart",
+      "deviceId": "${command:dart.promptForDeviceId}"
     }
   ]
 }

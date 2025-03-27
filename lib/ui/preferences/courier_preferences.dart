@@ -429,21 +429,27 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
 
     if (_error != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
-              _userId == null ? 'No User Found' : _error!,
-            ),
-            const SizedBox(height: 16.0),
-            FilledButton(
-              style: getTheme(isDarkMode).getInfoViewButtonStyle(context),
-              onPressed: () => _retry(),
-              child: const Text('Retry'),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                _error!,
+                style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+              const SizedBox(height: 16.0),
+              FilledButton(
+                style: getTheme(isDarkMode).getInfoViewButtonStyle(context),
+                onPressed: () => _retry(),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
       );
     }

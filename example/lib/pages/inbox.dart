@@ -5,7 +5,7 @@ import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/inbox_custom.dart';
 import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:courier_flutter_sample/pages/full_inbox_page.dart'; // Import the full inbox page
+import 'package:courier_flutter_sample/pages/full_inbox_page.dart';
 
 class InboxPage extends StatefulWidget {
   const InboxPage({super.key});
@@ -86,6 +86,9 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       onActionClick: (action, message, index) {
         print(action);
       },
+      onError: (error) {
+        print(error);
+      },
     ),
     'Branded': CourierInbox(
       keepAlive: true,
@@ -97,6 +100,9 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       ),
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
+      },
+      onError: (error) {
+        print(error);
       },
     ),
     'Styled': CourierInbox(
@@ -134,13 +140,13 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
                         Navigator.pop(context);
                       },
                     ),
-                    // ListTile(
-                    //   title: const Text('Scroll to top'),
-                    //   onTap: () {
-                    //     _feedScrollController.jumpTo(0);
-                    //     Navigator.pop(context);
-                    //   },
-                    // ),
+                    ListTile(
+                      title: const Text('Scroll to top'),
+                      onTap: () {
+                        _feedScrollController.jumpTo(0);
+                        Navigator.pop(context);
+                      },
+                    ),
                     ListTile(
                       title: const Text('Cancel'),
                       onTap: () {
@@ -157,6 +163,9 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       onActionClick: (action, message, index) {
         print(action);
       },
+      onError: (error) {
+        print(error);
+      },
     ),
     'Custom': const CustomInboxPage(),
   };
@@ -165,6 +174,9 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: pages.length, vsync: this);
+    Future.delayed(const Duration(seconds: 10), () async {
+      await Courier.shared.signOut();
+    });
   }
 
   @override

@@ -2,7 +2,6 @@ import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
-import 'package:courier_flutter_sample/env.dart';
 import 'package:courier_flutter_sample/pages/prefs_custom.dart';
 import 'package:courier_flutter_sample/theme.dart';
 import 'package:flutter/material.dart';

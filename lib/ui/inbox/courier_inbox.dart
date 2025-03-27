@@ -27,6 +27,7 @@ class CourierInbox extends StatefulWidget {
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
   final Function(InboxAction, InboxMessage, int)? onActionClick;
+  final Function(String)? onError;
 
   // Scroll handling
   final ScrollController feedScrollController;
@@ -49,6 +50,7 @@ class CourierInbox extends StatefulWidget {
     this.onMessageClick,
     this.onMessageLongPress,
     this.onActionClick,
+    this.onError,
     this.canSwipePages = false,
   })  : _lightTheme = lightTheme ?? CourierInboxTheme(),
         _darkTheme = darkTheme ?? CourierInboxTheme(),
@@ -121,6 +123,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       },
       onError: (error) {
         if (!mounted) return;
+        widget.onError?.call(error);
         setState(() {
           _brand = brand;
           _isLoading = false;
@@ -315,24 +318,29 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         ),
       );
     }
-
     if (_error != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
-              _error!,
-            ),
-            const SizedBox(height: 16.0),
-            FilledButton(
-              style: getTheme(isDarkMode).getInfoViewButtonStyle(context),
-              onPressed: () => _retry(),
-              child: const Text('Retry'),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                _error!,
+                style: getTheme(isDarkMode).getInfoViewTitleStyle(context),
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+              const SizedBox(height: 16.0),
+              FilledButton(
+                style: getTheme(isDarkMode).getInfoViewButtonStyle(context),
+                onPressed: () => _retry(),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
       );
     }
