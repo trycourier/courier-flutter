@@ -79,8 +79,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
 
   Future<void> _getPreferences() async {
 
-    final userId = await Courier.shared.userId;
-
     final brand = await _refreshBrand();
 
     try {
