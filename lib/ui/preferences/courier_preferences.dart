@@ -22,8 +22,10 @@ class ChannelsMode extends Mode {
 }
 
 class CourierPreferences extends StatefulWidget {
+
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
+  final bool showCourierFooter;
 
   // The theming for your Inbox
   final Mode mode;
@@ -39,6 +41,7 @@ class CourierPreferences extends StatefulWidget {
   CourierPreferences({
     super.key,
     this.keepAlive = false,
+    this.showCourierFooter = true,
     Mode? mode,
     CourierPreferencesTheme? lightTheme,
     CourierPreferencesTheme? darkTheme,
@@ -479,7 +482,8 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
             ),
           ),
         ),
-        CourierFooter(shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
+        if (widget.showCourierFooter)
+          CourierFooter(shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
       ],
     );
   }

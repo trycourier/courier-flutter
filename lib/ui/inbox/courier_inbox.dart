@@ -17,6 +17,7 @@ class CourierInbox extends StatefulWidget {
 
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
+  final bool showCourierFooter;
 
   // The theming for your Inbox
   final CourierInboxTheme _lightTheme;
@@ -40,6 +41,7 @@ class CourierInbox extends StatefulWidget {
   CourierInbox({
     super.key,
     this.keepAlive = false,
+    this.showCourierFooter = true,
     CourierInboxTheme? lightTheme,
     CourierInboxTheme? darkTheme,
     ScrollController? feedScrollController,
@@ -381,9 +383,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             children: _buildTabViews(isDarkMode, triggerPoint),
           ),
         ),
-        CourierFooter(
-          shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true,
-        ),
+        if (widget.showCourierFooter)
+          CourierFooter(
+            shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true,
+          ),
       ],
     );
   }

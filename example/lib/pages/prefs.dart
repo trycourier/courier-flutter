@@ -18,7 +18,6 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
   TabController? _tabController;
 
   final customTheme = CourierPreferencesTheme(
-    brandId: Env.brandId,
     topicSeparator: null,
     sectionTitleStyle: AppTheme.sectionText,
     topicTitleStyle: AppTheme.titleText,
@@ -54,6 +53,7 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
     ),
     'Styled': CourierPreferences(
       keepAlive: true,
+      showCourierFooter: false,
       lightTheme: customTheme,
       darkTheme: customTheme,
       mode: ChannelsMode(channels: [CourierUserPreferencesChannel.push, CourierUserPreferencesChannel.sms, CourierUserPreferencesChannel.email]),

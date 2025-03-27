@@ -132,7 +132,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                 case "auth.remove_all_authentication_listeners":
                     for value in authenticationListeners.values {
-                        value.remove()
+                        await Courier.shared.removeAuthenticationListener(value)
                     }
                     authenticationListeners.removeAll()
                     result(nil)
@@ -342,18 +342,14 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                         throw CourierFlutterError.invalidParameter(value: "listenerId")
                     }
                     
-                    listener.remove()
+                    await Courier.shared.removeInboxListener(listener)
                     inboxListeners.removeValue(forKey: listenerId)
                     
                     result(nil)
                     
                 case "inbox.remove_all_listeners":
-                    // Fix the old bug that accidentally removed authentication listeners again.
-                    for value in inboxListeners.values {
-                        value.remove()
-                    }
+                    await Courier.shared.removeAllInboxListeners()
                     inboxListeners.removeAll()
-                    
                     result(nil)
                     
                 case "inbox.open_message":

@@ -1,7 +1,8 @@
+// ignore_for_file: camel_case_types
 enum iOSNotificationPresentationOption {
 
   sound(value: "sound"),
-  list(value: "list"),
+  list(value: "list"), 
   banner(value: "banner"),
   badge(value: "badge");
 

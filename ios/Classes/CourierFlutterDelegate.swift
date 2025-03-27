@@ -168,7 +168,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
                 )
             }
         } catch {
-            Courier.shared.client?.options.error(error.localizedDescription)
+            await Courier.shared.client?.options.error(error.localizedDescription)
         }
         
         // Format the payload sent back to dart
@@ -197,7 +197,9 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
     // MARK: Token Management
 
     open override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        Courier.shared.client?.error("Unable to register for remote notifications: \(error.localizedDescription)")
+        Task {
+            await Courier.shared.client?.error("Unable to register for remote notifications: \(error.localizedDescription)")
+        }
     }
 
     open override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -205,7 +207,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
             do {
                 try await Courier.shared.setAPNSToken(deviceToken)
             } catch {
-                Courier.shared.client?.error(String(describing: error))
+                await Courier.shared.client?.error(String(describing: error))
             }
         }
     }
