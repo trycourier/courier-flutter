@@ -45,7 +45,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
     _inboxListener = await Courier.shared.addInboxListener(
       onLoading: (isRefresh) {
         setState(() {
-          _isLoading = true;
+          if (!isRefresh) _isLoading = true;
           _error = null;
         });
       },
@@ -62,7 +62,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
         print('totalCount: $totalCount');
       },
       onMessagesChanged: (messages, canPaginate, feed) {
-        if (feed == InboxFeed.archive) {
+        if (feed == InboxFeed.feed) {
           setState(() {
             _messages = messages;
             _isLoading = false;
@@ -72,7 +72,7 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
         }
       },
       onPageAdded: (messages, canPaginate, isFirstPage, feed) {
-        if (feed == InboxFeed.archive && !isFirstPage) {
+        if (feed == InboxFeed.feed && !isFirstPage) {
           setState(() {
             _messages = messages;
             _isLoading = false;
@@ -120,6 +120,10 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
 
   Future<void> _refresh() async {
     await Courier.shared.refreshInbox();
+  }
+
+  Future<void> _loadMore() async {
+    await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
   }
 
   Future<void> _onMessageClick(InboxMessage message) async {
@@ -206,10 +210,6 @@ class _CustomInboxPageState extends State<CustomInboxPage> with AutomaticKeepAli
   Widget build(BuildContext context) {
     super.build(context);
     return _buildContent();
-  }
-
-  Future<void> _loadMore() async {
-    // await Courier.shared.fetchNextInboxPage(feed: InboxFeed.feed);
   }
 
 }
