@@ -36,7 +36,7 @@ class CourierPreferences extends StatefulWidget {
   final ScrollController? scrollController;
 
   // Error callbacks
-  final Function(String)? onError;
+  final String Function(String)? onError;
 
   CourierPreferences({
     super.key,
@@ -66,7 +66,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
   List<PreferenceSection> _sections = [];
 
   CourierBrand? _brand;
-  String? _userId;
 
   @override
   void initState() {
@@ -125,7 +124,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       }
 
       setState(() {
-        _userId = userId;
         _brand = brand;
         _sections = sections;
         _isLoading = false;
@@ -136,12 +134,14 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
 
       if (!mounted) return;
 
+      final originalError = error.toString();
+      final errorMessage = widget.onError?.call(originalError);
+
       setState(() {
-        _userId = userId;
         _brand = brand;
         _sections = [];
         _isLoading = false;
-        _error = error.toString();
+        _error = errorMessage ?? originalError;
       });
 
     }
@@ -188,10 +188,7 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
 
   Future<void> _retry() async {
 
-    final userId = await Courier.shared.userId;
-
     setState(() {
-      _userId = userId;
       _sections = [];
       _isLoading = true;
       _error = null;

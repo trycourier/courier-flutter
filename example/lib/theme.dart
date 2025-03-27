@@ -34,8 +34,8 @@ class AppTheme {
   );
 
   static final ButtonStyle buttonStyle = FilledButton.styleFrom(
-    backgroundColor: Colors.grey,
-    foregroundColor: Colors.white,
+    backgroundColor: Colors.grey.shade300,
+    foregroundColor: Colors.black,
     textStyle: bodyText
   );
 

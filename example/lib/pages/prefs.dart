@@ -56,7 +56,10 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
       lightTheme: customTheme,
       darkTheme: customTheme,
       mode: ChannelsMode(channels: [CourierUserPreferencesChannel.push, CourierUserPreferencesChannel.sms, CourierUserPreferencesChannel.email]),
-      onError: (error) => print(error),
+      onError: (error) {
+        print(error);
+         return 'You can now pass a custom error message here if you want to.';
+      },
     ),
     'Custom': const CustomPrefsPage(),
   };

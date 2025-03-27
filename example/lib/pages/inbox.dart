@@ -75,6 +75,10 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       unread: AppTheme.unreadButtonStyle,
     ),
     separator: null,
+    infoViewStyle: CourierInfoViewStyle(
+      textStyle: AppTheme.titleText,
+      buttonStyle: AppTheme.buttonStyle,
+    ),
   );
 
   late final Map<String, Widget> pages = {
@@ -85,9 +89,6 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
       onActionClick: (action, message, index) {
         print(action);
-      },
-      onError: (error) {
-        print(error);
       },
     ),
     'Branded': CourierInbox(
@@ -100,9 +101,6 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       ),
       onMessageClick: (message, index) {
         message.isRead ? message.markAsUnread() : message.markAsRead();
-      },
-      onError: (error) {
-        print(error);
       },
     ),
     'Styled': CourierInbox(
@@ -165,6 +163,7 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
       },
       onError: (error) {
         print(error);
+        return 'You can now pass a custom error message here if you want to.';
       },
     ),
     'Custom': const CustomInboxPage(),

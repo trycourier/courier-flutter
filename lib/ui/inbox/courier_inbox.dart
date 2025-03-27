@@ -27,7 +27,7 @@ class CourierInbox extends StatefulWidget {
   final Function(InboxMessage, int)? onMessageClick;
   final Function(InboxMessage, int)? onMessageLongPress;
   final Function(InboxAction, InboxMessage, int)? onActionClick;
-  final Function(String)? onError;
+  final String Function(String)? onError;
 
   // Scroll handling
   final ScrollController feedScrollController;
@@ -123,11 +123,11 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       },
       onError: (error) {
         if (!mounted) return;
-        widget.onError?.call(error);
+        final errorMessage = widget.onError?.call(error);
         setState(() {
           _brand = brand;
           _isLoading = false;
-          _error = error;
+          _error = errorMessage ?? error;
         });
       },
       onPageAdded: (messages, canPaginate, isFirstPage, feed) {
