@@ -27,7 +27,6 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "deviceId": "${command:dart.promptForDeviceId}"
     },
     {
       "name": "example_app (profile mode)",
@@ -36,7 +35,6 @@
       "type": "dart",
       "flutterMode": "profile",
       "program": "lib/main.dart",
-      "deviceId": "${command:dart.promptForDeviceId}"
     },
     {
       "name": "example_app (release mode)",
@@ -45,7 +43,6 @@
       "type": "dart",
       "flutterMode": "release",
       "program": "lib/main.dart",
-      "deviceId": "${command:dart.promptForDeviceId}"
     }
   ]
 }
