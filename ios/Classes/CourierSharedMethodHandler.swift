@@ -195,7 +195,6 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     let feedParam: String = try params.extract("feed")  // "archive" or "feed"
                     
-                    // If the new library's enum is `.archive` / `.feed`
                     let inboxFeed: InboxMessageFeed = (feedParam == "archive") ? .archive : .feed
                     
                     let messageSet = try await Courier.shared.fetchNextInboxPage(inboxFeed)

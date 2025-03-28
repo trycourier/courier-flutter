@@ -112,6 +112,8 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     final brand = await _refreshBrand();
 
+    await Courier.shared.setInboxPaginationLimit(limit: 1);
+
     _inboxListener = await Courier.shared.addInboxListener(
       onLoading: (isRefresh) {
         if (!mounted) return;
@@ -134,6 +136,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         if (!mounted) return;
         setState(() {
           if (feed == InboxFeed.feed) {
+            _isFeedPaginating = false;
             if (isFirstPage) {
               _feedMessages = messages;
             } else {
@@ -141,6 +144,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             }
             _canPaginateFeed = canPaginate;
           } else {
+            _isArchivedPaginating = false;
             if (isFirstPage) {
               _archivedMessages = messages;
             } else {

@@ -19,6 +19,9 @@ import com.courier.android.modules.openMessage
 import com.courier.android.modules.readAllInboxMessages
 import com.courier.android.modules.readMessage
 import com.courier.android.modules.refreshInbox
+import com.courier.android.modules.removeAllInboxListeners
+import com.courier.android.modules.removeAuthenticationListener
+import com.courier.android.modules.removeInboxListener
 import com.courier.android.modules.setToken
 import com.courier.android.modules.signIn
 import com.courier.android.modules.signOut
@@ -155,7 +158,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                 "auth.remove_all_authentication_listeners" -> {
 
                     for (value in authenticationListeners.values) {
-                        value.remove()
+                        Courier.shared.removeAuthenticationListener(value)
                     }
 
                     authenticationListeners.clear()
@@ -263,19 +266,26 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                 }
 
                 "inbox.fetch_next_page" -> {
-
                     val params = call.arguments as? HashMap<*, *> ?: throw MissingParameter("params")
 
-                    val feed = params.extract("feed") as String
+                    val feedParam = params.extract("feed") as String  // "archive" or "feed"
+                    val inboxFeed = if (feedParam == "archive") { InboxMessageFeed.ARCHIVE } else { InboxMessageFeed.FEED }
 
-                    val inboxFeed = if (feed == "archived") InboxMessageFeed.ARCHIVE else InboxMessageFeed.FEED
+                    val messageSet = Courier.shared.fetchNextInboxPage(inboxFeed)
 
-                    val res = Courier.shared.fetchNextInboxPage(feed = inboxFeed)
+                    val messagesJson = messageSet
+                        ?.messages
+                        ?.map { it.toJson() }
+                        ?: emptyList()
 
-                    val json = res?.toJson()
+                    val resultMap = mapOf(
+                        "messages" to messagesJson,
+                        "totalCount" to (messageSet?.totalCount ?: 0),
+                        "canPaginate" to (messageSet?.canPaginate ?: false),
+                        "paginationCursor" to (messageSet?.paginationCursor ?: "")
+                    )
 
-                    result.success(json)
-
+                    result.success(resultMap)
                 }
 
                 "inbox.add_listener" -> {
@@ -314,72 +324,74 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                                 )
                             )
                         },
-                        onFeedChanged = { messageSet ->
+                        onTotalCountChanged = { totalCount, feed ->
+                            val feedName = if (feed == InboxMessageFeed.ARCHIVE) "archive" else "feed"
                             CourierFlutterChannel.EVENTS.invokeMethod(
                                 messenger = binding.binaryMessenger,
-                                method = "inbox.listener_feed_changed",
+                                method = "inbox.listener_total_count_changed",
                                 arguments = mapOf(
                                     "id" to listenerId,
-                                    "messageSet" to messageSet.toJson(),
+                                    "feed" to feedName,
+                                    "totalCount" to totalCount
                                 )
                             )
                         },
-                        onArchiveChanged = { messageSet ->
-                            CourierFlutterChannel.EVENTS.invokeMethod(
-                                messenger = binding.binaryMessenger,
-                                method = "inbox.listener_archive_changed",
-                                arguments = mapOf(
-                                    "id" to listenerId,
-                                    "messageSet" to messageSet.toJson(),
+                        onMessagesChanged = { messages, canPaginate, feed ->
+                            val feedName = if (feed == InboxMessageFeed.ARCHIVE) "archive" else "feed"
+                            try {
+                                val jsonMessages = messages.map { it.toJson() }
+                                CourierFlutterChannel.EVENTS.invokeMethod(
+                                    messenger = binding.binaryMessenger,
+                                    method = "inbox.listener_messages_changed",
+                                    arguments = mapOf(
+                                        "id" to listenerId,
+                                        "feed" to feedName,
+                                        "canPaginate" to canPaginate,
+                                        "messages" to jsonMessages
+                                    )
                                 )
-                            )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         },
-                        onPageAdded = { feed, page ->
-                            CourierFlutterChannel.EVENTS.invokeMethod(
-                                messenger = binding.binaryMessenger,
-                                method = "inbox.listener_page_added",
-                                arguments = mapOf(
-                                    "id" to listenerId,
-                                    "feed" to if (feed == InboxMessageFeed.ARCHIVE) "archived" else "feed",
-                                    "page" to page.toJson(),
+                        onPageAdded = { messages, canPaginate, isFirstPage, feed ->
+                            val feedName = if (feed == InboxMessageFeed.ARCHIVE) "archive" else "feed"
+                            try {
+                                val jsonMessages = messages.map { it.toJson() }
+                                CourierFlutterChannel.EVENTS.invokeMethod(
+                                    messenger = binding.binaryMessenger,
+                                    method = "inbox.listener_page_added",
+                                    arguments = mapOf(
+                                        "id" to listenerId,
+                                        "feed" to feedName,
+                                        "canPaginate" to canPaginate,
+                                        "isFirstPage" to isFirstPage,
+                                        "messages" to jsonMessages
+                                    )
                                 )
-                            )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         },
-                        onMessageChanged = { feed, index, message ->
-                            CourierFlutterChannel.EVENTS.invokeMethod(
-                                messenger = binding.binaryMessenger,
-                                method = "inbox.listener_message_changed",
-                                arguments = mapOf(
-                                    "id" to listenerId,
-                                    "feed" to if (feed == InboxMessageFeed.ARCHIVE) "archived" else "feed",
-                                    "index" to index,
-                                    "message" to message.toJson(),
+                        onMessageEvent = { message, index, feed, event ->
+                            val feedName = if (feed == InboxMessageFeed.ARCHIVE) "archive" else "feed"
+                            try {
+                                val messageJson = message.toJson()
+                                val eventName = event.name.lowercase() // e.g., "added", "changed", "removed"
+                                CourierFlutterChannel.EVENTS.invokeMethod(
+                                    messenger = binding.binaryMessenger,
+                                    method = "inbox.listener_message_event",
+                                    arguments = mapOf(
+                                        "id" to listenerId,
+                                        "feed" to feedName,
+                                        "event" to eventName,
+                                        "index" to index,
+                                        "message" to messageJson
+                                    )
                                 )
-                            )
-                        },
-                        onMessageAdded = { feed, index, message ->
-                            CourierFlutterChannel.EVENTS.invokeMethod(
-                                messenger = binding.binaryMessenger,
-                                method = "inbox.listener_message_added",
-                                arguments = mapOf(
-                                    "id" to listenerId,
-                                    "feed" to if (feed == InboxMessageFeed.ARCHIVE) "archived" else "feed",
-                                    "index" to index,
-                                    "message" to message.toJson(),
-                                )
-                            )
-                        },
-                        onMessageRemoved = { feed, index, message ->
-                            CourierFlutterChannel.EVENTS.invokeMethod(
-                                messenger = binding.binaryMessenger,
-                                method = "inbox.listener_message_removed",
-                                arguments = mapOf(
-                                    "id" to listenerId,
-                                    "feed" to if (feed == InboxMessageFeed.ARCHIVE) "archived" else "feed",
-                                    "index" to index,
-                                    "message" to message.toJson(),
-                                )
-                            )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
                     )
 
@@ -397,7 +409,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                     // Get and remove the listener
                     val listener = inboxListeners[listenerId] ?: throw InvalidParameter("listenerId")
-                    listener.remove()
+                    Courier.shared.removeInboxListener(listener)
 
                     result.success(null)
 
@@ -405,9 +417,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                 "inbox.remove_all_listeners" -> {
 
-                    for (value in inboxListeners.values) {
-                        value.remove()
-                    }
+                    Courier.shared.removeAllInboxListeners()
 
                     inboxListeners.clear()
 

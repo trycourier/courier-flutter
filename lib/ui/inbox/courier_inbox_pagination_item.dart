@@ -16,12 +16,11 @@ class CourierInboxPaginationItem extends StatelessWidget {
     required this.triggerPoint,
     required this.loadingColor,
   });
-
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      key: const Key('pagination-item'),
-      onVisibilityChanged: (VisibilityInfo info) {
+      key: const Key('pagination'),
+      onVisibilityChanged: (info) {
         if (info.visibleFraction > 0 && !isPaginating && canPaginate) {
           onPaginationTriggered();
         }
