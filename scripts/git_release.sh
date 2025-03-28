@@ -15,7 +15,7 @@ error_exit() {
 
 # Function to get the package version from pubspec.yaml
 get_package_version() {
-    local version=$(yq .version pubspec.yaml | tr -d '"')
+    local version=$(grep "^version:" pubspec.yaml | cut -d " " -f 2 | tr -d '"')
     echo "$version"
 }
 
