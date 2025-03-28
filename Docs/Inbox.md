@@ -236,7 +236,7 @@ bool _canLoadMore = false;
 _inboxListener = await Courier.shared.addInboxListener(
   onLoading: (isRefresh) {
     setState(() {
-      _isLoading = true;
+      if (!isRefresh) _isLoading = true;
       _error = null;
     });
   },
@@ -249,41 +249,61 @@ _inboxListener = await Courier.shared.addInboxListener(
   onUnreadCountChanged: (unreadCount) {
     print('unreadCount: $unreadCount');
   },
-  onFeedChanged: (messageSet) {
-    setState(() {
-      _messages = messageSet.messages;
-      _isLoading = false;
-      _error = null;
-      _canLoadMore = messageSet.canPaginate;
-    });
+  onTotalCountChanged: (feed, totalCount) {
+    print('totalCount: $totalCount');
   },
-  onMessageChanged: (feed, index, message) {
+  onMessagesChanged: (messages, canPaginate, feed) {
     if (feed == InboxFeed.feed) {
       setState(() {
-        _messages[index] = message;
+        _messages = messages;
+        _isLoading = false;
+        _error = null;
+        _canLoadMore = canPaginate;
       });
     }
   },
-  onMessageAdded: (feed, index, message) {
-    if (feed == InboxFeed.feed) {
+  onPageAdded: (messages, canPaginate, isFirstPage, feed) {
+    if (feed == InboxFeed.feed && !isFirstPage) {
       setState(() {
-        _messages.insert(index, message);
+        _messages = messages;
+        _isLoading = false;
+        _error = null;
+        _canLoadMore = canPaginate;
       });
     }
   },
-  onMessageRemoved: (feed, index, message) {
-    if (feed == InboxFeed.feed) {
-      setState(() {
-        _messages.removeAt(index);
-      });
-    }
-  },
-  onPageAdded: (feed, page) {
-    if (feed == InboxFeed.feed) {
-      setState(() {
-        _messages += page.messages;
-        _canLoadMore = page.canPaginate;
-      });
+  onMessageEvent: (message, index, feed, event) {
+    switch (event) {
+      case InboxMessageEvent.added:
+        setState(() {
+          _messages.insert(index, message);
+        });
+        break;
+      case InboxMessageEvent.read:
+        setState(() {
+          _messages[index] = message;
+        });
+        break;
+      case InboxMessageEvent.unread:
+        setState(() {
+          _messages[index] = message;
+        });
+        break;
+      case InboxMessageEvent.opened:
+        setState(() {
+          _messages[index] = message;
+        });
+        break;
+      case InboxMessageEvent.archived:
+        setState(() {
+          _messages.removeAt(index);
+        });
+        break;
+      case InboxMessageEvent.clicked:
+        setState(() {
+          _messages[index] = message;
+        });
+        break;
     }
   },
 );
@@ -377,19 +397,16 @@ final inboxListener = await Courier.shared.addInboxListener(
   onUnreadCountChanged: (unreadCount) {
     
   },
-  onFeedChanged: (messageSet) {
+  onTotalCountChanged: (feed, totalCount) {
     
   },
-  onMessageChanged: (feed, index, message) {
+  onMessagesChanged: (messages, canPaginate, feed) {
     
   },
-  onMessageAdded: (feed, index, message) {
+  onPageAdded: (messages, canPaginate, isFirstPage, feed) {
     
   },
-  onMessageRemoved: (feed, index, message) {
-    
-  },
-  onPageAdded: (feed, page) {
+  onMessageEvent: (message, index, feed, event) {
     
   },
 );
