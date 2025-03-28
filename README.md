@@ -115,12 +115,12 @@ These are all the available features of the SDK.
                 1
             </td>
             <td align="left">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/1_Authentication.md">
                     <code>Authentication</code>
                 </a>
             </td>
             <td align="left">
-                Manages user credentials between app sessions. Required if you would like to use <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md"><code>Inbox</code></a>, <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md"><code>Push Notifications</code></a> and <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Preferences.md"><code>Preferences</code></a>.
+                Manages user credentials between app sessions. Required if you would like to use <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/2_Inbox.md"><code>Inbox</code></a>, <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/3_PushNotifications.md"><code>Push Notifications</code></a> and <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/4_Preferences.md"><code>Preferences</code></a>.
             </td>
         </tr>
         <tr width="600px">
@@ -128,7 +128,7 @@ These are all the available features of the SDK.
                 2
             </td>
             <td align="left">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Inbox.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/2_Inbox.md">
                     <code>Inbox</code>
                 </a>
             </td>
@@ -141,7 +141,7 @@ These are all the available features of the SDK.
                 3
             </td>
             <td align="left">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/PushNotifications.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/3_PushNotifications.md">
                     <code>Push Notifications</code>
                 </a>
             </td>
@@ -154,7 +154,7 @@ These are all the available features of the SDK.
                 4
             </td>
             <td align="left">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Preferences.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/4_Preferences.md">
                     <code>Preferences</code>
                 </a>
             </td>
@@ -167,7 +167,7 @@ These are all the available features of the SDK.
                 5
             </td>
             <td align="left">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/5_Client.md">
                     <code>CourierClient</code>
                 </a>
             </td>

@@ -77,7 +77,7 @@ The easiest way to support push notifications in your app.
     <tbody>
         <tr width="600px">
             <td align="left">
-                <a href="https://github.com/trycourier/courier-react-native/blob/master/Docs/Authentication.md">
+                <a href="https://github.com/trycourier/courier-react-native/blob/master/Docs/1_Authentication.md">
                     <code>Authentication</code>
                 </a>
             </td>
@@ -416,4 +416,4 @@ pushListener.remove();
 
 ---
 
-👋 `TokenManagement APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md#token-management-apis"><code>here</code></a>
+👋 `TokenManagement APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/5_Client.md#token-management-apis"><code>here</code></a>

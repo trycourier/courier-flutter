@@ -28,7 +28,7 @@ An in-app notification center list you can use to notify your users. Allows you 
                 </td>
             </tr>
             <td align="left">
-                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Authentication.md">
+                <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/1_Authentication.md">
                     <code>Authentication</code>
                 </a>
             </td>
@@ -416,4 +416,4 @@ await inboxListener.remove();
 
 ---
 
-👋 `Inbox APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/Client.md#inbox-apis"><code>here</code></a>
+👋 `Inbox APIs` can be found <a href="https://github.com/trycourier/courier-flutter/blob/master/Docs/5_Client.md#inbox-apis"><code>here</code></a>
