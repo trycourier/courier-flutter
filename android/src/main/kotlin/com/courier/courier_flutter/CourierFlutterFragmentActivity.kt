@@ -21,7 +21,7 @@ open class CourierFlutterFragmentActivity : FlutterFragmentActivity() {
         handler.attach(this, intent)
 
         // Setup and run the agent
-        Courier.agent = CourierAgent.FlutterAndroid(version = "4.0.3")
+        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.0")
         Courier.initialize(this)
 
     }
