@@ -213,6 +213,9 @@ CourierInbox(
   },
   onMessageLongPress: (message, index) {
     ...
+  },
+  onError: (error) {
+    return 'Your custom error message';
   }
 )
 ...
