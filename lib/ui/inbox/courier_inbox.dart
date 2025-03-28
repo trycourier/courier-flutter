@@ -112,8 +112,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     final brand = await _refreshBrand();
 
-    await Courier.shared.setInboxPaginationLimit(limit: 1);
-
     _inboxListener = await Courier.shared.addInboxListener(
       onLoading: (isRefresh) {
         if (!mounted) return;
@@ -683,6 +681,7 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
       return _buildMessageItem(context, widget.messages[index], index);
     } else if (index == widget.messages.length && widget.canPaginate) {
       return CourierInboxPaginationItem(
+        visibilityKey: Key('pagination_${widget.messages.length}'),
         isPaginating: widget.isPaginating,
         canPaginate: widget.canPaginate,
         onPaginationTriggered: widget.onPaginationTriggered,
