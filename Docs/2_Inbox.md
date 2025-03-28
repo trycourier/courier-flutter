@@ -89,7 +89,6 @@ The styles you can use to quickly customize the `CourierInbox`.
 <img width="390" alt="default-inbox-styles" src="https://github.com/user-attachments/assets/b2a48933-0299-4a9f-8ad9-753b81ab39e4">
 <img width="410" alt="android-default-inbox-styles" src="https://github.com/user-attachments/assets/f5edd497-43cd-45cd-bdca-c6a2c77d4958">
 
-
 ```dart
 final theme = CourierInboxTheme(
     unreadIndicatorStyle: const CourierInboxUnreadIndicatorStyle(
@@ -209,12 +208,12 @@ CourierInbox(
   },
   onActionClick: (action, message, index) {
     print(action);
-    _customScrollController.jumpTo(0);
   },
   onMessageLongPress: (message, index) {
-    ...
+    print(message);
   },
   onError: (error) {
+    print(error);
     return 'Your custom error message';
   }
 )
