@@ -216,12 +216,12 @@ https://user-images.githubusercontent.com/29832989/214159327-01ef662f-094b-455c-
     - You do NOT need to click "Activate" here. Your Notification Service Extension will still work just fine.
 7. Select Service Extension (i.e. "CourierService"), select general, change deployment sdk to min SDK target to iOS 13.0+
 7. Open your `Podfile` and add the following snippet to the end of your Podfile
-    - This will link the `Courier-iOS` pod to your Notification Service Extension
+    - This will link the `Courier_iOS` pod to your Notification Service Extension
 
 ```
 target 'CourierService' do
   use_frameworks!
-  pod 'Courier-iOS'
+  pod 'Courier_iOS'
 end
 ```
 
