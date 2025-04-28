@@ -225,7 +225,7 @@ target 'CourierService' do
 end
 ```
 
-8. From the root of your Flutter app, run: `cd ios && pod install`
+9. From the root of your Flutter app, run: `cd ios && pod install`
 
 &emsp;
 
