@@ -227,6 +227,7 @@ end
 
 9. From the root of your Flutter app, run: `cd ios && pod install`
 10. In your project target, move the "Embedded Foundation Extensions" above "Run Scripts" and below "Link Binary With Libraries"
+
 ![foundation-item-move](https://github.com/user-attachments/assets/a9e0783e-cac4-4c13-9073-cb41d92ab8b8)
 
 &emsp;
