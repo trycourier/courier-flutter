@@ -135,6 +135,12 @@ class Courier extends CourierChannelManager {
     }
   }
 
+  // UI debug options
+  // This simplifies UI testing by providing
+  // used fonts and colors in UI element tag
+
+  bool isUITestsActive = false;
+
   // iOS Foreground Notification
 
   static List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions =
@@ -386,10 +392,10 @@ class Courier extends CourierChannelManager {
 
     try {
       final Map<String, dynamic> responseMap = Map<String, dynamic>.from(response);
-      
+
       final List<dynamic> rawMessages = responseMap['messages'] as List<dynamic>;
       final messages = rawMessages.map((m) => InboxMessage.fromJson(jsonDecode(m))).toList();
-      
+
       final int totalCount = responseMap['totalCount'] as int;
       final bool canPaginate = responseMap['canPaginate'] as bool;
       final String? paginationCursor = responseMap['paginationCursor'] as String?;
@@ -406,7 +412,7 @@ class Courier extends CourierChannelManager {
       return null;
     }
   }
-  
+
   @override
   Future<CourierInboxListener> addInboxListener({
     Function(bool isRefresh)? onLoading,
@@ -504,7 +510,7 @@ class Courier extends CourierChannelManager {
 // --------------------------
 
 abstract class CourierChannelManager extends PlatformInterface {
-  
+
   CourierChannelManager({required super.token});
 
   // Client

@@ -9,6 +9,7 @@ import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_section.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_sheet.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -461,27 +462,30 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
     return Column(
       children: [
         Expanded(
-          child: RefreshIndicator(
-            color: getTheme(isDarkMode).getLoadingColor(context),
-            onRefresh: _getPreferences,
-            child: Scrollbar(
-              controller: _scrollController,
-              child: ListView.separated(
-                physics: const AlwaysScrollableScrollPhysics(),
+          child: Semantics(
+            label: Courier.shared.isUITestsActive ? 'RefreshIndicator loadingColor: ${getTheme(isDarkMode).getLoadingColor(context).toHex()}' : 'RefreshIndicator',
+            child: RefreshIndicator(
+              color: getTheme(isDarkMode).getLoadingColor(context),
+              onRefresh: _getPreferences,
+              child: Scrollbar(
                 controller: _scrollController,
-                separatorBuilder: (context, index) => const SizedBox(height: CourierTheme.margin),
-                itemCount: _itemCount,
-                itemBuilder: (BuildContext context, int index) {
-                  return CourierPreferencesSection(
-                    mode: widget.mode,
-                    theme: getTheme(isDarkMode),
-                    section: _sections[index],
-                    onTopicClick: (topic) => _showTopicSheet(context, isDarkMode, topic),
-                  );
-                },
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
+                  separatorBuilder: (context, index) => const SizedBox(height: CourierTheme.margin),
+                  itemCount: _itemCount,
+                  itemBuilder: (BuildContext context, int index) {
+                    return CourierPreferencesSection(
+                      mode: widget.mode,
+                      theme: getTheme(isDarkMode),
+                      section: _sections[index],
+                      onTopicClick: (topic) => _showTopicSheet(context, isDarkMode, topic),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
+          )
         ),
         if (widget.showCourierFooter)
           CourierFooter(shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),

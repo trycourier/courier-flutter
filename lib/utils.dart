@@ -57,3 +57,15 @@ extension AnimatedListStateExtensions on AnimatedListState {
   }
 
 }
+
+extension HexColor on Color {
+  String toHex({bool leadingHashSign = true, bool includeAlpha = false}) {
+    final buffer = StringBuffer();
+    if (leadingHashSign) buffer.write('#');
+    if (includeAlpha) buffer.write((a.round()).toRadixString(16).padLeft(2, '0'));
+    buffer.write((r.round()).toRadixString(16).padLeft(2, '0'));
+    buffer.write((g.round()).toRadixString(16).padLeft(2, '0'));
+    buffer.write((b.round()).toRadixString(16).padLeft(2, '0'));
+    return buffer.toString().toUpperCase();
+  }
+}
