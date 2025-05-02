@@ -1,7 +1,9 @@
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 
 class CourierPreferencesListItem extends StatefulWidget {
@@ -25,6 +27,15 @@ class CourierPreferencesListItem extends StatefulWidget {
 class CourierPreferencesListItemState extends State<CourierPreferencesListItem> {
   CourierUserPreferencesTopic get _topic => widget.topic;
 
+  String getSemanticsLabel() {
+    TextStyle? titleStyle = widget.theme.topicTitleStyle;
+    String titleLabel = 'fontColor: ${titleStyle?.color?.toHex()}, fontName: ${titleStyle?.fontFamily}, fontSize: ${titleStyle?.fontSize}';
+    TextStyle? subtitleStyle = widget.theme.topicSubtitleStyle;
+    String subtitleLabel = 'fontColor: ${subtitleStyle?.color?.toHex()}, fontName: ${subtitleStyle?.fontFamily}, fontSize: ${subtitleStyle?.fontSize}';
+    String label = 'ListTile titleLabel: {$titleLabel}, subtitleLabel: {$subtitleLabel}';
+    return Courier.shared.isUITestsActive ? label : 'ListTile';
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = _topic.topicName;
@@ -45,17 +56,20 @@ class CourierPreferencesListItemState extends State<CourierPreferencesListItem> 
       }
     }
 
-    return ListTile(
-      title: Text(
-        title,
-        style: widget.theme.topicTitleStyle,
-      ),
-      subtitle: Text(
-        subtitle,
-        style: widget.theme.topicSubtitleStyle,
-      ),
-      trailing: widget.theme.topicTrailing,
-      onTap: () => widget.onTopicClick(widget.topic),
+    return Semantics(
+      label: getSemanticsLabel(),
+      child: ListTile(
+        title: Text(
+          title,
+          style: widget.theme.topicTitleStyle,
+        ),
+        subtitle: Text(
+          subtitle,
+          style: widget.theme.topicSubtitleStyle,
+        ),
+        trailing: widget.theme.topicTrailing,
+        onTap: () => widget.onTopicClick(widget.topic),
+      )
     );
   }
 }

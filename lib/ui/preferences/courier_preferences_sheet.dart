@@ -1,8 +1,10 @@
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 
 class CourierSheetItem {
@@ -38,6 +40,16 @@ class CourierPreferencesSheet extends StatefulWidget {
 }
 
 class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
+
+  String getSwitchSemanticsLabel() {
+    String activeThumb = widget.theme.sheetSettingStyles?.activeThumbColor?.toHex() ?? 'null';
+    String activeTrack = widget.theme.sheetSettingStyles?.activeTrackColor?.toHex() ?? 'null';
+    String inactiveThumb = widget.theme.sheetSettingStyles?.inactiveThumbColor?.toHex() ?? 'null';
+    String inactiveTrack = widget.theme.sheetSettingStyles?.inactiveTrackColor?.toHex() ?? 'null';
+    String label = 'Switch activeThumbColor: $activeThumb, activeTrackColor: $activeTrack, inactiveThumbColor: $inactiveThumb, inactiveTrackColor: $inactiveTrack';
+    return Courier.shared.isUITestsActive ? label : 'Switch';
+  }
+
   Widget _getListItem(int index, CourierSheetItem item) {
     final onChanged = item.isDisabled
         ? null
@@ -57,13 +69,16 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
           onChanged(!item.isOn);
         }
       },
-      trailing: Switch(
-        activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
-        activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,
-        inactiveThumbColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveThumbColor,
-        inactiveTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveTrackColor,
-        value: item.isOn,
-        onChanged: onChanged,
+      trailing: Semantics(
+        label: getSwitchSemanticsLabel(),
+        child: Switch(
+          activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
+          activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,
+          inactiveThumbColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveThumbColor,
+          inactiveTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveTrackColor,
+          value: item.isOn,
+          onChanged: onChanged,
+        )
       ),
     );
   }
