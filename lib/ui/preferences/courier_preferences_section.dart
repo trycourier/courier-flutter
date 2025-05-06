@@ -1,4 +1,3 @@
-import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
@@ -57,22 +56,16 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
       ));
     }
 
-    TextStyle? titleStyle = widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge;
-    String getSemanticsLabel() {
-      String label = 'CourierPreferencesSection fontColor: ${titleStyle?.color?.toHex()}, fontName: ${titleStyle?.fontFamily}, fontSize: ${titleStyle?.fontSize}';
-      return Courier.shared.isUITestsActive ? label : 'CourierPreferencesSection';
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin, right: CourierTheme.margin, bottom: CourierTheme.margin / 2),
           child: Semantics(
-            label: getSemanticsLabel(),
+            label: getPreferencesSectionSemanticsLabel(widget, context),
             child: Text(
               _section.title,
-              style: titleStyle,
+              style: widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge,
             )
           ),
         ),

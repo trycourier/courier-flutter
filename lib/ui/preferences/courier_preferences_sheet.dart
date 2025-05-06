@@ -1,4 +1,3 @@
-import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
@@ -41,15 +40,6 @@ class CourierPreferencesSheet extends StatefulWidget {
 
 class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
 
-  String getSwitchSemanticsLabel() {
-    String activeThumb = widget.theme.sheetSettingStyles?.activeThumbColor?.toHex() ?? 'null';
-    String activeTrack = widget.theme.sheetSettingStyles?.activeTrackColor?.toHex() ?? 'null';
-    String inactiveThumb = widget.theme.sheetSettingStyles?.inactiveThumbColor?.toHex() ?? 'null';
-    String inactiveTrack = widget.theme.sheetSettingStyles?.inactiveTrackColor?.toHex() ?? 'null';
-    String label = 'Switch activeThumbColor: $activeThumb, activeTrackColor: $activeTrack, inactiveThumbColor: $inactiveThumb, inactiveTrackColor: $inactiveTrack';
-    return Courier.shared.isUITestsActive ? label : 'Switch';
-  }
-
   Widget _getListItem(int index, CourierSheetItem item) {
     final onChanged = item.isDisabled
         ? null
@@ -70,7 +60,7 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
         }
       },
       trailing: Semantics(
-        label: getSwitchSemanticsLabel(),
+        label: getPreferencesSheetSwitchSemanticsLabel(widget),
         child: Switch(
           activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
           activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,

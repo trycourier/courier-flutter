@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:courier_flutter/courier_flutter.dart';
-import 'package:courier_flutter/models/inbox_action.dart';
 import 'package:courier_flutter/models/inbox_feed.dart';
-import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/ui/inbox/swipable_container.dart';
@@ -177,20 +175,6 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
     ]);
   }
 
-  String getSemanticsLabel(bool showUnreadStyle) {
-    Color unreadColor = widget.theme.getUnreadIndicatorColor(context);
-    TextStyle? titleStyle = widget.theme.getTitleStyle(context, showUnreadStyle);
-    String titleLabel = 'fontColor: ${titleStyle?.color?.toHex()}, fontName: ${titleStyle?.fontFamily}, fontSize: ${titleStyle?.fontSize}';
-    TextStyle? timeStyle = widget.theme.getTimeStyle(context, showUnreadStyle);
-    String timeLabel = 'fontColor: ${timeStyle?.color?.toHex()}, fontName: ${timeStyle?.fontFamily}, fontSize: ${timeStyle?.fontSize}';
-    TextStyle? bodyStyle = widget.theme.getBodyStyle(context, showUnreadStyle);
-    String bodyLabel = 'fontColor: ${bodyStyle?.color?.toHex()}, fontName: ${bodyStyle?.fontFamily}, fontSize: ${bodyStyle?.fontSize}';
-    ButtonStyle? buttonStyle = widget.theme.getButtonStyle(context, showUnreadStyle);
-    String buttonLabel = 'backgroundColor: ${buttonStyle?.backgroundColor?.resolve({WidgetState.pressed})?.toHex()}, fontName: ${buttonStyle?.textStyle?.resolve({WidgetState.pressed})?.fontFamily}, fontSize: ${buttonStyle?.textStyle?.resolve({WidgetState.pressed})?.fontSize}';
-    String label = 'ListRow unreadColor: ${unreadColor.toHex()}, titleLabel: {$titleLabel}, timeLabel: {$timeLabel}, bodyLabel: {$bodyLabel}, buttonLabel: {$buttonLabel}';
-    return Courier.shared.isUITestsActive ? label : 'ListRow';
-  }
-
   List<Widget> _buildContent(BuildContext context, bool showUnreadStyle) {
     List<Widget> items = [];
     if (_message.title != null) {
@@ -201,7 +185,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
           children: [
             Expanded(
               child: Semantics(
-                label: getSemanticsLabel(showUnreadStyle),
+                label: getInboxListItemSemanticsLabel(widget, context, showUnreadStyle),
                 child: Stack(
                   alignment: Alignment.centerLeft,
                   clipBehavior: Clip.none,

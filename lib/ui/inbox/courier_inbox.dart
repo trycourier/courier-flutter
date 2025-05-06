@@ -496,17 +496,10 @@ class CourierTabContentState extends State<CourierTabContent> with SingleTickerP
     super.dispose();
   }
 
-  String getSemanticsLabel() {
-    Color backgroundColor = widget.isActive ? widget.theme.getSelectedTabIndicatorBackgroundColor(context) : widget.theme.getUnselectedTabIndicatorBackgroundColor(context);
-    TextStyle? textStyle = widget.isActive ? widget.theme.getSelectedIndicatorTabTextStyle(context) : widget.theme.getUnselectedIndicatorTabTextStyle(context);
-    String label = 'CourierTabContent backgroundColor: ${backgroundColor.toHex()}, fontColor: ${textStyle?.color?.toHex()}, fontName: ${textStyle?.fontFamily}, fontSize: ${textStyle?.fontSize}';
-    return Courier.shared.isUITestsActive ? label : 'CourierTabContent';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: getSemanticsLabel(),
+      label: getInboxTabSemanticsLabel(widget, context),
       child: IntrinsicWidth(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

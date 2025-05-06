@@ -135,12 +135,6 @@ class Courier extends CourierChannelManager {
     }
   }
 
-  // UI debug options
-  // This simplifies UI testing by providing
-  // used fonts and colors in UI element tag
-
-  bool isUITestsActive = false;
-
   // iOS Foreground Notification
 
   static List<iOSNotificationPresentationOption> _iOSForegroundNotificationPresentationOptions =
@@ -639,5 +633,11 @@ abstract class CourierChannelManager extends PlatformInterface {
   Future readAllInboxMessages() async {
     throw UnimplementedError('readAllMessages() has not been implemented.');
   }
+
+  // UI debug options
+  // This simplifies UI testing by providing
+  // used fonts and colors in UI element tag
+
+  bool isUITestsActive = false;
 
 }
