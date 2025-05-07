@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,49 +63,58 @@ extension AnimatedListStateExtensions on AnimatedListState {
 
 extension HexColor on Color {
   String toHex({bool leadingHashSign = true, bool includeAlpha = false}) {
-    final buffer = StringBuffer();
-    if (leadingHashSign) buffer.write('#');
-    if (includeAlpha) buffer.write((a.round()).toRadixString(16).padLeft(2, '0'));
-    buffer.write((r.round()).toRadixString(16).padLeft(2, '0'));
-    buffer.write((g.round()).toRadixString(16).padLeft(2, '0'));
-    buffer.write((b.round()).toRadixString(16).padLeft(2, '0'));
-    return buffer.toString().toUpperCase();
+    final hex = includeAlpha
+      ? toARGB32().toRadixString(16).padLeft(8, '0')
+      : toARGB32().toRadixString(16).padLeft(8, '0').substring(2);
+    return '${leadingHashSign ? '#' : ''}$hex'.toUpperCase();
   }
 }
 
 String getInboxListItemSemanticsLabel(widget, context, bool showUnreadStyle) {
   Color unreadColor = widget.theme.getUnreadIndicatorColor(context);
   TextStyle? titleStyle = widget.theme.getTitleStyle(context, showUnreadStyle);
-  String titleLabel = 'fontColor: ${titleStyle?.color?.toHex()}, fontName: ${titleStyle?.fontFamily}, fontSize: ${titleStyle?.fontSize}';
   TextStyle? timeStyle = widget.theme.getTimeStyle(context, showUnreadStyle);
-  String timeLabel = 'fontColor: ${timeStyle?.color?.toHex()}, fontName: ${timeStyle?.fontFamily}, fontSize: ${timeStyle?.fontSize}';
   TextStyle? bodyStyle = widget.theme.getBodyStyle(context, showUnreadStyle);
-  String bodyLabel = 'fontColor: ${bodyStyle?.color?.toHex()}, fontName: ${bodyStyle?.fontFamily}, fontSize: ${bodyStyle?.fontSize}';
   ButtonStyle? buttonStyle = widget.theme.getButtonStyle(context, showUnreadStyle);
-  String buttonLabel = 'backgroundColor: ${buttonStyle?.backgroundColor?.resolve({WidgetState.pressed})?.toHex()}, fontName: ${buttonStyle?.textStyle?.resolve({WidgetState.pressed})?.fontFamily}, fontSize: ${buttonStyle?.textStyle?.resolve({WidgetState.pressed})?.fontSize}';
-  String label = 'ListRow unreadColor: ${unreadColor.toHex()}, titleLabel: {$titleLabel}, timeLabel: {$timeLabel}, bodyLabel: {$bodyLabel}, buttonLabel: {$buttonLabel}';
+  SemanticProperties semanticProperties = SemanticProperties([
+    SemanticProperty('unreadColor', unreadColor.toHex()),
+    SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
+    SemanticProperty('timeStyle', timeStyle?.toJsonString() ?? "null"),
+    SemanticProperty('bodyStyle', bodyStyle?.toJsonString() ?? "null"),
+    SemanticProperty('buttonStyle', buttonStyle?.toJsonString() ?? "null"),
+  ]);
+  String label = jsonEncode(semanticProperties.toJson());
   return Courier.shared.isUITestsActive ? label : 'ListRow';
 }
 
 String getInboxTabSemanticsLabel(widget, context) {
   Color backgroundColor = widget.isActive ? widget.theme.getSelectedTabIndicatorBackgroundColor(context) : widget.theme.getUnselectedTabIndicatorBackgroundColor(context);
   TextStyle? textStyle = widget.isActive ? widget.theme.getSelectedIndicatorTabTextStyle(context) : widget.theme.getUnselectedIndicatorTabTextStyle(context);
-  String label = 'CourierTabContent backgroundColor: ${backgroundColor.toHex()}, fontColor: ${textStyle?.color?.toHex()}, fontName: ${textStyle?.fontFamily}, fontSize: ${textStyle?.fontSize}';
+  SemanticProperties semanticProperties = SemanticProperties([
+    SemanticProperty('backgroundColor', backgroundColor.toHex()),
+    SemanticProperty('textStyle', textStyle?.toJsonString() ?? "null"),
+  ]);
+  String label = jsonEncode(semanticProperties.toJson());
   return Courier.shared.isUITestsActive ? label : 'CourierTabContent';
 }
 
 String getPreferencesListItemSemanticsLabel(widget, context) {
   TextStyle? titleStyle = widget.theme.topicTitleStyle;
-  String titleLabel = 'fontColor: ${titleStyle?.color?.toHex()}, fontName: ${titleStyle?.fontFamily}, fontSize: ${titleStyle?.fontSize}';
   TextStyle? subtitleStyle = widget.theme.topicSubtitleStyle;
-  String subtitleLabel = 'fontColor: ${subtitleStyle?.color?.toHex()}, fontName: ${subtitleStyle?.fontFamily}, fontSize: ${subtitleStyle?.fontSize}';
-  String label = 'ListTile titleLabel: {$titleLabel}, subtitleLabel: {$subtitleLabel}';
+  SemanticProperties semanticProperties = SemanticProperties([
+    SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
+    SemanticProperty('subtitleStyle', subtitleStyle?.toJsonString() ?? "null"),
+  ]);
+  String label = jsonEncode(semanticProperties.toJson());
   return Courier.shared.isUITestsActive ? label : 'ListTile';
 }
 
 String getPreferencesSectionSemanticsLabel(widget, context) {
   TextStyle? titleStyle = widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge;
-  String label = 'CourierPreferencesSection fontColor: ${titleStyle?.color?.toHex()}, fontName: ${titleStyle?.fontFamily}, fontSize: ${titleStyle?.fontSize}';
+  SemanticProperties semanticProperties = SemanticProperties([
+    SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
+  ]);
+  String label = jsonEncode(semanticProperties.toJson());
   return Courier.shared.isUITestsActive ? label : 'CourierPreferencesSection';
 }
 
@@ -112,6 +123,91 @@ String getPreferencesSheetSwitchSemanticsLabel(widget) {
   String activeTrack = widget.theme.sheetSettingStyles?.activeTrackColor?.toHex() ?? 'null';
   String inactiveThumb = widget.theme.sheetSettingStyles?.inactiveThumbColor?.toHex() ?? 'null';
   String inactiveTrack = widget.theme.sheetSettingStyles?.inactiveTrackColor?.toHex() ?? 'null';
-  String label = 'Switch activeThumbColor: $activeThumb, activeTrackColor: $activeTrack, inactiveThumbColor: $inactiveThumb, inactiveTrackColor: $inactiveTrack';
+  SemanticProperties semanticProperties = SemanticProperties([
+    SemanticProperty('activeThumbColor', activeThumb),
+    SemanticProperty('activeTrackColor', activeTrack),
+    SemanticProperty('inactiveThumbColor', inactiveThumb),
+    SemanticProperty('inactiveTrackColor', inactiveTrack),
+  ]);
+  String label = jsonEncode(semanticProperties.toJson());
   return Courier.shared.isUITestsActive ? label : 'Switch';
+}
+
+class SemanticProperty {
+  final String name;
+  final String value;
+
+  SemanticProperty(this.name, this.value);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
+    };
+  }
+
+  factory SemanticProperty.fromJson(Map<String, dynamic> json) {
+    return SemanticProperty(
+      json['name'],
+      json['value'],
+    );
+  }
+}
+
+class SemanticProperties {
+  final List<SemanticProperty> properties;
+
+  SemanticProperties(this.properties);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'properties': properties.map((e) => e.toJson()).toList(),
+    };
+  }
+
+  factory SemanticProperties.fromJson(Map<String, dynamic> json) {
+    return SemanticProperties(
+      (json['properties'] as List).map<SemanticProperty>((e) => SemanticProperty.fromJson(e)).toList(),
+    );
+  }
+}
+
+extension TextStyleToJsonString on TextStyle {
+  String toJsonString() {
+    return jsonEncode(toJson());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fontSize': fontSize,
+      'fontWeight': fontWeight.toString(),
+      'fontStyle': fontStyle?.index,
+      'color': color?.toHex(),
+      'backgroundColor': backgroundColor?.toHex(),
+      'decoration': decoration.toString(),
+      'decorationColor': decorationColor?.toHex(),
+      'decorationStyle': decorationStyle?.index,
+      'decorationThickness': decorationThickness,
+      'fontFamily': fontFamily,
+      'fontFeatures': fontFeatures?.map((e) => e.toString()).toList(),
+      'letterSpacing': letterSpacing,
+      'wordSpacing': wordSpacing,
+      'height': height,
+      'locale': locale?.toLanguageTag(),
+      'textBaseline': textBaseline?.index,
+    };
+  }
+}
+
+extension ButtonStyleToJsonString on ButtonStyle {
+  String toJsonString() {
+    return jsonEncode(toJson());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'foregroundColor': foregroundColor?.resolve({})?.toHex(),
+      'backgroundColor': backgroundColor?.resolve({})?.toHex(),
+    };
+  }
 }
