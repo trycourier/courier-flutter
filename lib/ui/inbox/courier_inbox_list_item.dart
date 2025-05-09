@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:courier_flutter/models/inbox_action.dart';
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/inbox_feed.dart';
-import 'package:courier_flutter/models/inbox_message.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
 import 'package:courier_flutter/ui/inbox/swipable_container.dart';
@@ -78,7 +77,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
 
     // Initialize enter animation
     _enterController = AnimationController(
-      vsync: this, 
+      vsync: this,
       duration: _enterDuration,
       value: widget.shouldAnimateOnLoad ? 0.0 : 1.0,
     );
@@ -106,7 +105,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
       vsync: this,
       duration: _exitDuration,
     );
-    
+
     // Exit animations - size change and fade out
     _exitSizeAnimation = Tween<double>(
       begin: 1.0,
@@ -141,7 +140,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
     }
   }
 
-  @override 
+  @override
   void dispose() {
     _exitController.dispose();
     _enterController.dispose();
@@ -185,28 +184,31 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Stack(
-                alignment: Alignment.centerLeft,
-                clipBehavior: Clip.none,
-                children: [
-                  _showDotIndicator
-                      ? Positioned(
-                          left: -(CourierTheme.dotSize + CourierTheme.dotSize / 2),
-                          child: Container(
-                            width: CourierTheme.dotSize,
-                            height: CourierTheme.dotSize,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: showUnreadStyle ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context),
+              child: Semantics(
+                label: widget.getSemanticsLabel(context, showUnreadStyle),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  clipBehavior: Clip.none,
+                  children: [
+                    _showDotIndicator
+                        ? Positioned(
+                            left: -(CourierTheme.dotSize + CourierTheme.dotSize / 2),
+                            child: Container(
+                              width: CourierTheme.dotSize,
+                              height: CourierTheme.dotSize,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: showUnreadStyle ? Colors.transparent : widget.theme.getUnreadIndicatorColor(context),
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox(),
-                  Text(
-                    style: widget.theme.getTitleStyle(context, showUnreadStyle),
-                    _message.title ?? "Missing",
-                  ),
-                ],
+                          )
+                        : const SizedBox(),
+                    Text(
+                      style: widget.theme.getTitleStyle(context, showUnreadStyle),
+                      _message.title ?? "Missing",
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: CourierTheme.margin),

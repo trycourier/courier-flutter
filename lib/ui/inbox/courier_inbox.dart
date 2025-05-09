@@ -8,6 +8,7 @@ import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_pagination_item.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -81,7 +82,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   int _lastTab = 0;
   final feedKey = const Uuid().v4();
   final archivedKey = const Uuid().v4();
-  
+
   late final Map<String, GlobalKey<CourierMessageListState>> _listStates = {
     feedKey: GlobalKey<CourierMessageListState>(),
     archivedKey: GlobalKey<CourierMessageListState>(),
@@ -138,7 +139,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             if (isFirstPage) {
               _feedMessages = messages;
             } else {
-              _feedMessages.addAll(messages); 
+              _feedMessages.addAll(messages);
             }
             _canPaginateFeed = canPaginate;
           } else {
@@ -225,7 +226,7 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
   Future<void> _fetchNextPage(InboxFeed feed) async {
     // Check if already paginating for this feed
-    if ((feed == InboxFeed.feed && _isFeedPaginating) || 
+    if ((feed == InboxFeed.feed && _isFeedPaginating) ||
         (feed == InboxFeed.archive && _isArchivedPaginating)) {
       return;
     }
@@ -349,42 +350,45 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
 
     return Column(
       children: [
-        TabBar(
-          controller: _tabController,
-          indicatorColor: getTheme(isDarkMode).getTabIndicatorColor(context),
-          tabs: [
-            Tab(
-              child: CourierTabContent(
-                text: 'Notifications',
-                textStyle: _currentTab == 0 ? getTheme(isDarkMode).getSelectedTabTextStyle(context) : getTheme(isDarkMode).getUnselectedTabTextStyle(context),
-                canShowUnreadCount: true,
-                theme: getTheme(isDarkMode),
-                isActive: _currentTab == 0,
+        Semantics(
+          label: Courier.shared.isUITestsActive ? 'TabBar indicatorColor: ${getTheme(isDarkMode).getTabIndicatorColor(context).toHex()}' : 'TabBar',
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: getTheme(isDarkMode).getTabIndicatorColor(context),
+            tabs: [
+              Tab(
+                child: CourierTabContent(
+                  text: 'Notifications',
+                  textStyle: _currentTab == 0 ? getTheme(isDarkMode).getSelectedTabTextStyle(context) : getTheme(isDarkMode).getUnselectedTabTextStyle(context),
+                  canShowUnreadCount: true,
+                  theme: getTheme(isDarkMode),
+                  isActive: _currentTab == 0,
+                )
               ),
-            ),
-            Tab(
-              child: CourierTabContent(
-                text: 'Archive',
-                textStyle: _currentTab == 1 ? getTheme(isDarkMode).getSelectedTabTextStyle(context) : getTheme(isDarkMode).getUnselectedTabTextStyle(context),
-                theme: getTheme(isDarkMode),
-                isActive: _currentTab == 1,
+              Tab(
+                child: CourierTabContent(
+                  text: 'Archive',
+                  textStyle: _currentTab == 1 ? getTheme(isDarkMode).getSelectedTabTextStyle(context) : getTheme(isDarkMode).getUnselectedTabTextStyle(context),
+                  theme: getTheme(isDarkMode),
+                  isActive: _currentTab == 1,
+                ),
               ),
-            ),
-          ],
-          onTap: (index) {
-            if (index == _lastTab) {
-              final controller = index == 0 ? widget.feedScrollController : widget.archivedScrollController;
-              if (controller.hasClients) {
-                controller.animateTo(
-                  0,
-                  duration: CourierInbox._scrollAnimationDuration,
-                  curve: Curves.easeInOut,
-                );
+            ],
+            onTap: (index) {
+              if (index == _lastTab) {
+                final controller = index == 0 ? widget.feedScrollController : widget.archivedScrollController;
+                if (controller.hasClients) {
+                  controller.animateTo(
+                    0,
+                    duration: CourierInbox._scrollAnimationDuration,
+                    curve: Curves.easeInOut,
+                  );
+                }
+                return;
               }
-              return;
-            }
-            _lastTab = index;
-          },
+              _lastTab = index;
+            },
+          ),
         ),
         Expanded(
           child: TabBarView(
@@ -494,25 +498,28 @@ class CourierTabContentState extends State<CourierTabContent> with SingleTickerP
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicWidth(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(widget.text, style: widget.textStyle),
-          if (_unreadCount > 0) ...[
-            const SizedBox(width: 8.0),
-            UnreadCountIndicator(
-              unreadCount: _unreadCount,
-              backgroundColor: widget.isActive
-                  ? widget.theme.getSelectedTabIndicatorBackgroundColor(context)
-                  : widget.theme.getUnselectedTabIndicatorBackgroundColor(context),
-              textStyle: widget.isActive
-                  ? widget.theme.getSelectedIndicatorTabTextStyle(context)
-                  : widget.theme.getUnselectedIndicatorTabTextStyle(context),
-            ),
+    return Semantics(
+      label: widget.getSemanticsLabel(context),
+      child: IntrinsicWidth(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(widget.text, style: widget.textStyle),
+            if (_unreadCount > 0) ...[
+              const SizedBox(width: 8.0),
+              UnreadCountIndicator(
+                unreadCount: _unreadCount,
+                backgroundColor: widget.isActive
+                    ? widget.theme.getSelectedTabIndicatorBackgroundColor(context)
+                    : widget.theme.getUnselectedTabIndicatorBackgroundColor(context),
+                textStyle: widget.isActive
+                    ? widget.theme.getSelectedIndicatorTabTextStyle(context)
+                    : widget.theme.getUnselectedIndicatorTabTextStyle(context),
+              ),
+            ],
           ],
-        ],
-      ),
+        ),
+      )
     );
   }
 }
@@ -521,18 +528,21 @@ class UnreadCountIndicator extends StatelessWidget {
   final int unreadCount;
   final Color backgroundColor;
   final TextStyle? textStyle;
-  
+
   const UnreadCountIndicator({super.key, required this.unreadCount, required this.backgroundColor, required this.textStyle});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Text('$unreadCount', style: textStyle),
+    return Semantics(
+      label: getSemanticsLabel(backgroundColor),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Text('$unreadCount', style: textStyle),
+      )
     );
   }
 }
@@ -579,7 +589,7 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
 
   final Map<String, GlobalKey<CourierInboxListItemState>> _listItemRefs = {};
   final List<String> _messagesToAdd = [];
-  
+
   @override
   bool get wantKeepAlive => true;
 
@@ -601,12 +611,12 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
       if (!updatedMessage.isArchived && mounted) {
         final itemId = getItemId(updatedMessage);
         final listItemRef = _listItemRefs[itemId];
-        
+
         // If the item is in view, animate the refresh
         if (listItemRef?.currentState != null && listItemRef?.currentState?.mounted == true) {
           await listItemRef?.currentState?.refresh(updatedMessage);
         }
-        
+
         // Update the state regardless
         setState(() {
           widget.messages[index] = updatedMessage;

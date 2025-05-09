@@ -2,6 +2,7 @@ import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 
 class CourierPreferencesListItem extends StatefulWidget {
@@ -45,17 +46,20 @@ class CourierPreferencesListItemState extends State<CourierPreferencesListItem> 
       }
     }
 
-    return ListTile(
-      title: Text(
-        title,
-        style: widget.theme.topicTitleStyle,
-      ),
-      subtitle: Text(
-        subtitle,
-        style: widget.theme.topicSubtitleStyle,
-      ),
-      trailing: widget.theme.topicTrailing,
-      onTap: () => widget.onTopicClick(widget.topic),
+    return Semantics(
+      label: widget.getSemanticsLabel(context),
+      child: ListTile(
+        title: Text(
+          title,
+          style: widget.theme.topicTitleStyle,
+        ),
+        subtitle: Text(
+          subtitle,
+          style: widget.theme.topicSubtitleStyle,
+        ),
+        trailing: widget.theme.topicTrailing,
+        onTap: () => widget.onTopicClick(widget.topic),
+      )
     );
   }
 }
