@@ -499,7 +499,7 @@ class CourierTabContentState extends State<CourierTabContent> with SingleTickerP
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: getInboxTabSemanticsLabel(widget, context),
+      label: widget.getSemanticsLabel(context),
       child: IntrinsicWidth(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -534,7 +534,7 @@ class UnreadCountIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: Courier.shared.isUITestsActive ? 'UnreadCountIndicator backgroundColor: ${backgroundColor.toHex()}' : 'UnreadCountIndicator',
+      label: getSemanticsLabel(backgroundColor),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
         decoration: BoxDecoration(

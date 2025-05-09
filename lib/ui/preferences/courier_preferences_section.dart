@@ -62,7 +62,7 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
         Padding(
           padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin, right: CourierTheme.margin, bottom: CourierTheme.margin / 2),
           child: Semantics(
-            label: getPreferencesSectionSemanticsLabel(widget, context),
+            label: widget.getSemanticsLabel(context),
             child: Text(
               _section.title,
               style: widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge,

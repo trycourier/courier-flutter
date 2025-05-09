@@ -60,7 +60,7 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
         }
       },
       trailing: Semantics(
-        label: getPreferencesSheetSwitchSemanticsLabel(widget),
+        label: widget.getSemanticsLabel(),
         child: Switch(
           activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
           activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,

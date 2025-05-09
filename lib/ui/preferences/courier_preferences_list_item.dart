@@ -47,7 +47,7 @@ class CourierPreferencesListItemState extends State<CourierPreferencesListItem> 
     }
 
     return Semantics(
-      label: getPreferencesListItemSemanticsLabel(widget, context),
+      label: widget.getSemanticsLabel(context),
       child: ListTile(
         title: Text(
           title,

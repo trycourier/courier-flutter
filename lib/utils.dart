@@ -1,6 +1,14 @@
 import 'dart:convert';
 
 import 'package:courier_flutter/courier_flutter.dart';
+import 'package:courier_flutter/semantic_property.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
+import 'package:courier_flutter/ui/inbox/courier_inbox_list_item.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_list_item.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_section.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_sheet.dart';
+import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -70,105 +78,124 @@ extension HexColor on Color {
   }
 }
 
-String getInboxListItemSemanticsLabel(widget, context, bool showUnreadStyle) {
-  Color unreadColor = widget.theme.getUnreadIndicatorColor(context);
-  TextStyle? titleStyle = widget.theme.getTitleStyle(context, showUnreadStyle);
-  TextStyle? timeStyle = widget.theme.getTimeStyle(context, showUnreadStyle);
-  TextStyle? bodyStyle = widget.theme.getBodyStyle(context, showUnreadStyle);
-  ButtonStyle? buttonStyle = widget.theme.getButtonStyle(context, showUnreadStyle);
-  SemanticProperties semanticProperties = SemanticProperties([
-    SemanticProperty('unreadColor', unreadColor.toHex()),
-    SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
-    SemanticProperty('timeStyle', timeStyle?.toJsonString() ?? "null"),
-    SemanticProperty('bodyStyle', bodyStyle?.toJsonString() ?? "null"),
-    SemanticProperty('buttonStyle', buttonStyle?.toJsonString() ?? "null"),
-  ]);
-  String label = jsonEncode(semanticProperties.toJson());
-  return Courier.shared.isUITestsActive ? label : 'ListRow';
-}
+extension InboxListItemSemanticsExtension on CourierInboxListItem {
+  String getSemanticsLabel(BuildContext context, bool showUnreadStyle) {
+    final Color unreadColor = theme.getUnreadIndicatorColor(context);
+    final TextStyle? titleStyle = theme.getTitleStyle(context, showUnreadStyle);
+    final TextStyle? timeStyle = theme.getTimeStyle(context, showUnreadStyle);
+    final TextStyle? bodyStyle = theme.getBodyStyle(context, showUnreadStyle);
+    final ButtonStyle? buttonStyle = theme.getButtonStyle(context, showUnreadStyle);
 
-String getInboxTabSemanticsLabel(widget, context) {
-  Color backgroundColor = widget.isActive ? widget.theme.getSelectedTabIndicatorBackgroundColor(context) : widget.theme.getUnselectedTabIndicatorBackgroundColor(context);
-  TextStyle? textStyle = widget.isActive ? widget.theme.getSelectedIndicatorTabTextStyle(context) : widget.theme.getUnselectedIndicatorTabTextStyle(context);
-  SemanticProperties semanticProperties = SemanticProperties([
-    SemanticProperty('backgroundColor', backgroundColor.toHex()),
-    SemanticProperty('textStyle', textStyle?.toJsonString() ?? "null"),
-  ]);
-  String label = jsonEncode(semanticProperties.toJson());
-  return Courier.shared.isUITestsActive ? label : 'CourierTabContent';
-}
+    final semanticProperties = SemanticProperties([
+      SemanticProperty('unreadColor', unreadColor.toHex()),
+      SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
+      SemanticProperty('timeStyle', timeStyle?.toJsonString() ?? "null"),
+      SemanticProperty('bodyStyle', bodyStyle?.toJsonString() ?? "null"),
+      SemanticProperty('buttonStyle', buttonStyle?.toJsonString() ?? "null"),
+    ]);
 
-String getPreferencesListItemSemanticsLabel(widget, context) {
-  TextStyle? titleStyle = widget.theme.topicTitleStyle;
-  TextStyle? subtitleStyle = widget.theme.topicSubtitleStyle;
-  SemanticProperties semanticProperties = SemanticProperties([
-    SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
-    SemanticProperty('subtitleStyle', subtitleStyle?.toJsonString() ?? "null"),
-  ]);
-  String label = jsonEncode(semanticProperties.toJson());
-  return Courier.shared.isUITestsActive ? label : 'ListTile';
-}
+    final String label = jsonEncode(semanticProperties.toJson());
 
-String getPreferencesSectionSemanticsLabel(widget, context) {
-  TextStyle? titleStyle = widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge;
-  SemanticProperties semanticProperties = SemanticProperties([
-    SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
-  ]);
-  String label = jsonEncode(semanticProperties.toJson());
-  return Courier.shared.isUITestsActive ? label : 'CourierPreferencesSection';
-}
-
-String getPreferencesSheetSwitchSemanticsLabel(widget) {
-  String activeThumb = widget.theme.sheetSettingStyles?.activeThumbColor?.toHex() ?? 'null';
-  String activeTrack = widget.theme.sheetSettingStyles?.activeTrackColor?.toHex() ?? 'null';
-  String inactiveThumb = widget.theme.sheetSettingStyles?.inactiveThumbColor?.toHex() ?? 'null';
-  String inactiveTrack = widget.theme.sheetSettingStyles?.inactiveTrackColor?.toHex() ?? 'null';
-  SemanticProperties semanticProperties = SemanticProperties([
-    SemanticProperty('activeThumbColor', activeThumb),
-    SemanticProperty('activeTrackColor', activeTrack),
-    SemanticProperty('inactiveThumbColor', inactiveThumb),
-    SemanticProperty('inactiveTrackColor', inactiveTrack),
-  ]);
-  String label = jsonEncode(semanticProperties.toJson());
-  return Courier.shared.isUITestsActive ? label : 'Switch';
-}
-
-class SemanticProperty {
-  final String name;
-  final String value;
-
-  SemanticProperty(this.name, this.value);
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
-  }
-
-  factory SemanticProperty.fromJson(Map<String, dynamic> json) {
-    return SemanticProperty(
-      json['name'],
-      json['value'],
-    );
+    return Courier.shared.isUITestsActive ? label : 'CourierInboxListItem';
   }
 }
 
-class SemanticProperties {
-  final List<SemanticProperty> properties;
+extension InboxTabSemanticsExtension on CourierTabContent {
+  String getSemanticsLabel(BuildContext context) {
+    final Color backgroundColor = isActive
+        ? theme.getSelectedTabIndicatorBackgroundColor(context)
+        : theme.getUnselectedTabIndicatorBackgroundColor(context);
 
-  SemanticProperties(this.properties);
+    final TextStyle? textStyle = isActive
+        ? theme.getSelectedIndicatorTabTextStyle(context)
+        : theme.getUnselectedIndicatorTabTextStyle(context);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'properties': properties.map((e) => e.toJson()).toList(),
-    };
+    final semanticProperties = SemanticProperties([
+      SemanticProperty('backgroundColor', backgroundColor.toHex()),
+      SemanticProperty('textStyle', textStyle?.toJsonString() ?? "null"),
+    ]);
+
+    final String label = jsonEncode(semanticProperties.toJson());
+
+    return Courier.shared.isUITestsActive ? label : 'CourierTabContent';
   }
+}
 
-  factory SemanticProperties.fromJson(Map<String, dynamic> json) {
-    return SemanticProperties(
-      (json['properties'] as List).map<SemanticProperty>((e) => SemanticProperty.fromJson(e)).toList(),
-    );
+extension PreferencesListItemSemanticsExtension on CourierPreferencesListItem {
+  String getSemanticsLabel(BuildContext context) {
+    final TextStyle? titleStyle = theme.topicTitleStyle;
+    final TextStyle? subtitleStyle = theme.topicSubtitleStyle;
+
+    final SemanticProperties semanticProperties = SemanticProperties([
+      SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
+      SemanticProperty('subtitleStyle', subtitleStyle?.toJsonString() ?? "null"),
+    ]);
+
+    final String label = jsonEncode(semanticProperties.toJson());
+
+    return Courier.shared.isUITestsActive ? label : 'CourierPreferencesListItem';
+  }
+}
+
+extension PreferencesSectionSemanticsExtension on CourierPreferencesSection {
+  String getSemanticsLabel(BuildContext context) {
+    final TextStyle? titleStyle = theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge;
+
+    final SemanticProperties semanticProperties = SemanticProperties([
+      SemanticProperty('titleStyle', titleStyle?.toJsonString() ?? "null"),
+    ]);
+
+    final String label = jsonEncode(semanticProperties.toJson());
+
+    return Courier.shared.isUITestsActive ? label : 'CourierPreferencesSection';
+  }
+}
+
+extension PreferencesSheetSemanticsExtension on CourierPreferencesSheet {
+  String getSemanticsLabel() {
+    final String activeThumb = theme.sheetSettingStyles?.activeThumbColor?.toHex() ?? 'null';
+    final String activeTrack = theme.sheetSettingStyles?.activeTrackColor?.toHex() ?? 'null';
+    final String inactiveThumb = theme.sheetSettingStyles?.inactiveThumbColor?.toHex() ?? 'null';
+    final String inactiveTrack = theme.sheetSettingStyles?.inactiveTrackColor?.toHex() ?? 'null';
+
+    final SemanticProperties semanticProperties = SemanticProperties([
+      SemanticProperty('activeThumbColor', activeThumb),
+      SemanticProperty('activeTrackColor', activeTrack),
+      SemanticProperty('inactiveThumbColor', inactiveThumb),
+      SemanticProperty('inactiveTrackColor', inactiveTrack),
+    ]);
+
+    final String label = jsonEncode(semanticProperties.toJson());
+
+    return Courier.shared.isUITestsActive ? label : 'CourierPreferencesSheet';
+  }
+}
+
+extension UnreadCountIndicatorSemanticsExtension on UnreadCountIndicator {
+  String getSemanticsLabel(Color background) {
+    final String backgroundColor = background.toHex();
+
+    final SemanticProperties semanticProperties = SemanticProperties([
+      SemanticProperty('backgroundColor', backgroundColor),
+    ]);
+
+    final String label = jsonEncode(semanticProperties.toJson());
+
+    return Courier.shared.isUITestsActive ? label : 'UnreadCountIndicator';
+  }
+}
+
+extension SemanticsExtension on CourierPreferences {
+  String getSemanticsLabel(BuildContext context, CourierPreferencesTheme theme) {
+    final String loadingColor = theme.getLoadingColor(context).toHex();
+
+    final SemanticProperties semanticProperties = SemanticProperties([
+      SemanticProperty('loadingColor', loadingColor),
+    ]);
+
+    final String label = jsonEncode(semanticProperties.toJson());
+
+    return Courier.shared.isUITestsActive ? label : 'RefreshIndicator';
   }
 }
 

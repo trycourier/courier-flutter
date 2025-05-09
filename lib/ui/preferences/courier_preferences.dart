@@ -463,7 +463,7 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       children: [
         Expanded(
           child: Semantics(
-            label: Courier.shared.isUITestsActive ? 'RefreshIndicator loadingColor: ${getTheme(isDarkMode).getLoadingColor(context).toHex()}' : 'RefreshIndicator',
+            label: widget.getSemanticsLabel(context, getTheme(isDarkMode)),
             child: RefreshIndicator(
               color: getTheme(isDarkMode).getLoadingColor(context),
               onRefresh: _getPreferences,
