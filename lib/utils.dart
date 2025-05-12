@@ -185,7 +185,7 @@ extension UnreadCountIndicatorSemanticsExtension on UnreadCountIndicator {
   }
 }
 
-extension SemanticsExtension on CourierPreferences {
+extension CourierPreferencesSemanticsExtension on CourierPreferences {
   String getSemanticsLabel(BuildContext context, CourierPreferencesTheme theme) {
     final String loadingColor = theme.getLoadingColor(context).toHex();
 
