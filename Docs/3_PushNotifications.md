@@ -210,22 +210,25 @@ https://user-images.githubusercontent.com/29832989/214159327-01ef662f-094b-455c-
 2. Open the folder in terminal and run `sh make_template.sh`
     - This will create the Notification Service Extension on your mac to save you time
 3. Open your iOS app in Xcode and go to File > New > Target
-4. Select "Courier Service" and click "Next"
-5. Give the Notification Service Extension a name (i.e. "CourierService"), select `Courier_iOS` as the Package, and click "Finish"
+4. Search for "Courier Service" in the template selection screen and click "Next"
+5. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
 6. Click "Cancel" on the next popup
     - You do NOT need to click "Activate" here. Your Notification Service Extension will still work just fine.
 7. Select Service Extension (i.e. "CourierService"), select general, change deployment sdk to min SDK target to iOS 13.0+
-7. Open your `Podfile` and add the following snippet to the end of your Podfile
-    - This will link the `Courier-iOS` pod to your Notification Service Extension
+8. Open your `Podfile` and add the following snippet to the end of your Podfile
+    - This will link the `Courier_iOS` pod to your Notification Service Extension
 
 ```
 target 'CourierService' do
   use_frameworks!
-  pod 'Courier-iOS'
+  pod 'Courier_iOS'
 end
 ```
 
-8. From the root of your Flutter app, run: `cd ios && pod install`
+9. From the root of your Flutter app, run: `cd ios && pod install`
+10. In your project target, move the "Embedded Foundation Extensions" above "Run Scripts" and below "Link Binary With Libraries"
+
+![foundation-item-move](https://github.com/user-attachments/assets/a9e0783e-cac4-4c13-9073-cb41d92ab8b8)
 
 &emsp;
 
