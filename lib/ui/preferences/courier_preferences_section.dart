@@ -3,6 +3,7 @@ import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_list_item.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 
 class PreferenceSection {
@@ -60,9 +61,12 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin, right: CourierTheme.margin, bottom: CourierTheme.margin / 2),
-          child: Text(
-            _section.title,
-            style: widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge,
+          child: Semantics(
+            label: widget.getSemanticsLabel(context),
+            child: Text(
+              _section.title,
+              style: widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge,
+            )
           ),
         ),
         Column(

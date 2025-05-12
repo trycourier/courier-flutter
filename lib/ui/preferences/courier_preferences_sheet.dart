@@ -3,6 +3,7 @@ import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
+import 'package:courier_flutter/utils.dart';
 import 'package:flutter/material.dart';
 
 class CourierSheetItem {
@@ -38,6 +39,7 @@ class CourierPreferencesSheet extends StatefulWidget {
 }
 
 class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
+
   Widget _getListItem(int index, CourierSheetItem item) {
     final onChanged = item.isDisabled
         ? null
@@ -57,13 +59,16 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
           onChanged(!item.isOn);
         }
       },
-      trailing: Switch(
-        activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
-        activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,
-        inactiveThumbColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveThumbColor,
-        inactiveTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveTrackColor,
-        value: item.isOn,
-        onChanged: onChanged,
+      trailing: Semantics(
+        label: widget.getSemanticsLabel(),
+        child: Switch(
+          activeColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeThumbColor,
+          activeTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.activeTrackColor,
+          inactiveThumbColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveThumbColor,
+          inactiveTrackColor: onChanged == null ? null : widget.theme.sheetSettingStyles?.inactiveTrackColor,
+          value: item.isOn,
+          onChanged: onChanged,
+        )
       ),
     );
   }
