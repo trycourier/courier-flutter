@@ -41,7 +41,7 @@ open class CourierFlutterDelegate: FlutterAppDelegate {
         super.init()
         
         // Set the api agent version
-        Courier.agent = CourierAgent.flutterIOS("4.1.0")
+        Courier.agent = CourierAgent.flutterIOS("4.1.1")
         
         // Handle notification registration
         app.registerForRemoteNotifications()
