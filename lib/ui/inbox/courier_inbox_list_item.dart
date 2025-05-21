@@ -185,7 +185,7 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
           children: [
             Expanded(
               child: Semantics(
-                label: widget.getSemanticsLabel(context, showUnreadStyle),
+                label: widget.getSemanticsLabel(context, _message.isRead),
                 child: Stack(
                   alignment: Alignment.centerLeft,
                   clipBehavior: Clip.none,

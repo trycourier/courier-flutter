@@ -79,12 +79,12 @@ extension HexColor on Color {
 }
 
 extension InboxListItemSemanticsExtension on CourierInboxListItem {
-  String getSemanticsLabel(BuildContext context, bool showUnreadStyle) {
+  String getSemanticsLabel(BuildContext context, bool isRead) {
     final Color unreadColor = theme.getUnreadIndicatorColor(context);
-    final TextStyle? titleStyle = theme.getTitleStyle(context, showUnreadStyle);
-    final TextStyle? timeStyle = theme.getTimeStyle(context, showUnreadStyle);
-    final TextStyle? bodyStyle = theme.getBodyStyle(context, showUnreadStyle);
-    final ButtonStyle? buttonStyle = theme.getButtonStyle(context, showUnreadStyle);
+    final TextStyle? titleStyle = theme.getTitleStyle(context, isRead);
+    final TextStyle? timeStyle = theme.getTimeStyle(context, isRead);
+    final TextStyle? bodyStyle = theme.getBodyStyle(context, isRead);
+    final ButtonStyle? buttonStyle = theme.getButtonStyle(context, isRead);
 
     final semanticProperties = SemanticProperties([
       SemanticProperty('unreadColor', unreadColor.toHex()),
