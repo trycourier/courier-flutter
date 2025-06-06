@@ -13,7 +13,7 @@ internal class CourierPlugin : FlutterPlugin {
     }
 
     init {
-        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.3")
+        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.4")
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {

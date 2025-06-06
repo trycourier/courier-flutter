@@ -1,6 +1,6 @@
 name: courier_flutter
 description: Inbox, Push Notifications and Preferences for Flutter
-version: 4.1.3
+version: 4.1.4
 homepage: https://courier.com
 
 environment:
