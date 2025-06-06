@@ -18,11 +18,13 @@ open class CourierFlutterActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handler.attach(context, intent)
 
         // Setup and run the agent
-        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.2")
+        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.3")
         Courier.initialize(context)
+
+        // Handle system events
+        handler.attach(context, intent)
 
     }
 

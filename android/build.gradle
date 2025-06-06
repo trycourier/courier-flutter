@@ -53,6 +53,6 @@ android {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.11.0'
-    api 'com.github.trycourier:courier-android:5.2.0'
+    api 'com.github.trycourier:courier-android:5.2.9'
     api 'com.google.firebase:firebase-messaging-ktx:24.1.0'
 }

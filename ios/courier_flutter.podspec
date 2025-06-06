@@ -16,7 +16,7 @@ Inbox, Push Notification & Preferences for Flutter by Courier
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'Courier_iOS', '5.7.4'
+  s.dependency 'Courier_iOS', '5.7.13'
   s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.

@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import com.courier.android.Courier
+import com.courier.android.models.CourierTrackingEvent
 import com.courier.android.modules.isPushPermissionGranted
 import com.courier.android.modules.requestNotificationPermission
-import com.courier.android.utils.getLastDeliveredMessage
+import com.courier.android.utils.onPushNotificationEvent
 import com.courier.android.utils.pushNotification
+import com.courier.android.utils.trackPushNotificationClick
 import com.google.firebase.messaging.RemoteMessage
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -72,21 +74,25 @@ internal class CourierSystemEventHandler : CourierFlutterPushNotificationListene
         Courier.initialize(context)
 
         // See if there is a pending click event
-        intent.getAndTrackRemoteMessage()?.let { message ->
-            postPushNotificationClicked(message)
-        }
+        checkIntentForPushNotificationClick(intent)
 
         // Handle delivered messages on the main thread
-        Courier.shared.getLastDeliveredMessage { message ->
-            postPushNotificationDelivered(message)
+        Courier.shared.onPushNotificationEvent { event ->
+            if (event.trackingEvent == CourierTrackingEvent.DELIVERED) {
+                postPushNotificationDelivered(event.remoteMessage)
+            }
         }
 
     }
 
-    fun newIntent(intent: Intent) {
-        intent.getAndTrackRemoteMessage()?.let { message ->
+    private fun checkIntentForPushNotificationClick(intent: Intent?) {
+        intent?.trackPushNotificationClick { message ->
             postPushNotificationClicked(message)
         }
+    }
+
+    fun newIntent(intent: Intent) {
+        checkIntentForPushNotificationClick(intent)
     }
 
     fun detach() {

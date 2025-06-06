@@ -1,6 +1,7 @@
 enum CourierUserPreferencesChannel {
 
   directMessage(value: "direct_message"),
+  inbox(value: "inbox"),
   email(value: "email"),
   push(value: "push"),
   sms(value: "sms"),
@@ -15,6 +16,8 @@ enum CourierUserPreferencesChannel {
     switch (data) {
       case 'direct_message':
         return CourierUserPreferencesChannel.directMessage;
+      case 'inbox':
+        return CourierUserPreferencesChannel.inbox;
       case 'email':
         return CourierUserPreferencesChannel.email;
       case 'push':
@@ -32,6 +35,8 @@ enum CourierUserPreferencesChannel {
     switch (this) {
       case CourierUserPreferencesChannel.directMessage:
         return 'In App Messages';
+      case CourierUserPreferencesChannel.inbox:
+        return 'Inbox';
       case CourierUserPreferencesChannel.email:
         return 'Emails';
       case CourierUserPreferencesChannel.push:
@@ -47,6 +52,7 @@ enum CourierUserPreferencesChannel {
 
   static List<CourierUserPreferencesChannel> get allCases => [
     CourierUserPreferencesChannel.push,
+    CourierUserPreferencesChannel.inbox,
     CourierUserPreferencesChannel.sms,
     CourierUserPreferencesChannel.email,
     CourierUserPreferencesChannel.directMessage,
