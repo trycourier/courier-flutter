@@ -206,4 +206,3 @@ These are all the available features of the SDK.
 We want to make this the best SDK for managing notifications! Have an idea or feedback about our SDKs? Here are some links to contact us:
 
 [Courier Flutter Issues](https://github.com/trycourier/courier-flutter/issues)
-
