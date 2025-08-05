@@ -63,7 +63,7 @@ android {
 
     defaultConfig {
         // Application ID for your Android app package
-        applicationId "com.courier.flutter"
+        applicationId "com.courier.flutter_app"
 
         // Pull min/target SDK from your own needs or from Flutter DSL if desired
         minSdkVersion 23
