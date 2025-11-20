@@ -20,7 +20,7 @@ open class CourierFlutterActivity : FlutterActivity() {
         super.onCreate(savedInstanceState)
 
         // Setup and run the agent
-        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.6")
+        Courier.agent = CourierAgent.FlutterAndroid(version = "4.1.7")
         Courier.initialize(context)
 
         // Handle system events

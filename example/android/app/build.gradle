@@ -41,8 +41,8 @@ if (keystorePropertiesFile.exists()) {
 android {
 
     namespace "com.courier.flutter"
-    compileSdkVersion 35
-    compileSdk 35
+    compileSdkVersion 36
+    compileSdk 36
 
     // The Flutter DSL object (provided by dev.flutter.flutter-gradle-plugin)
     ndkVersion "27.0.12077973"
@@ -66,7 +66,7 @@ android {
         applicationId "com.courier.flutter_app"
 
         // Pull min/target SDK from your own needs or from Flutter DSL if desired
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 35
         targetSdk 35
 
