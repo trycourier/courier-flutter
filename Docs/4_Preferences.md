@@ -1,5 +1,7 @@
 <img width="1040" alt="banner-flutter-preferences" src="https://github.com/trycourier/courier-flutter/assets/6370613/29da0de2-bd74-4ed8-9245-ebbe1d74ff19">
 
+> **Note**: These docs have moved to [courier.com/docs/sdk-libraries/flutter](https://www.courier.com/docs/sdk-libraries/flutter/). The content below may be outdated.
+
 # Courier Preferences
 
 Allow users to update which types of notifications they would like to receive.

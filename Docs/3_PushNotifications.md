@@ -1,5 +1,7 @@
 <img width="1040" alt="banner-flutter-push" src="https://github.com/trycourier/courier-flutter/assets/6370613/45e4a58b-2bad-49fb-850d-244be3ffd0d7">
 
+> **Note**: These docs have moved to [courier.com/docs/sdk-libraries/flutter](https://www.courier.com/docs/sdk-libraries/flutter/). The content below may be outdated.
+
 &emsp;
 
 # Push Notifications
