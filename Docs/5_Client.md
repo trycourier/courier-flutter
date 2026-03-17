@@ -14,6 +14,7 @@ final client = CourierClient(
   userId: 'user_id',
   connectionId: 'connection_id', // Optional. Used for inbox websocket
   tenantId: 'tenant_id',         // Optional. Used for scoping a client to a specific tenant
+  apiUrls: CourierApiUrls.forRegion(CourierApiRegion.eu), // Optional. Use for EU-hosted workspaces
   showLogs: true,                // Optional. Defaults to your current kDebugMode
 );
 

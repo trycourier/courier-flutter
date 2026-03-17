@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:courier_flutter/courier_flutter_channels.dart';
+import 'package:courier_flutter/client/courier_api_urls.dart';
 import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/ios_foreground_notification_presentation_options.dart';
@@ -18,6 +19,7 @@ import 'package:uuid/uuid.dart';
 export 'models/inbox_message.dart';
 export 'models/inbox_action.dart';
 export 'ios_foreground_notification_presentation_options.dart';
+export 'client/courier_api_urls.dart';
 
 class Courier extends CourierChannelManager {
 
@@ -204,6 +206,9 @@ class Courier extends CourierChannelManager {
       userId: options['userId'],
       tenantId: options['tenantId'],
       connectionId: options['connectionId'],
+      apiUrls: options['apiUrls'] == null
+          ? null
+          : CourierApiUrls.fromJson(options['apiUrls']),
       showLogs: options['showLogs'],
     );
   }
@@ -232,6 +237,7 @@ class Courier extends CourierChannelManager {
     required String accessToken,
     String? clientKey,
     String? tenantId,
+    CourierApiUrls? apiUrls,
     bool? showLogs
   }) async {
     _isDebugging = showLogs ?? kDebugMode;
@@ -241,6 +247,7 @@ class Courier extends CourierChannelManager {
       'accessToken': accessToken,
       'clientKey': clientKey,
       'showLogs': _isDebugging,
+      'apiUrls': apiUrls?.toJson(),
     });
   }
 
@@ -521,7 +528,7 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
-  Future signIn({ required String userId, required String accessToken, String? clientKey, String? tenantId, bool? showLogs }) async {
+  Future signIn({ required String userId, required String accessToken, String? clientKey, String? tenantId, CourierApiUrls? apiUrls, bool? showLogs }) async {
     throw UnimplementedError('signIn() has not been implemented.');
   }
 

@@ -1,5 +1,6 @@
 import 'package:courier_flutter/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/brand_client.dart';
+import 'package:courier_flutter/client/courier_api_urls.dart';
 import 'package:courier_flutter/client/inbox_client.dart';
 import 'package:courier_flutter/client/preference_client.dart';
 import 'package:courier_flutter/client/token_client.dart';
@@ -16,6 +17,7 @@ class CourierClientOptions {
   final String? connectionId;
   final String? tenantId;
   final bool showLogs;
+  final CourierApiUrls? apiUrls;
 
   CourierClientOptions({
     required this.id,
@@ -25,6 +27,7 @@ class CourierClientOptions {
     this.connectionId,
     this.tenantId,
     required this.showLogs,
+    this.apiUrls,
   });
 
   Map<String, dynamic> toJson() {
@@ -35,6 +38,7 @@ class CourierClientOptions {
       'connectionId': connectionId,
       'tenantId': tenantId,
       'showLogs': showLogs,
+      'apiUrls': apiUrls?.toJson(),
     };
   }
 
@@ -88,6 +92,7 @@ class CourierClient {
     required String userId,
     String? connectionId,
     String? tenantId,
+    CourierApiUrls? apiUrls,
     bool? showLogs,
   }) : options = CourierClientOptions(
     id: const Uuid().v4(),
@@ -97,6 +102,7 @@ class CourierClient {
     connectionId: connectionId,
     tenantId: tenantId,
     showLogs: showLogs ?? kDebugMode,
+    apiUrls: apiUrls,
   );
 
   Future add() async {

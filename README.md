@@ -97,6 +97,18 @@ Your app must support at least gradle `8.4`
 
 &emsp;
 
+## EU endpoints
+
+If your workspace uses EU-hosted Courier endpoints, pass the built-in EU preset through `apiUrls`.
+
+```dart
+await Courier.shared.signIn(
+  userId: "your_user_id",
+  accessToken: jwt,
+  apiUrls: CourierApiUrls.forRegion(CourierApiRegion.eu),
+);
+```
+
 # Getting Started
 
 These are all the available features of the SDK.
