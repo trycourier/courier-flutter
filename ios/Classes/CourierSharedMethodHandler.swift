@@ -48,7 +48,13 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                         "userId": options.userId,
                         "connectionId": options.connectionId,
                         "tenantId": options.tenantId,
-                        "showLogs": options.showLogs
+                        "showLogs": options.showLogs,
+                        "apiUrls": [
+                            "rest": options.apiUrls.rest,
+                            "graphql": options.apiUrls.graphql,
+                            "inboxGraphql": options.apiUrls.inboxGraphql,
+                            "inboxWebSocket": options.apiUrls.inboxWebSocket
+                        ]
                     ]
                     
                     result(dict.compactMapValues { $0 })
@@ -75,12 +81,14 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     let accessToken: String = try params.extract("accessToken")
                     let clientKey = params["clientKey"] as? String
                     let showLogs: Bool = try params.extract("showLogs")
+                    let apiUrls = (params["apiUrls"] as? [String: Any])?.toCourierApiUrls()
                     
                     await Courier.shared.signIn(
                         userId: userId,
                         tenantId: tenantId,
                         accessToken: accessToken,
                         clientKey: clientKey,
+                        baseUrls: apiUrls ?? CourierClient.ApiUrls(),
                         showLogs: showLogs
                     )
                     

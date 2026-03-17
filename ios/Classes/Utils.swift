@@ -124,6 +124,7 @@ internal extension Dictionary<String, Any> {
         let clientKey = options["clientKey"] as? String
         let connectionId = options["connectionId"] as? String
         let tenantId = options["tenantId"] as? String
+        let apiUrls = (options["apiUrls"] as? [String: Any])?.toCourierApiUrls()
         
         return CourierClient(
             jwt: jwt,
@@ -131,6 +132,7 @@ internal extension Dictionary<String, Any> {
             userId: userId,
             connectionId: connectionId,
             tenantId: tenantId,
+            baseUrls: apiUrls ?? CourierClient.ApiUrls(),
             showLogs: showLogs
         )
         
@@ -143,6 +145,20 @@ internal extension Dictionary<String, Any> {
         return value
     }
     
+}
+
+internal extension Dictionary where Key == String, Value == Any {
+
+    func toCourierApiUrls() -> CourierClient.ApiUrls {
+        let defaults = CourierClient.ApiUrls()
+        return CourierClient.ApiUrls(
+            rest: self["rest"] as? String ?? defaults.rest,
+            graphql: self["graphql"] as? String ?? defaults.graphql,
+            inboxGraphql: self["inboxGraphql"] as? String ?? defaults.inboxGraphql,
+            inboxWebSocket: self["inboxWebSocket"] as? String ?? defaults.inboxWebSocket
+        )
+    }
+
 }
 
 internal extension Error {

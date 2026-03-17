@@ -1,6 +1,7 @@
 package com.courier.courier_flutter
 
 import com.courier.android.Courier
+import com.courier.android.client.CourierClient
 import com.courier.android.models.CourierAuthenticationListener
 import com.courier.android.models.CourierInboxListener
 import com.courier.android.models.remove
@@ -63,7 +64,13 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                         "userId" to options.userId,
                         "connectionId" to options.connectionId,
                         "tenantId" to options.tenantId,
-                        "showLogs" to options.showLogs
+                        "showLogs" to options.showLogs,
+                        "apiUrls" to mapOf(
+                            "rest" to options.apiUrls.rest,
+                            "graphql" to options.apiUrls.graphql,
+                            "inboxGraphql" to options.apiUrls.inboxGraphql,
+                            "inboxWebSocket" to options.apiUrls.inboxWebSocket
+                        )
                     )
 
                     result.success(client)
@@ -99,12 +106,14 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                     val accessToken = params.extract("accessToken") as String
                     val clientKey = params["clientKey"] as? String
                     val showLogs = params.extract("showLogs") as Boolean
+                    val apiUrls = (params["apiUrls"] as? HashMap<*, *>)?.toApiUrls()
 
                     Courier.shared.signIn(
                         userId = userId,
                         tenantId = tenantId,
                         accessToken = accessToken,
                         clientKey = clientKey,
+                        apiUrls = apiUrls ?: CourierClient.ApiUrls(),
                         showLogs = showLogs,
                     )
 
