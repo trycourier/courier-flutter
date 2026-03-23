@@ -1,5 +1,7 @@
 <img width="1040" alt="banner-flutter" src="https://github.com/user-attachments/assets/e7164275-cb8c-45b3-8d12-5dacfae5ec5e">
 
+<!-- AUTO-GENERATED-OVERVIEW:START — Do not edit this section. It is synced from mintlify-docs. -->
+
 &emsp;
 
 # Requirements & Support
@@ -94,6 +96,8 @@ compileSdkVersion 33+
 ### 3. Gradle Sync
 
 Your app must support at least gradle `8.4`
+
+<!-- AUTO-GENERATED-OVERVIEW:END -->
 
 &emsp;
 
