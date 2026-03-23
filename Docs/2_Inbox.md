@@ -1,5 +1,7 @@
 <img width="1040" alt="banner-flutter-inbox" src="https://github.com/trycourier/courier-flutter/assets/6370613/57eb1876-6cf3-4ecd-a9ff-134c36c45678">
 
+> **Note**: These docs have moved to [courier.com/docs/sdk-libraries/flutter](https://www.courier.com/docs/sdk-libraries/flutter/). The content below may be outdated.
+
 &emsp;
 
 # Courier Inbox

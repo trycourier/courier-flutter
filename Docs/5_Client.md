@@ -1,3 +1,5 @@
+> **Note**: These docs have moved to [courier.com/docs/sdk-libraries/flutter](https://www.courier.com/docs/sdk-libraries/flutter/). The content below may be outdated.
+
 # `CourierClient`
 
 Base layer Courier API wrapper.
