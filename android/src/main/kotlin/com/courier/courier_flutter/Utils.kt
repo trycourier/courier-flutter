@@ -54,6 +54,7 @@ internal fun HashMap<*, *>.toClient(): CourierClient {
     val clientKey = options["clientKey"] as? String
     val connectionId = options["connectionId"] as? String
     val tenantId = options["tenantId"] as? String
+    val apiUrls = (options["apiUrls"] as? HashMap<*, *>)?.toApiUrls()
 
     return CourierClient(
         jwt = jwt,
@@ -61,9 +62,20 @@ internal fun HashMap<*, *>.toClient(): CourierClient {
         userId = userId,
         connectionId = connectionId,
         tenantId = tenantId,
+        apiUrls = apiUrls ?: CourierClient.ApiUrls(),
         showLogs = showLogs
     )
 
+}
+
+internal fun HashMap<*, *>.toApiUrls(): CourierClient.ApiUrls {
+    val defaults = CourierClient.ApiUrls()
+    return CourierClient.ApiUrls(
+        rest = this["rest"] as? String ?: defaults.rest,
+        graphql = this["graphql"] as? String ?: defaults.graphql,
+        inboxGraphql = this["inboxGraphql"] as? String ?: defaults.inboxGraphql,
+        inboxWebSocket = this["inboxWebSocket"] as? String ?: defaults.inboxWebSocket
+    )
 }
 
 // Stringify
