@@ -1,6 +1,8 @@
 
 ## 4.3.2
 
+- Deploy: trigger pub.dev publish from tag-dispatch run
+- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: checkout tag ref for publish so CHANGELOG is included
 - Update CHANGELOG.md for 4.3.2 [skip ci]
 - Retrigger deploy for 4.3.2
