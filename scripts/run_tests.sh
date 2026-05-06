@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Change to the root directory
-cd ../example || exit
+# Change to the example directory
+cd "$(dirname "$0")/../example" || exit
 
 # Function to run the tests with the selected device ID
 run_tests() {

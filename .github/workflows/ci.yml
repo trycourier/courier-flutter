@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  flutter-tests:
+    name: Flutter tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Generate env.dart from secrets
+        env:
+          COURIER_AUTH_KEY: ${{ secrets.COURIER_AUTH_KEY }}
+          COURIER_CLIENT_KEY: ${{ secrets.COURIER_CLIENT_KEY }}
+          COURIER_BRAND_ID: ${{ secrets.COURIER_BRAND_ID }}
+          COURIER_PREFERENCE_TOPIC_ID: ${{ secrets.COURIER_PREFERENCE_TOPIC_ID }}
+        run: |
+          python3 << 'PY'
+          import os
+          def q(k):
+              return os.environ.get(k, "").replace("\\", "\\\\").replace('"', '\\"')
+
+          src = f'''class Env {{
+            static const authKey = "{q('COURIER_AUTH_KEY')}";
+            static const clientKey = "{q('COURIER_CLIENT_KEY')}";
+            static const brandId = "{q('COURIER_BRAND_ID')}";
+            static const preferenceTopicId = "{q('COURIER_PREFERENCE_TOPIC_ID')}";
+          }}
+          '''
+          os.makedirs("example/lib", exist_ok=True)
+          open("example/lib/env.dart", "w").write(src)
+          PY
+
+      - name: Install example dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run integration tests on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          force-avd-creation: false
+          emulator-boot-timeout: 300
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          working-directory: example
+          script: |
+            flutter test integration_test/client_tests.dart
+            flutter test integration_test/shared_tests.dart

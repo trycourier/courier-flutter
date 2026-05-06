@@ -1,48 +1,47 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "courier_flutter",
+      "name": "Update Package Version",
+      "type": "node-terminal",
       "request": "launch",
-      "type": "dart"
+      "command": "sh scripts/update_version.sh; exit",
+      "cwd": "${workspaceFolder}"
     },
     {
-      "name": "courier_flutter (profile mode)", 
+      "name": "Build Demo App",
+      "type": "node-terminal",
       "request": "launch",
-      "type": "dart",
-      "flutterMode": "profile"
+      "command": "sh scripts/build_demo_app.sh; exit",
+      "cwd": "${workspaceFolder}"
     },
     {
-      "name": "courier_flutter (release mode)",
-      "request": "launch", 
-      "type": "dart",
-      "flutterMode": "release"
+      "name": "Manually Release Package",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "sh scripts/git_release.sh; exit",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Run Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "sh scripts/run_tests.sh; exit",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Update Native Plugin Version",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "sh scripts/update_native_plugin_version.sh; exit",
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "example_app",
       "cwd": "example",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-    },
-    {
-      "name": "example_app (profile mode)",
-      "cwd": "example", 
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "profile",
-      "program": "lib/main.dart",
-    },
-    {
-      "name": "example_app (release mode)",
-      "cwd": "example",
-      "request": "launch", 
-      "type": "dart",
-      "flutterMode": "release",
-      "program": "lib/main.dart",
+      "program": "lib/main.dart"
     }
   ]
 }

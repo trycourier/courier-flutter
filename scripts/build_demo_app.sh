@@ -21,7 +21,7 @@ increment_build_number() {
 }
 
 # Navigate to the example directory
-cd ../example || { echo "Failed to navigate to the example directory. Please ensure the path is correct."; exit 1; }
+cd "$(dirname "$0")/../example" || { echo "Failed to navigate to the example directory. Please ensure the path is correct."; exit 1; }
 echo "Navigated to the example directory."
 
 # Increment Flutter build number

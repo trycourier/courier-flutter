@@ -1,7 +1,10 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 # Get the version from the root pubspec.yaml
-version=$(grep '^version:' ../pubspec.yaml | sed 's/version: //')
+version=$(grep '^version:' "$ROOT_DIR/pubspec.yaml" | sed 's/version: //')
 
 # Remove any leading/trailing whitespace
 version=$(echo $version | xargs)
@@ -35,12 +38,12 @@ update_kotlin_file() {
 }
 
 # Update the Swift files
-update_swift_file "../ios/Classes/CourierFlutterDelegate.swift"
-update_swift_file "../ios/Classes/CourierFlutterMethodHandler.swift"
+update_swift_file "$ROOT_DIR/ios/Classes/CourierFlutterDelegate.swift"
+update_swift_file "$ROOT_DIR/ios/Classes/CourierFlutterMethodHandler.swift"
 
 # Update the Kotlin file
-update_kotlin_file "../android/src/main/kotlin/com/courier/courier_flutter/CourierPlugin.kt"
-update_kotlin_file "../android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterFragmentActivity.kt"
-update_kotlin_file "../android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterActivity.kt"
+update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierPlugin.kt"
+update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterFragmentActivity.kt"
+update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterActivity.kt"
 
 echo "All files updated successfully with version $version."
