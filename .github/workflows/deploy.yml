@@ -3,16 +3,16 @@ name: Deploy
 on:
   push:
     branches: [main]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
-  deploy:
+  tag-and-release:
     name: Tag and Release
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      deployed: ${{ steps.check.outputs.deployed }}
-      version: ${{ steps.check.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,23 +38,6 @@ jobs:
             echo "Tag $VERSION does not exist. Deploying."
             echo "deployed=true" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Create git tag
-        if: steps.check.outputs.deployed == 'true'
-        run: |
-          VERSION="${{ steps.check.outputs.version }}"
-          git tag "$VERSION"
-          git push origin "$VERSION"
-
-      - name: Generate release notes
-        if: steps.check.outputs.deployed == 'true'
-        id: notes
-        run: |
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)
-          NOTES=$(git log "$PREVIOUS_TAG"..HEAD --pretty=format:"- %s" --no-merges)
-          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$NOTES" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Generate CHANGELOG.md
         if: steps.check.outputs.deployed == 'true'
@@ -82,6 +65,23 @@ jobs:
           git commit -m "Update CHANGELOG.md for ${{ steps.check.outputs.version }} [skip ci]" || true
           git push origin HEAD:main
 
+      - name: Create git tag
+        if: steps.check.outputs.deployed == 'true'
+        run: |
+          VERSION="${{ steps.check.outputs.version }}"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+
+      - name: Generate release notes
+        if: steps.check.outputs.deployed == 'true'
+        id: notes
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          NOTES=$(git log "$PREVIOUS_TAG"..HEAD --pretty=format:"- %s" --no-merges)
+          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$NOTES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         if: steps.check.outputs.deployed == 'true'
         env:
@@ -92,8 +92,7 @@ jobs:
 
   publish:
     name: Publish to pub.dev
-    needs: deploy
-    if: needs.deploy.outputs.deployed == 'true'
+    if: github.ref_type == 'tag'
     permissions:
       id-token: write
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
