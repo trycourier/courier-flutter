@@ -1,4 +1,11 @@
 
+## 4.3.2
+
+- Retrigger deploy for 4.3.2
+- Fix CHANGELOG generation to include current version entry
+- Update CHANGELOG.md for 4.3.2 [skip ci]
+- Bump version to 4.3.2 and simplify deploy workflow
+
 ## 4.3.1
 
 - Update CHANGELOG.md for 4.3.1 [skip ci]
