@@ -189,6 +189,16 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     result(nil)
                     
+                case "inbox.get_feed_messages":
+                    let messages = await Courier.shared.feedMessages
+                    let json = try messages.map { try $0.toJson() ?? "" }
+                    result(json)
+
+                case "inbox.get_archived_messages":
+                    let messages = await Courier.shared.archivedMessages
+                    let json = try messages.map { try $0.toJson() ?? "" }
+                    result(json)
+
                 case "inbox.refresh":
                     await Courier.shared.refreshInbox()
                     result(nil)

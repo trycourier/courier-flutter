@@ -375,10 +375,19 @@ class Courier extends CourierChannelManager {
     });
   }
 
-  /// Because the native code no longer provides "inbox.get_feed_messages" or
-  /// "inbox.get_archived_messages", we remove those calls. The user is
-  /// expected to rely on the "inbox.listener_messages_changed" callback
-  /// and/or the incremental fetch "fetchNextInboxPage()" below.
+  @override
+  Future<List<InboxMessage>> get feedMessages async {
+    final List<dynamic>? result = await CourierFlutterChannels.shared.invokeMethod('inbox.get_feed_messages');
+    if (result == null) return [];
+    return result.map((m) => InboxMessage.fromJson(Map<String, dynamic>.from(m))).toList();
+  }
+
+  @override
+  Future<List<InboxMessage>> get archivedMessages async {
+    final List<dynamic>? result = await CourierFlutterChannels.shared.invokeMethod('inbox.get_archived_messages');
+    if (result == null) return [];
+    return result.map((m) => InboxMessage.fromJson(Map<String, dynamic>.from(m))).toList();
+  }
 
   @override
   Future refreshInbox() async {
