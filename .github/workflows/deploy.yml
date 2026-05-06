@@ -69,11 +69,13 @@ jobs:
           VERSION="${{ steps.check.outputs.version }}"
           gh release create "$VERSION" --notes "${{ steps.notes.outputs.notes }}"
 
-      - name: Set up pub credentials
+      - name: Set up pub token
         if: steps.check.outputs.deployed == 'true'
         run: |
           mkdir -p ~/.config/dart
-          echo '${{ secrets.PUB_CREDENTIALS }}' > ~/.config/dart/pub-credentials.json
+          cat > ~/.config/dart/pub-tokens.json << EOF
+          {"version":1,"hosted":[{"url":"https://pub.dev","token":"${{ secrets.PUB_TOKEN }}"}]}
+          EOF
 
       - name: Publish to pub.dev
         if: steps.check.outputs.deployed == 'true'
