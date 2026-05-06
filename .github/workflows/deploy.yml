@@ -71,11 +71,11 @@ jobs:
 
       - name: Set up pub token
         if: steps.check.outputs.deployed == 'true'
+        env:
+          PUB_TOKEN: ${{ secrets.PUB_TOKEN }}
         run: |
           mkdir -p ~/.config/dart
-          cat > ~/.config/dart/pub-tokens.json << EOF
-          {"version":1,"hosted":[{"url":"https://pub.dev","token":"${{ secrets.PUB_TOKEN }}"}]}
-          EOF
+          echo "{\"version\":1,\"hosted\":[{\"url\":\"https://pub.dev\",\"token\":\"${PUB_TOKEN}\"}]}" > ~/.config/dart/pub-tokens.json
 
       - name: Publish to pub.dev
         if: steps.check.outputs.deployed == 'true'
