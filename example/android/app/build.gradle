@@ -27,12 +27,18 @@ def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '
 def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
 
 // ------------------------------------------------------------------
-// Release signing (matches courier-android-keystores/native_android).
-// Uses example/android/keystore.properties and example/android/keystore.
-// Optional storeFile= path in keystore.properties overrides the default keystore file.
+// Release signing (source of truth: ../courier-android-keystores/flutter_android).
+// You can override the folder via:
+// - local.properties: courier.keystore.dir=<path>
+// - env var: COURIER_ANDROID_KEYSTORE_DIR=<path>
 // ------------------------------------------------------------------
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreDirPath =
+        localProperties.getProperty('courier.keystore.dir')
+                ?: System.getenv('COURIER_ANDROID_KEYSTORE_DIR')
+                ?: '../../../courier-android-keystores/flutter_android'
+def keystoreDir = rootProject.file(keystoreDirPath)
+def keystorePropertiesFile = new File(keystoreDir, 'keystore.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -83,7 +89,7 @@ android {
             storePassword keystoreProperties['storePassword']
             storeFile keystoreProperties['storeFile']
                     ? file(keystoreProperties['storeFile'])
-                    : rootProject.file('keystore')
+                    : new File(keystoreDir, 'keystore')
         }
     }
 

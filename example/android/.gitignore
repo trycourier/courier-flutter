@@ -6,8 +6,9 @@ gradle-wrapper.jar
 /local.properties
 GeneratedPluginRegistrant.java
 
-# Example signing uses committed courier-android-keystores/native_android files
-# (example/android/keystore.properties + keystore). Still ignore stray binaries:
+# Android signing files are kept in ../courier-android-keystores/native_android
+keystore
+keystore.properties
 key.properties
 **/*.keystore
 **/*.jks
