@@ -42,7 +42,26 @@ jobs:
       - name: Generate CHANGELOG.md
         if: steps.check.outputs.deployed == 'true'
         run: |
+          VERSION="${{ steps.check.outputs.version }}"
           echo "" > CHANGELOG.md
+
+          # Current release: commits since the latest existing tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || true)
+          if [ -n "$LATEST_TAG" ]; then
+            CURRENT_ENTRIES=$(git log "$LATEST_TAG"..HEAD --pretty=format:"- %s" --no-merges)
+          else
+            CURRENT_ENTRIES=$(git log --pretty=format:"- %s" --no-merges)
+          fi
+          echo "## $VERSION" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          if [ -n "$CURRENT_ENTRIES" ]; then
+            echo "$CURRENT_ENTRIES" >> CHANGELOG.md
+          else
+            echo "- Release $VERSION" >> CHANGELOG.md
+          fi
+          echo "" >> CHANGELOG.md
+
+          # Previous releases from existing tags
           for TAG in $(git tag --sort=-v:refname); do
             PREV=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || git rev-list --max-parents=0 HEAD)
             ENTRIES=$(git log "$PREV".."$TAG" --pretty=format:"- %s" --no-merges)
