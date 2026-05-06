@@ -1,4 +1,36 @@
 
+## 4.3.1
+
+- Update CHANGELOG.md for 4.3.1 [skip ci]
+- Deploy: publish from tag ref to satisfy pub.dev OIDC requirements
+- Deploy: add [skip ci] to CHANGELOG commit to prevent re-trigger loop
+- Update CHANGELOG.md for 4.3.1
+- Deploy: auto-generate CHANGELOG.md from git tags at release time
+- Add CHANGELOG.md for pub.dev publishing
+- Deploy: use official dart-lang publish workflow for OIDC auth
+- Retrigger deploy for 4.3.1
+- Deploy: use OIDC for pub.dev auth instead of token
+- Trigger deploy for 4.3.1
+- Fix deploy: write pub token without heredoc whitespace issues
+- Bump version to 4.3.1
+- Rewrite update_version.sh to use gum, matching Android style
+- Track example devtools_options.yaml
+- Consolidate update_version.sh and update_native_plugin_version.sh
+- Deploy: use pub token for pub.dev authentication
+- CI: remove push-to-main trigger to match Android
+- CI: specify test files explicitly to avoid running helper files
+- CI: run all integration tests in a single build pass
+- Implement feedMessages and archivedMessages on Dart and iOS
+- CI: pass --no-fatal-infos to flutter analyze
+- Fix CI: use string concatenation instead of f-strings to avoid dict/set confusion
+- CI: generate real firebase_options.dart and google-services.json from secrets
+- Fix CI: generate env.dart and firebase_options.dart before analyze
+- Add CI/CD workflows and clean up scripts for Android parity
+- feat: EU API/backend URLs and iOS 15 minimum
+- Add Android example signing aligned with courier-android-keystores/native_android
+- Bump courier-android to 5.3.0
+- Bump Courier_iOS to 5.8.0
+
 ## 4.2.0
 
 - Bump
