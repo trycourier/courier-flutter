@@ -104,6 +104,30 @@ internal extension String {
     
 }
 
+internal extension Optional where Wrapped == String {
+    func toApiUrls() -> CourierClient.ApiUrls {
+        switch self {
+        case "eu": return .eu
+        default: return .us
+        }
+    }
+}
+
+internal extension Dictionary where Key == String, Value == Any {
+    func resolveApiUrls() -> CourierClient.ApiUrls {
+        if let backendUrls = self["backendUrls"] as? [String: String] {
+            let defaults = CourierClient.ApiUrls()
+            return CourierClient.ApiUrls(
+                rest: backendUrls["rest"] ?? defaults.rest,
+                graphql: backendUrls["graphql"] ?? defaults.graphql,
+                inboxGraphql: backendUrls["inboxGraphql"] ?? defaults.inboxGraphql,
+                inboxWebSocket: backendUrls["inboxWebSocket"] ?? defaults.inboxWebSocket
+            )
+        }
+        return (self["apiUrls"] as? String).toApiUrls()
+    }
+}
+
 internal extension Dictionary<String, Any> {
     
     func toClient() throws -> CourierClient? {
@@ -124,6 +148,7 @@ internal extension Dictionary<String, Any> {
         let clientKey = options["clientKey"] as? String
         let connectionId = options["connectionId"] as? String
         let tenantId = options["tenantId"] as? String
+        let apiUrls = options.resolveApiUrls()
         
         return CourierClient(
             jwt: jwt,
@@ -131,6 +156,7 @@ internal extension Dictionary<String, Any> {
             userId: userId,
             connectionId: connectionId,
             tenantId: tenantId,
+            apiUrls: apiUrls,
             showLogs: showLogs
         )
         

@@ -195,7 +195,7 @@ final token = await Courier.shared.getToken(provider: 'YOUR_PROVIDER');
 
 https://user-images.githubusercontent.com/6370613/198094477-40f22b1e-b3ad-4029-9120-0eee22de02e0.mov
 
-1. Open your iOS project and increase the min SDK target to iOS 13.0+
+1. Open your iOS project and increase the min SDK target to iOS 15.0+
 2. From your Flutter project's root directory, run: `cd ios && pod update`
 3. Change your `AppDelegate` to extend the `CourierFlutterDelegate` and add `import courier_flutter` to the top of your `AppDelegate` file
     - This automatically syncs APNS tokens to Courier
@@ -216,7 +216,7 @@ https://user-images.githubusercontent.com/29832989/214159327-01ef662f-094b-455c-
 5. Give the Notification Service Extension a name (i.e. "CourierService") and click "Finish"
 6. Click "Cancel" on the next popup
     - You do NOT need to click "Activate" here. Your Notification Service Extension will still work just fine.
-7. Select Service Extension (i.e. "CourierService"), select general, change deployment sdk to min SDK target to iOS 13.0+
+7. Select Service Extension (i.e. "CourierService"), select general, change deployment sdk to min SDK target to iOS 15.0+
 8. Open your `Podfile` and add the following snippet to the end of your Podfile
     - This will link the `Courier_iOS` pod to your Notification Service Extension
 

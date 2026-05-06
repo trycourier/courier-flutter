@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:courier_flutter/courier_api_urls.dart';
+import 'package:courier_flutter/courier_backend_urls.dart';
 import 'package:courier_flutter/courier_flutter_channels.dart';
 import 'package:courier_flutter/client/courier_client.dart';
 import 'package:courier_flutter/courier_provider.dart';
@@ -15,6 +17,8 @@ import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:uuid/uuid.dart';
 
+export 'courier_api_urls.dart';
+export 'courier_backend_urls.dart';
 export 'models/inbox_message.dart';
 export 'models/inbox_action.dart';
 export 'ios_foreground_notification_presentation_options.dart';
@@ -204,6 +208,7 @@ class Courier extends CourierChannelManager {
       userId: options['userId'],
       tenantId: options['tenantId'],
       connectionId: options['connectionId'],
+      apiUrls: CourierApiUrls.fromValue(options['apiUrls']),
       showLogs: options['showLogs'],
     );
   }
@@ -232,6 +237,8 @@ class Courier extends CourierChannelManager {
     required String accessToken,
     String? clientKey,
     String? tenantId,
+    CourierApiUrls? apiUrls,
+    CourierBackendUrls? backendUrls,
     bool? showLogs
   }) async {
     _isDebugging = showLogs ?? kDebugMode;
@@ -240,6 +247,8 @@ class Courier extends CourierChannelManager {
       'tenantId': tenantId,
       'accessToken': accessToken,
       'clientKey': clientKey,
+      'apiUrls': apiUrls?.value,
+      'backendUrls': backendUrls?.toMap(),
       'showLogs': _isDebugging,
     });
   }
@@ -521,7 +530,7 @@ abstract class CourierChannelManager extends PlatformInterface {
     throw UnimplementedError('signOut() has not been implemented.');
   }
 
-  Future signIn({ required String userId, required String accessToken, String? clientKey, String? tenantId, bool? showLogs }) async {
+  Future signIn({ required String userId, required String accessToken, String? clientKey, String? tenantId, CourierApiUrls? apiUrls, CourierBackendUrls? backendUrls, bool? showLogs }) async {
     throw UnimplementedError('signIn() has not been implemented.');
   }
 
