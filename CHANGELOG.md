@@ -1,6 +1,11 @@
 
 ## 4.3.2
 
+- Deploy: use v-prefixed tags for pub.dev OIDC allowlist
+
+## 4.3.2
+
+- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: trigger pub.dev publish from tag-dispatch run
 - Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: checkout tag ref for publish so CHANGELOG is included
