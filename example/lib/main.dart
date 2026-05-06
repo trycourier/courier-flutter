@@ -1,9 +1,11 @@
-import 'env.dart';
-import 'example_server.dart';
-import 'firebase_options.dart';
+import 'dart:async';
+
+import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/courier_provider.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/courier_push_listener.dart';
+import 'package:courier_flutter_sample/auth_preferences.dart';
+import 'package:courier_flutter_sample/example_server.dart';
 import 'package:courier_flutter_sample/pages/auth.dart';
 import 'package:courier_flutter_sample/pages/inbox.dart';
 import 'package:courier_flutter_sample/pages/prefs.dart';
@@ -11,9 +13,8 @@ import 'package:courier_flutter_sample/pages/push.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:courier_flutter/courier_flutter.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,40 +65,37 @@ class _MyAppState extends State<MyApp> {
     _start();
   }
 
-  Future _refreshJwt() async {
-
+  Future<void> _authenticate() async {
     final currentUserId = await Courier.shared.userId;
+    if (currentUserId == null) return;
 
-    if (currentUserId != null) {
+    try {
+      final prefs = await AuthPreferences.create();
+      final apiKey = prefs.apiKey;
+      final apiUrls = prefs.getApiUrls();
+      final tenantId = await Courier.shared.tenantId;
 
-      try {
+      final jwt = await ExampleServer.generateJwt(
+        authKey: apiKey,
+        userId: currentUserId,
+        baseUrl: apiUrls.rest,
+      );
 
-        // Get the new token
-        final token = await ExampleServer.generateJwt(
-            authKey: Env.authKey,
-            userId: currentUserId
-        );
-
-        // Sign in with new token
-        await Courier.shared.signIn(
-            accessToken: token,
-            userId: currentUserId
-        );
-
-      } catch (error) {
-
-        print(error);
-        await Courier.shared.signOut();
-
-      }
-
+      await Courier.shared.signIn(
+        userId: currentUserId,
+        tenantId: tenantId,
+        accessToken: jwt,
+        backendUrls: apiUrls,
+      );
+    } catch (error) {
+      print(error);
+      await Courier.shared.signOut();
     }
-
   }
 
   Future _start() async {
 
-    await _refreshJwt();
+    await _authenticate();
 
     _inboxListener = await Courier.shared.addInboxListener(
       onUnreadCountChanged: (unreadCount) {

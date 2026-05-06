@@ -44,6 +44,28 @@ internal fun Map<*, *>.toCourierDevice(): CourierDevice {
 
 // Create Client
 
+internal fun String?.toApiUrls(): CourierClient.ApiUrls {
+    return when (this) {
+        "eu" -> CourierClient.ApiUrls.eu()
+        else -> CourierClient.ApiUrls()
+    }
+}
+
+internal fun Map<*, *>.toBackendApiUrls(): CourierClient.ApiUrls {
+    return CourierClient.ApiUrls(
+        rest = this["rest"] as? String ?: CourierClient.ApiUrls().rest,
+        graphql = this["graphql"] as? String ?: CourierClient.ApiUrls().graphql,
+        inboxGraphql = this["inboxGraphql"] as? String ?: CourierClient.ApiUrls().inboxGraphql,
+        inboxWebSocket = this["inboxWebSocket"] as? String ?: CourierClient.ApiUrls().inboxWebSocket,
+    )
+}
+
+internal fun Map<*, *>.resolveApiUrls(): CourierClient.ApiUrls {
+    val backendUrls = this["backendUrls"] as? Map<*, *>
+    if (backendUrls != null) return backendUrls.toBackendApiUrls()
+    return (this["apiUrls"] as? String).toApiUrls()
+}
+
 internal fun HashMap<*, *>.toClient(): CourierClient {
 
     val options = this["options"] as? HashMap<*, *> ?: throw MissingParameter("options")
@@ -54,6 +76,7 @@ internal fun HashMap<*, *>.toClient(): CourierClient {
     val clientKey = options["clientKey"] as? String
     val connectionId = options["connectionId"] as? String
     val tenantId = options["tenantId"] as? String
+    val apiUrls = options.resolveApiUrls()
 
     return CourierClient(
         jwt = jwt,
@@ -61,6 +84,7 @@ internal fun HashMap<*, *>.toClient(): CourierClient {
         userId = userId,
         connectionId = connectionId,
         tenantId = tenantId,
+        apiUrls = apiUrls,
         showLogs = showLogs
     )
 

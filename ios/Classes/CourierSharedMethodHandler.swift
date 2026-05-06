@@ -42,12 +42,15 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                         return
                     }
                     
+                    let apiUrlsValue = options.apiUrls.rest == CourierClient.ApiUrls.eu.rest ? "eu" : "us"
+                    
                     let dict: [String : Any?] = [
                         "jwt": options.jwt,
                         "clientKey": options.clientKey,
                         "userId": options.userId,
                         "connectionId": options.connectionId,
                         "tenantId": options.tenantId,
+                        "apiUrls": apiUrlsValue,
                         "showLogs": options.showLogs
                     ]
                     
@@ -74,6 +77,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     let tenantId = params["tenantId"] as? String
                     let accessToken: String = try params.extract("accessToken")
                     let clientKey = params["clientKey"] as? String
+                    let apiUrls = params.resolveApiUrls()
                     let showLogs: Bool = try params.extract("showLogs")
                     
                     await Courier.shared.signIn(
@@ -81,6 +85,7 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                         tenantId: tenantId,
                         accessToken: accessToken,
                         clientKey: clientKey,
+                        apiUrls: apiUrls,
                         showLogs: showLogs
                     )
                     
@@ -184,6 +189,16 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     
                     result(nil)
                     
+                case "inbox.get_feed_messages":
+                    let messages = await Courier.shared.feedMessages
+                    let json = try messages.map { try $0.toJson() ?? "" }
+                    result(json)
+
+                case "inbox.get_archived_messages":
+                    let messages = await Courier.shared.archivedMessages
+                    let json = try messages.map { try $0.toJson() ?? "" }
+                    result(json)
+
                 case "inbox.refresh":
                     await Courier.shared.refreshInbox()
                     result(nil)

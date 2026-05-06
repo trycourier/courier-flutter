@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 
 class ExampleServer {
 
-  static Future<String> generateJwt({required String authKey, required String userId}) async {
-    const url = 'https://api.courier.com/auth/issue-token';
+  static Future<String> generateJwt({required String authKey, required String userId, String baseUrl = 'https://api.courier.com'}) async {
+    final url = '$baseUrl/auth/issue-token';
 
     final headers = {
       'Content-Type': 'application/json',

@@ -1,8 +1,8 @@
 PODS:
   - courier_flutter (0.0.1):
-    - Courier_iOS (= 5.7.14)
+    - Courier_iOS (= 5.8.0)
     - Flutter
-  - Courier_iOS (5.7.14)
+  - Courier_iOS (5.8.0)
   - Firebase/CoreOnly (11.4.0):
     - FirebaseCore (= 11.4.0)
   - Firebase/Messaging (11.4.0):
@@ -76,6 +76,9 @@ PODS:
     - Flutter
     - FlutterMacOS
   - PromisesObjC (2.4.0)
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -88,6 +91,7 @@ DEPENDENCIES:
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -118,12 +122,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  courier_flutter: f984566c08a65b92bbbe3fc48bcb79d7427f522f
-  Courier_iOS: f424db1a45a18870350f96f0432fcd42a9676c66
+  courier_flutter: 9f4af69e1d53984079b0f40a982131e27a43bdc7
+  Courier_iOS: 129a2192c66aa0c20332cef153cd70a52051b030
   Firebase: cf1b19f21410b029b6786a54e9764a0cacad3c99
   firebase_core: b62a5080210edad3f2934314a8b2c6f5124e8e10
   firebase_messaging: 98619a0572d82cfb3668e78859ba9f1110e268c9
@@ -139,8 +145,9 @@ SPEC CHECKSUMS:
   package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: fa6a7b911208159b8e8f247d0c758f436db05357
+PODFILE CHECKSUM: 39c9ac09e8b1fce61aca245872058045fd7fcb42
 
 COCOAPODS: 1.16.2
