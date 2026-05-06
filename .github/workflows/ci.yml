@@ -21,13 +21,7 @@ jobs:
         with:
           channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Generate env.dart from secrets
+      - name: Generate env.dart and firebase_options.dart from secrets
         env:
           COURIER_AUTH_KEY: ${{ secrets.COURIER_AUTH_KEY }}
           COURIER_CLIENT_KEY: ${{ secrets.COURIER_CLIENT_KEY }}
@@ -39,20 +33,60 @@ jobs:
           def q(k):
               return os.environ.get(k, "").replace("\\", "\\\\").replace('"', '\\"')
 
-          src = f'''class Env {{
+          env_src = f'''class Env {{
             static const authKey = "{q('COURIER_AUTH_KEY')}";
             static const clientKey = "{q('COURIER_CLIENT_KEY')}";
             static const brandId = "{q('COURIER_BRAND_ID')}";
             static const preferenceTopicId = "{q('COURIER_PREFERENCE_TOPIC_ID')}";
           }}
           '''
+
+          firebase_src = '''import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+          import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              switch (defaultTargetPlatform) {
+                case TargetPlatform.android:
+                  return android;
+                case TargetPlatform.iOS:
+                  return ios;
+                default:
+                  return android;
+              }
+            }
+
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: '',
+              appId: '',
+              messagingSenderId: '',
+              projectId: '',
+            );
+
+            static const FirebaseOptions ios = FirebaseOptions(
+              apiKey: '',
+              appId: '',
+              messagingSenderId: '',
+              projectId: '',
+              iosBundleId: '',
+            );
+          }
+          '''
+
           os.makedirs("example/lib", exist_ok=True)
-          open("example/lib/env.dart", "w").write(src)
+          open("example/lib/env.dart", "w").write(env_src)
+          open("example/lib/firebase_options.dart", "w").write(firebase_src)
           PY
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Install example dependencies
         working-directory: example
         run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
 
       - name: Enable KVM
         run: |
