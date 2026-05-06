@@ -3,19 +3,29 @@ name: Deploy
 on:
   push:
     branches: [main]
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      publish_from_tag:
+        description: "Run publish steps (must be a tag ref)"
+        required: false
+        default: "false"
 
 jobs:
   tag-and-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     name: Tag and Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     outputs:
       deployed: ${{ steps.check.outputs.deployed }}
       version: ${{ steps.check.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -109,18 +119,25 @@ jobs:
           VERSION="${{ steps.check.outputs.version }}"
           gh release create "$VERSION" --notes "${{ steps.notes.outputs.notes }}"
 
+      - name: Trigger publish run on tag
+        if: steps.check.outputs.deployed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.check.outputs.version }}"
+          gh workflow run ".github/workflows/deploy.yml" --ref "$VERSION" -f publish_from_tag=true
+
   publish:
     name: Publish to pub.dev
-    needs: tag-and-release
-    if: needs.tag-and-release.outputs.deployed == 'true'
+    if: |
+      (github.event_name == 'push' && github.ref_type == 'tag') ||
+      (github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' && inputs.publish_from_tag == 'true')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
     steps:
       - name: Checkout tag
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.tag-and-release.outputs.version }}
+        uses: actions/checkout@v5
 
       - name: Setup Dart (with OIDC token)
         uses: dart-lang/setup-dart@v1
