@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       publish_from_tag:
@@ -33,6 +33,7 @@ jobs:
         id: check
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | tr -d '[:space:]')
+          TAG="v$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Version: $VERSION"
 
@@ -41,11 +42,11 @@ jobs:
             exit 1
           fi
 
-          if git rev-parse "$VERSION" >/dev/null 2>&1; then
-            echo "Tag $VERSION already exists. Skipping deploy."
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists. Skipping deploy."
             echo "deployed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "Tag $VERSION does not exist. Deploying."
+            echo "Tag $TAG does not exist. Deploying."
             echo "deployed=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -98,8 +99,9 @@ jobs:
         if: steps.check.outputs.deployed == 'true'
         run: |
           VERSION="${{ steps.check.outputs.version }}"
-          git tag "$VERSION"
-          git push origin "$VERSION"
+          TAG="v$VERSION"
+          git tag "$TAG"
+          git push origin "$TAG"
 
       - name: Generate release notes
         if: steps.check.outputs.deployed == 'true'
@@ -117,7 +119,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ steps.check.outputs.version }}"
-          gh release create "$VERSION" --notes "${{ steps.notes.outputs.notes }}"
+          TAG="v$VERSION"
+          gh release create "$TAG" --notes "${{ steps.notes.outputs.notes }}"
 
       - name: Trigger publish run on tag
         if: steps.check.outputs.deployed == 'true'
@@ -125,7 +128,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ steps.check.outputs.version }}"
-          gh workflow run ".github/workflows/deploy.yml" --ref "$VERSION" -f publish_from_tag=true
+          TAG="v$VERSION"
+          gh workflow run ".github/workflows/deploy.yml" --ref "$TAG" -f publish_from_tag=true
 
   publish:
     name: Publish to pub.dev
