@@ -1,6 +1,8 @@
 
 ## 4.3.2
 
+- Deploy: checkout tag ref for publish so CHANGELOG is included
+- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Retrigger deploy for 4.3.2
 - Fix CHANGELOG generation to include current version entry
 - Update CHANGELOG.md for 4.3.2 [skip ci]
