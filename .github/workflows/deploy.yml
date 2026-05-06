@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     outputs:
       deployed: ${{ steps.check.outputs.deployed }}
       version: ${{ steps.check.outputs.version }}
@@ -68,14 +69,6 @@ jobs:
         run: |
           VERSION="${{ steps.check.outputs.version }}"
           gh release create "$VERSION" --notes "${{ steps.notes.outputs.notes }}"
-
-      - name: Set up pub token
-        if: steps.check.outputs.deployed == 'true'
-        env:
-          PUB_TOKEN: ${{ secrets.PUB_TOKEN }}
-        run: |
-          mkdir -p ~/.config/dart
-          echo "{\"version\":1,\"hosted\":[{\"url\":\"https://pub.dev\",\"token\":\"${PUB_TOKEN}\"}]}" > ~/.config/dart/pub-tokens.json
 
       - name: Publish to pub.dev
         if: steps.check.outputs.deployed == 'true'
