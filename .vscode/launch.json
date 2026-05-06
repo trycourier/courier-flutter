@@ -30,13 +30,6 @@
       "cwd": "${workspaceFolder}"
     },
     {
-      "name": "Update Native Plugin Version",
-      "type": "node-terminal",
-      "request": "launch",
-      "command": "sh scripts/update_native_plugin_version.sh; exit",
-      "cwd": "${workspaceFolder}"
-    },
-    {
       "name": "example_app",
       "cwd": "example",
       "request": "launch",

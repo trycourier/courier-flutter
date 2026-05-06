@@ -1,59 +1,99 @@
 #!/bin/bash
+set -euo pipefail
 
-# Change to the root directory
 cd "$(dirname "$0")/.."
+ROOT_DIR="$(pwd)"
 
-# Define ANSI color codes
-ORANGE='\033[0;33m'
-NC='\033[0m' # No Color
+if ! command -v gum &> /dev/null; then
+    echo "gum is required but not installed."
+    echo "Install it with: brew install gum"
+    exit 1
+fi
 
-# Function to read the current version from pubspec.yaml
 get_current_version() {
     grep '^version:' pubspec.yaml | awk '{print $2}'
 }
 
-# Function to parse the version and suggest the next version
-suggest_next_version() {
-    local current_version=$1
-    local base_version=$(echo $current_version | awk -F '+' '{print $1}')
-    local build_metadata=$(echo $current_version | awk -F '+' '{print $2}')
+CURRENT=$(get_current_version)
+IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
 
-    if [[ -n $build_metadata ]]; then
-        local next_build=$((build_metadata + 1))
-        echo "${base_version}+${next_build}"
-    else
-        IFS='.' read -r -a version_parts <<< "$base_version"
-        local next_patch=$((version_parts[2] + 1))
-        echo "${version_parts[0]}.${version_parts[1]}.$next_patch"
-    fi
-}
+gum style \
+    --border rounded \
+    --border-foreground 212 \
+    --padding "0 2" \
+    --margin "1 0" \
+    "📦 Courier Flutter — Package Version" \
+    "" \
+    "Current version: $CURRENT"
 
-# Function to update the version in pubspec.yaml
-update_version() {
-    local new_version=$1
-    sed -i '' "s/^version:.*/version: $new_version/" pubspec.yaml
-}
+BUMP_TYPE=$(gum choose "patch → $MAJOR.$MINOR.$((PATCH + 1))" "minor → $MAJOR.$((MINOR + 1)).0" "major → $((MAJOR + 1)).0.0" "custom")
 
-# Get the current version
-current_version=$(get_current_version)
-echo "Current version: ${ORANGE}$current_version${NC}"
+case "$BUMP_TYPE" in
+    patch*)  NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))" ;;
+    minor*)  NEW_VERSION="$MAJOR.$((MINOR + 1)).0" ;;
+    major*)  NEW_VERSION="$((MAJOR + 1)).0.0" ;;
+    custom)  NEW_VERSION=$(gum input --placeholder "x.y.z" --prompt "Version: ") ;;
+esac
 
-# Suggest the next version
-suggested_version=$(suggest_next_version "$current_version")
-echo "Suggested next version: ${ORANGE}$suggested_version${NC}"
-
-# Prompt the user for the new version
-read -p "Enter the new version (or press Enter to use suggested version): " user_version
-new_version=${user_version:-$suggested_version}
-
-# Ask for confirmation
-echo "You entered version ${ORANGE}$new_version${NC}"
-read -p "Do you want to update the version in pubspec.yaml? (y/n): " confirmation
-
-if [[ $confirmation == "y" || $confirmation == "Y" ]]; then
-    # Update the version in pubspec.yaml
-    update_version "$new_version"
-    echo "Version updated to: ${ORANGE}$new_version${NC}"
-else
-    echo "Version update canceled."
+if [[ -z "$NEW_VERSION" ]]; then
+    echo "No version entered. Aborting."
+    exit 1
 fi
+
+if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    gum style --foreground 196 "Invalid version format: $NEW_VERSION (expected x.y.z)"
+    exit 1
+fi
+
+gum style \
+    --border rounded \
+    --border-foreground 214 \
+    --padding "0 2" \
+    "$CURRENT → $NEW_VERSION"
+
+if ! gum confirm "Apply this version update?"; then
+    echo "Cancelled."
+    exit 0
+fi
+
+# Update pubspec.yaml
+sed -i '' "s/^version:.*/version: $NEW_VERSION/" pubspec.yaml
+
+# Update native Swift agent strings
+update_swift_file() {
+    local file=$1
+    sed -i '' "s/Courier\.agent = CourierAgent\.flutterIOS(\"[^\"]*\")/Courier.agent = CourierAgent.flutterIOS(\"$NEW_VERSION\")/" "$file"
+}
+
+# Update native Kotlin agent strings
+update_kotlin_file() {
+    local file=$1
+    sed -i '' "s/Courier\.agent = CourierAgent\.FlutterAndroid(version = \"[^\"]*\")/Courier.agent = CourierAgent.FlutterAndroid(version = \"$NEW_VERSION\")/" "$file"
+}
+
+update_swift_file "$ROOT_DIR/ios/Classes/CourierFlutterDelegate.swift"
+update_swift_file "$ROOT_DIR/ios/Classes/CourierFlutterMethodHandler.swift"
+
+update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierPlugin.kt"
+update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterFragmentActivity.kt"
+update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterActivity.kt"
+
+# Bump example app build number
+EXAMPLE_PUBSPEC="example/pubspec.yaml"
+CURRENT_BUILD=$(grep -E '^\s*version:' "$EXAMPLE_PUBSPEC" | sed -E 's/.*\+([0-9]+).*/\1/')
+if [[ "$CURRENT_BUILD" =~ ^[0-9]+$ ]]; then
+    NEW_BUILD=$((CURRENT_BUILD + 1))
+    sed -i '' -E "s/(version: .+)\+[0-9]+/\1+$NEW_BUILD/" "$EXAMPLE_PUBSPEC"
+fi
+
+gum style \
+    --border rounded \
+    --border-foreground 46 \
+    --padding "0 2" \
+    --margin "1 0" \
+    "✅ Version updated to $NEW_VERSION" \
+    "" \
+    "  pubspec.yaml              → $NEW_VERSION" \
+    "  iOS Swift agents          → $NEW_VERSION" \
+    "  Android Kotlin agents     → $NEW_VERSION" \
+    "  Example build number      → ${NEW_BUILD:-$CURRENT_BUILD}"
