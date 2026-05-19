@@ -10,7 +10,6 @@ import com.courier.android.modules.addInboxListener
 import com.courier.android.modules.archiveMessage
 import com.courier.android.modules.archivedMessages
 import com.courier.android.modules.clickMessage
-import com.courier.android.modules.fcmToken
 import com.courier.android.modules.feedMessages
 import com.courier.android.modules.fetchNextInboxPage
 import com.courier.android.modules.getToken
@@ -177,7 +176,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                 "tokens.get_fcm_token" -> {
 
-                    val fcmToken = Courier.shared.fcmToken
+                    val fcmToken = Courier.shared.getToken("firebase-fcm")
 
                     result.success(fcmToken)
 

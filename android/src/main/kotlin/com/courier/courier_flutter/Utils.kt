@@ -4,22 +4,19 @@ import android.content.Intent
 import com.courier.android.client.CourierClient
 import com.courier.android.models.CourierDevice
 import com.courier.android.utils.trackPushNotificationClick
-import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.GsonBuilder
 
-// Remote Message
+// Push Data
 
-internal fun Intent.getAndTrackRemoteMessage(): RemoteMessage? {
+internal fun Intent.getAndTrackPushData(): Map<String, String>? {
 
-    var clickedMessage: RemoteMessage? = null
+    var clickedData: Map<String, String>? = null
 
-    // Try and track the clicked message
-    // Will return a message if the message was able to be tracked
     trackPushNotificationClick { message ->
-        clickedMessage = message
+        clickedData = message.data
     }
 
-    return clickedMessage
+    return clickedData
 
 }
 

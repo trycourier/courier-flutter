@@ -1,9 +1,7 @@
 package com.courier.courier_flutter
 
-import com.google.firebase.messaging.RemoteMessage
-
 interface CourierFlutterPushNotificationListener {
-    fun postPushNotificationDelivered(message: RemoteMessage)
-    fun postPushNotificationClicked(message: RemoteMessage)
+    fun postPushNotificationDelivered(data: Map<String, String>)
+    fun postPushNotificationClicked(data: Map<String, String>)
 }
 
