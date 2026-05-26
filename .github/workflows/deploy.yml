@@ -3,8 +3,6 @@ name: Deploy
 on:
   push:
     branches: [main]
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       publish_from_tag:
@@ -20,9 +18,6 @@ jobs:
     permissions:
       contents: write
       actions: write
-    outputs:
-      deployed: ${{ steps.check.outputs.deployed }}
-      version: ${{ steps.check.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -56,7 +51,6 @@ jobs:
           VERSION="${{ steps.check.outputs.version }}"
           echo "" > CHANGELOG.md
 
-          # Current release: commits since the latest existing tag
           LATEST_TAG=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || true)
           if [ -n "$LATEST_TAG" ]; then
             CURRENT_ENTRIES=$(git log "$LATEST_TAG"..HEAD --pretty=format:"- %s" --no-merges)
@@ -72,7 +66,6 @@ jobs:
           fi
           echo "" >> CHANGELOG.md
 
-          # Previous releases from existing tags
           for TAG in $(git tag --sort=-v:refname); do
             PREV=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || git rev-list --max-parents=0 HEAD)
             ENTRIES=$(git log "$PREV".."$TAG" --pretty=format:"- %s" --no-merges)
@@ -103,16 +96,6 @@ jobs:
           git tag "$TAG"
           git push origin "$TAG"
 
-      - name: Generate release notes
-        if: steps.check.outputs.deployed == 'true'
-        id: notes
-        run: |
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)
-          NOTES=$(git log "$PREVIOUS_TAG"..HEAD --pretty=format:"- %s" --no-merges)
-          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$NOTES" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub release
         if: steps.check.outputs.deployed == 'true'
         env:
@@ -120,40 +103,20 @@ jobs:
         run: |
           VERSION="${{ steps.check.outputs.version }}"
           TAG="v$VERSION"
-          gh release create "$TAG" --notes "${{ steps.notes.outputs.notes }}"
+          gh release create "$TAG" --generate-notes
 
-      - name: Trigger publish run on tag
+      - name: Trigger publish
         if: steps.check.outputs.deployed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ steps.check.outputs.version }}"
           TAG="v$VERSION"
-          gh workflow run ".github/workflows/deploy.yml" --ref "$TAG" -f publish_from_tag=true
+          gh workflow run deploy.yml --ref "$TAG" -f publish_from_tag=true
 
   publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' && inputs.publish_from_tag == 'true'
     name: Publish to pub.dev
-    if: |
-      (github.event_name == 'push' && github.ref_type == 'tag') ||
-      (github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' && inputs.publish_from_tag == 'true')
-    runs-on: ubuntu-latest
     permissions:
       id-token: write
-    steps:
-      - name: Checkout tag
-        uses: actions/checkout@v6
-
-      - name: Setup Dart (with OIDC token)
-        uses: dart-lang/setup-dart@v1
-
-      - name: Setup Flutter
-        uses: flutter-actions/setup-flutter@v4
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Publish - dry run
-        run: dart pub publish --dry-run
-
-      - name: Publish to pub.dev
-        run: dart pub publish --force
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
