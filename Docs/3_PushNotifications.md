@@ -294,8 +294,8 @@ plugins {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    implementation("com.google.firebase:firebase-messaging")
+    implementation platform("com.google.firebase:firebase-bom:34.13.0")
+    implementation "com.google.firebase:firebase-messaging"
 }
 ```
 
