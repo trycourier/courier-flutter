@@ -108,3 +108,10 @@ android {
 flutter {
     source '../..'
 }
+
+// Firebase Messaging is needed at the app level for the notification service.
+// The Courier SDK no longer bundles it — apps must add it explicitly.
+dependencies {
+    implementation platform("com.google.firebase:firebase-bom:34.13.0")
+    implementation "com.google.firebase:firebase-messaging"
+}

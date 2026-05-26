@@ -284,47 +284,83 @@ allprojects {
 }
 ```
 
-3. Update your `app/build.gradle` to support the min and compile SDKs
-    - `minSdkVersion 21`
-    - `compileSdkVersion 33`
-4. Run Gradle sync
-5. Change your `MainActivity` to extend the `CourierFlutterActivity` (or `CourierFlutterFragmentActivity` if you're using a `FragmentActivity`)
+3. Add Firebase Messaging to your `app/build.gradle`
+    - The Courier SDK no longer bundles Firebase — your app must add it explicitly
+
+```gradle
+plugins {
+    // ...
+    id "com.google.gms.google-services"
+}
+
+dependencies {
+    implementation platform("com.google.firebase:firebase-bom:34.13.0")
+    implementation "com.google.firebase:firebase-messaging"
+}
+```
+
+4. Add your `google-services.json` file to `android/app/`
+    - Download this from the [Firebase Console](https://console.firebase.google.com/) for your project
+
+5. Update your `app/build.gradle` to support the min and compile SDKs
+    - `minSdkVersion 24`
+    - `compileSdkVersion 34`
+6. Run Gradle sync
+7. Change your `MainActivity` to extend the `CourierFlutterActivity` (or `CourierFlutterFragmentActivity` if you're using a `FragmentActivity`)
     - This allows Courier to handle when push notifications are delivered and clicked
-6. Setup a new Notification Service by creating a new file and pasting the code below in it
+8. Setup a new Notification Service by creating a new file and pasting the code below in it
     - This allows you to present a notification to your user when a new notification arrives
 
 ```kotlin
-import android.annotation.SuppressLint
-import com.courier.android.notifications.presentNotification
-import com.courier.android.service.CourierService
+import com.courier.android.Courier
+import com.courier.android.notifications.CourierPushNotificationIntent
+import com.courier.android.notifications.RemoteMessageExtensionsKt
+import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-// This is safe. `CourierService` will automatically handle token refreshes.
-@SuppressLint("MissingFirebaseInstanceTokenRefresh")
-class YourNotificationService: CourierService() {
+class YourNotificationService : FirebaseMessagingService() {
 
-    override fun showNotification(message: RemoteMessage) {
-        super.showNotification(message)
+    override fun onMessageReceived(message: RemoteMessage) {
+        super.onMessageReceived(message)
 
-        // TODO: This is where you will customize the notification that is shown to your users
-        // The function below is used to get started quickly.
-        // You likely do not want to use `message.presentNotification(...)`
-        // For Flutter, you likely do not want to change the handlingClass
-        // More information on how to customize an Android notification here:
-        // https://developer.android.com/develop/ui/views/notifications/build-notification
+        // Notify the Courier SDK that a push was delivered
+        Courier.onMessageReceived(message.data)
 
-        message.presentNotification(
-            context = this,
-            handlingClass = MainActivity::class.java,
-            icon = android.R.drawable.ic_dialog_info
+        // Create the PendingIntent that runs when the user taps the notification
+        val notificationIntent = CourierPushNotificationIntent(
+            this,
+            0,
+            MainActivity::class.java,
+            message
         )
 
+        val title = message.data["title"] ?: message.notification?.title
+        val body = message.data["body"] ?: message.notification?.body
+
+        // Show the notification to the user
+        // More information on how to customize an Android notification here:
+        // https://developer.android.com/develop/ui/views/notifications/build-notification
+        RemoteMessageExtensionsKt.presentNotification(
+            notificationIntent,
+            title,
+            body,
+            android.R.drawable.ic_dialog_info,
+            "Notification Service"
+        )
+        
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+
+        // Register/refresh this device's FCM token with Courier
+        Courier.onNewToken(token)
     }
 
 }
 ```
 
-7. Add the Notification Service entry in your `AndroidManifest.xml` file
+9. Add the Notification Service entry in your `AndroidManifest.xml` file
 
 ```xml
 <manifest>
