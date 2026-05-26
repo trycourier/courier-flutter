@@ -1,7 +1,10 @@
 
-## 4.3.2
+## 5.0.0
 
-- Deploy: use v-prefixed tags for pub.dev OIDC allowlist
+- Upgrade to courier-android 6.0.0 (Firebase no longer bundled)
+- Fix duplicate push notification click events on Android
+- Add cache-emit-clear pattern for push click handling matching iOS
+- Update Firebase BOM to 34.13.0
 
 ## 4.3.2
 
