@@ -50,6 +50,51 @@ jobs:
             echo "deployed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Generate CHANGELOG.md
+        if: steps.check.outputs.deployed == 'true'
+        run: |
+          VERSION="${{ steps.check.outputs.version }}"
+          echo "" > CHANGELOG.md
+
+          # Current release: commits since the latest existing tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || true)
+          if [ -n "$LATEST_TAG" ]; then
+            CURRENT_ENTRIES=$(git log "$LATEST_TAG"..HEAD --pretty=format:"- %s" --no-merges)
+          else
+            CURRENT_ENTRIES=$(git log --pretty=format:"- %s" --no-merges)
+          fi
+          echo "## $VERSION" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          if [ -n "$CURRENT_ENTRIES" ]; then
+            echo "$CURRENT_ENTRIES" >> CHANGELOG.md
+          else
+            echo "- Release $VERSION" >> CHANGELOG.md
+          fi
+          echo "" >> CHANGELOG.md
+
+          # Previous releases from existing tags
+          for TAG in $(git tag --sort=-v:refname); do
+            PREV=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || git rev-list --max-parents=0 HEAD)
+            ENTRIES=$(git log "$PREV".."$TAG" --pretty=format:"- %s" --no-merges)
+            echo "## $TAG" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            if [ -n "$ENTRIES" ]; then
+              echo "$ENTRIES" >> CHANGELOG.md
+            else
+              echo "- Release $TAG" >> CHANGELOG.md
+            fi
+            echo "" >> CHANGELOG.md
+          done
+
+      - name: Commit CHANGELOG.md
+        if: steps.check.outputs.deployed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG.md for ${{ steps.check.outputs.version }} [skip ci]" || true
+          git push origin HEAD:main
+
       - name: Create git tag
         if: steps.check.outputs.deployed == 'true'
         run: |
@@ -58,6 +103,16 @@ jobs:
           git tag "$TAG"
           git push origin "$TAG"
 
+      - name: Generate release notes
+        if: steps.check.outputs.deployed == 'true'
+        id: notes
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          NOTES=$(git log "$PREVIOUS_TAG"..HEAD --pretty=format:"- %s" --no-merges)
+          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$NOTES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         if: steps.check.outputs.deployed == 'true'
         env:
@@ -65,8 +120,7 @@ jobs:
         run: |
           VERSION="${{ steps.check.outputs.version }}"
           TAG="v$VERSION"
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)
-          gh release create "$TAG" --generate-notes --notes-start-tag "$PREVIOUS_TAG"
+          gh release create "$TAG" --notes "${{ steps.notes.outputs.notes }}"
 
       - name: Trigger publish run on tag
         if: steps.check.outputs.deployed == 'true'
