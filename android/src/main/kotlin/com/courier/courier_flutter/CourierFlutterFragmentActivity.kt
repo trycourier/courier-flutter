@@ -20,7 +20,7 @@ open class CourierFlutterFragmentActivity : FlutterFragmentActivity() {
         super.onCreate(savedInstanceState)
 
         // Setup and run the agent
-        Courier.agent = CourierAgent.FlutterAndroid(version = "4.3.2")
+        Courier.agent = CourierAgent.FlutterAndroid(version = "5.0.0")
         Courier.initialize(this)
 
         // Handle system events

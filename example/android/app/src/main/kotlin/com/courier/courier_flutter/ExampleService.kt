@@ -32,6 +32,7 @@ class ExampleService : FirebaseMessagingService() {
             title = message.data["title"] ?: message.notification?.title,
             body = message.data["body"] ?: message.notification?.body,
         )
+
     }
 
     override fun onNewToken(token: String) {

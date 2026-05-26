@@ -3,9 +3,7 @@ package com.courier.courier_flutter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.courier.android.Courier
-import com.courier.android.models.CourierTrackingEvent.CLICKED
 import com.courier.android.models.CourierTrackingEvent.DELIVERED
 import com.courier.android.modules.isPushPermissionGranted
 import com.courier.android.modules.requestNotificationPermission
@@ -17,6 +15,7 @@ internal class CourierSystemEventHandler : CourierFlutterPushNotificationListene
 
     private var systemChannel: MethodChannel? = null
     private var eventsChannel: MethodChannel? = null
+    private var lastClickedPushNotification: Map<String, Any?>? = null
 
     fun configure(flutterEngine: FlutterEngine, activity: Activity) {
 
@@ -45,8 +44,9 @@ internal class CourierSystemEventHandler : CourierFlutterPushNotificationListene
 
                 "notifications.get_clicked_notification" -> {
 
-                    activity.intent.getAndTrackPushData()?.let { data ->
-                        postPushNotificationClicked(data)
+                    lastClickedPushNotification?.let { payload ->
+                        eventsChannel?.invokeMethod("push.clicked", payload)
+                        lastClickedPushNotification = null
                     }
 
                     result.success(null)
@@ -73,9 +73,8 @@ internal class CourierSystemEventHandler : CourierFlutterPushNotificationListene
 
         Courier.onPushNotificationEvent { event ->
             when (event.trackingEvent) {
-                CLICKED -> postPushNotificationClicked(event.data)
                 DELIVERED -> postPushNotificationDelivered(event.data)
-                else -> Log.w("CourierSystemEventHandler", "Unknown tracking event: ${event.trackingEvent}")
+                else -> {}
             }
         }
 
@@ -115,7 +114,9 @@ internal class CourierSystemEventHandler : CourierFlutterPushNotificationListene
     }
 
     override fun postPushNotificationClicked(data: Map<String, String>) {
-        eventsChannel?.invokeMethod("push.clicked", buildPushPayload(data))
+        val payload = buildPushPayload(data)
+        lastClickedPushNotification = payload
+        eventsChannel?.invokeMethod("push.clicked", payload)
     }
 
 }
