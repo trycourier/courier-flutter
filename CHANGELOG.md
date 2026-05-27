@@ -1,10 +1,29 @@
 
-## 5.0.0
+## 5.0.1
 
-- Upgrade to courier-android 6.0.0 (Firebase no longer bundled)
+- Release courier_flutter 5.0.1
+- Align ExampleService with courier-android 6.1.0 and bump example build
+- Bump courier-android to 6.1.0
+- chore(example): clarify ExampleService demo vs. Courier integration comments
+- Update Android push notification docs to use named args
+- Bump example app version to 1.0.0+30
+- Simplify deploy workflow
+
+## v5.0.0
+
+- Add 5.0.0 entry to CHANGELOG.md
+- Upgrade actions/checkout from v5 to v6
+- Restore CHANGELOG commit step in deploy workflow
+- Fix deploy workflow: remove direct push to protected main branch
+- Update docs Firebase BOM version to match example app
 - Fix duplicate push notification click events on Android
-- Add cache-emit-clear pattern for push click handling matching iOS
-- Update Firebase BOM to 34.13.0
+- Bump courier-android to 6.0.0 and remove bundled Firebase dependency
+- Android example: load signing files from shared flutter keystore folder.
+
+## v4.3.2
+
+- Update CHANGELOG.md for 4.3.2 [skip ci]
+- Deploy: use v-prefixed tags for pub.dev OIDC allowlist
 
 ## 4.3.2
 
