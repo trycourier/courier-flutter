@@ -26,12 +26,6 @@ class ExampleService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        // Required — Tells the Courier SDK a push was delivered.
-        // Behind the scenes this posts the trackingUrl from the FCM data payload
-        // as a DELIVERED event so delivery analytics appear in the Courier dashboard,
-        // and fires any onPushDelivered listeners registered from the Dart layer.
-        Courier.onMessageReceived(message.data)
-
         // --- Demo notification code (replace with your own for production) -----------
         //
         // CourierPushNotificationIntent is a convenience wrapper that bundles the
@@ -53,6 +47,12 @@ class ExampleService : FirebaseMessagingService() {
             title = message.data["title"] ?: message.notification?.title,
             body = message.data["body"] ?: message.notification?.body,
         )
+
+        // Required — Tells the Courier SDK a push was delivered.
+        // Behind the scenes this posts the trackingUrl from the FCM data payload
+        // as a DELIVERED event so delivery analytics appear in the Courier dashboard,
+        // and fires any onPushDelivered listeners registered from the Dart layer.
+        Courier.onMessageReceived(message.data)
 
     }
 

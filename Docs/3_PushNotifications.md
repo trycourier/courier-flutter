@@ -323,9 +323,6 @@ class YourNotificationService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        // Notify the Courier SDK that a push was delivered
-        Courier.onMessageReceived(message.data)
-
         // Create the PendingIntent that runs when the user taps the notification
         // This intent targets your Activity and carries the original message payload
         // TODO: Remove this if you'd like. This is mostly useful for demo purposes.
@@ -343,7 +340,10 @@ class YourNotificationService : FirebaseMessagingService() {
             title = message.data["title"] ?: message.notification?.title,
             body = message.data["body"] ?: message.notification?.body,
         )
-        
+
+        // Notify the Courier SDK that a push was delivered
+        Courier.onMessageReceived(message.data)
+
     }
 
     override fun onNewToken(token: String) {
