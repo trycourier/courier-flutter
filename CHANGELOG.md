@@ -1,6 +1,13 @@
 
-## 5.0.1
+## 5.0.2
 
+- chore: bump SDK version to 5.0.2 (#43)
+- Bump Courier_iOS to 5.8.3 (#42)
+- docs: slim README and delete legacy Docs/ folder (#41)
+
+## v5.0.1
+
+- Update CHANGELOG.md for 5.0.1 [skip ci]
 - Release courier_flutter 5.0.1
 - Align ExampleService with courier-android 6.1.0 and bump example build
 - Bump courier-android to 6.1.0
