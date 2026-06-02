@@ -1,6 +1,11 @@
 
-## 5.0.2
+## 5.0.3
 
+- chore: update copyright year to 2026 and bump to 5.0.3 (#46)
+
+## v5.0.2
+
+- Update CHANGELOG.md for 5.0.2 [skip ci]
 - chore: bump SDK version to 5.0.2 (#43)
 - Bump Courier_iOS to 5.8.3 (#42)
 - docs: slim README and delete legacy Docs/ folder (#41)
