@@ -1,6 +1,52 @@
 import 'package:courier_flutter/courier_flutter.dart';
 import 'package:intl/intl.dart';
 
+/// Tracking ids for an inbox message, as published at the root of the message by
+/// both the GraphQL read and the `iwpv=v2` socket.
+class InboxMessageTrackingIds {
+  final String? archiveTrackingId;
+  final String? channelTrackingId;
+  final String? clickTrackingId;
+  final String? deliverTrackingId;
+  final String? openTrackingId;
+  final String? readTrackingId;
+  final String? unreadTrackingId;
+
+  InboxMessageTrackingIds({
+    this.archiveTrackingId,
+    this.channelTrackingId,
+    this.clickTrackingId,
+    this.deliverTrackingId,
+    this.openTrackingId,
+    this.readTrackingId,
+    this.unreadTrackingId,
+  });
+
+  factory InboxMessageTrackingIds.fromJson(Map<String, dynamic> json) {
+    return InboxMessageTrackingIds(
+      archiveTrackingId: json['archiveTrackingId'],
+      channelTrackingId: json['channelTrackingId'],
+      clickTrackingId: json['clickTrackingId'],
+      deliverTrackingId: json['deliverTrackingId'],
+      openTrackingId: json['openTrackingId'],
+      readTrackingId: json['readTrackingId'],
+      unreadTrackingId: json['unreadTrackingId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'archiveTrackingId': archiveTrackingId,
+      'channelTrackingId': channelTrackingId,
+      'clickTrackingId': clickTrackingId,
+      'deliverTrackingId': deliverTrackingId,
+      'openTrackingId': openTrackingId,
+      'readTrackingId': readTrackingId,
+      'unreadTrackingId': unreadTrackingId,
+    };
+  }
+}
+
 class InboxMessage {
   final String messageId;
   final String? title;
@@ -13,6 +59,15 @@ class InboxMessage {
   final List<InboxAction>? actions;
   final dynamic data;
 
+  /// Tracking ids for this message.
+  ///
+  /// The native SDKs have always sent these — both platform handlers serialize a
+  /// message with the native `toJson()`, which encodes `trackingIds` — but this
+  /// model dropped the key on the floor in [fromJson]. So a Flutter app had no way
+  /// to reach a tracking id, and [CourierClient.inbox.click] requires the caller to
+  /// supply one. That made click tracking effectively unreachable from Dart.
+  final InboxMessageTrackingIds? trackingIds;
+
   InboxMessage({
     required this.messageId,
     this.title,
@@ -24,7 +79,11 @@ class InboxMessage {
     this.archived,
     this.read,
     this.opened,
+    this.trackingIds,
   });
+
+  /// Convenience accessor for the id [CourierClient.inbox.click] needs.
+  String? get clickTrackingId => trackingIds?.clickTrackingId;
 
   factory InboxMessage.fromJson(Map<String, dynamic> data) {
     List<dynamic>? actions = data['actions'];
@@ -39,6 +98,11 @@ class InboxMessage {
       archived: data['archived'],
       read: data['read'],
       opened: data['opened'],
+      trackingIds: data['trackingIds'] is Map
+          ? InboxMessageTrackingIds.fromJson(
+              Map<String, dynamic>.from(data['trackingIds'] as Map),
+            )
+          : null,
     );
   }
 
@@ -58,6 +122,7 @@ class InboxMessage {
         'data': action.data,
       }).toList(),
       'data': data,
+      'trackingIds': trackingIds?.toJson(),
     };
   }
 
