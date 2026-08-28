@@ -243,7 +243,12 @@ class CourierInboxListItemState extends State<CourierInboxListItem> with TickerP
             children: actions.map((action) {
               return FilledButton(
                 style: widget.theme.getButtonStyle(context, showUnreadStyle),
-                onPressed: () => widget.onActionClick(action),
+                onPressed: () {
+                  // Report the click before handing off, so tracking does not depend on the
+                  // integrator remembering to do it.
+                  action.markAsClicked(widget.message.messageId);
+                  widget.onActionClick(action);
+                },
                 child: Text(action.content ?? ''),
               );
             }).toList(),
