@@ -1,3 +1,7 @@
+## 5.0.4
+
+- feat: report inbox action clicks automatically, and expose `InboxAction.markAsClicked(messageId)`
+
 
 ## 5.0.3
 
