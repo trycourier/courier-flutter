@@ -1,6 +1,12 @@
 
-## 5.0.4
+## 5.0.5
 
+- chore: bump to 5.0.5 to publish the Courier_iOS 5.8.6 pin (#52)
+- Bump Courier_iOS to 5.8.6 (#51)
+
+## v5.0.4
+
+- Update CHANGELOG.md for 5.0.4 [skip ci]
 - feat: report inbox action clicks automatically (#50)
 
 ## v5.0.3
