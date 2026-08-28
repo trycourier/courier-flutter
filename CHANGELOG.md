@@ -1,10 +1,11 @@
+
 ## 5.0.4
 
-- feat: report inbox action clicks automatically, and expose `InboxAction.markAsClicked(messageId)`
+- feat: report inbox action clicks automatically (#50)
 
+## v5.0.3
 
-## 5.0.3
-
+- Update CHANGELOG.md for 5.0.3 [skip ci]
 - chore: update copyright year to 2026 and bump to 5.0.3 (#46)
 
 ## v5.0.2
