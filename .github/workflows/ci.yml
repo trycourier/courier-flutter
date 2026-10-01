@@ -160,3 +160,101 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           working-directory: example
           script: flutter test integration_test/client_tests.dart integration_test/shared_tests.dart
+
+  # Compiles the plugin's Swift (ios/Classes) against the Courier_iOS version pinned in
+  # ios/courier_flutter.podspec. Nothing else in CI builds iOS, so a Courier_iOS bump that breaks
+  # the Swift bridge would otherwise pass. Build-only: placeholder config, no secrets, no signing.
+  ios-build:
+    name: iOS build
+    runs-on: macos-15
+    timeout-minutes: 45
+    concurrency:
+      group: ios-build-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      LANG: en_US.UTF-8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Pinned so a new Flutter release can't fail this job for non-iOS reasons: the example's
+      # google_fonts 6.2.1 doesn't compile on Flutter 3.47. Bump deliberately.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.7
+          cache: true
+
+      # The example imports these gitignored files. Empty values compile fine; nothing runs.
+      - name: Write placeholder example config
+        working-directory: example
+        run: |
+          cat > lib/env.dart <<'DART'
+          class Env {
+            static const authKey = "";
+            static const clientKey = "";
+            static const brandId = "";
+            static const preferenceTopicId = "";
+          }
+          DART
+          cat > lib/firebase_options.dart <<'DART'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static const FirebaseOptions currentPlatform = FirebaseOptions(
+              apiKey: '',
+              appId: '',
+              messagingSenderId: '',
+              projectId: '',
+            );
+          }
+          DART
+          plutil -create xml1 ios/Runner/GoogleService-Info.plist
+
+      # The example integrates plugins through CocoaPods. Newer Flutter moves SPM-capable plugins
+      # (firebase_core) to Swift Package Manager, which leaves firebase_messaging's pod without its
+      # firebase_core dependency, so keep this build on CocoaPods.
+      - name: Install dependencies
+        run: |
+          flutter config --no-enable-swift-package-manager
+          flutter pub get
+          flutter precache --ios
+          cd example && flutter pub get
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock', 'ios/courier_flutter.podspec') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      # `pod update Courier_iOS` rather than `pod install`: bump PRs change the podspec pin without
+      # touching example/ios/Podfile.lock, and install would refuse the stale lock.
+      - name: Install pods
+        working-directory: example/ios
+        run: pod update Courier_iOS
+
+      - name: Check resolved Courier_iOS matches the podspec pin
+        run: |
+          PINNED=$(sed -nE "s/.*s\.dependency 'Courier_iOS', '([^']+)'.*/\1/p" ios/courier_flutter.podspec)
+          RESOLVED=$(sed -nE 's/^  - Courier_iOS \(([^)]+)\)$/\1/p' example/ios/Podfile.lock)
+          echo "Pinned: $PINNED  Resolved: $RESOLVED"
+          [ -n "$PINNED" ] && [ "$PINNED" = "$RESOLVED" ]
+
+      # ARCHS=arm64 keeps the generic simulator destination from also building x86_64.
+      - name: Build example app for iOS Simulator
+        working-directory: example/ios
+        run: |
+          xcodebuild build \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            ARCHS=arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet
