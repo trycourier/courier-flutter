@@ -178,13 +178,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Pinned so a new Flutter release can't fail this job for non-iOS reasons: the example's
-      # google_fonts 6.2.1 doesn't compile on Flutter 3.47. Bump deliberately.
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.35.7
           cache: true
 
       # The example imports these gitignored files. Empty values compile fine; nothing runs.

@@ -28,7 +28,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^3.9.0
   firebase_messaging: ^15.1.6
-  google_fonts: ^6.1.0
+  google_fonts: ^8.2.1
   http: ^1.2.1
   uuid: ^4.4.2
   shared_preferences: ^2.5.5
