@@ -90,7 +90,7 @@ internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterP
                     try await client.tokens.putUserToken(
                         token: token,
                         provider: provider,
-                        device: device ?? CourierDevice()
+                        device: device
                     )
                     
                     result(nil)
