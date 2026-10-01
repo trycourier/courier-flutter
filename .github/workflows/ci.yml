@@ -210,8 +210,12 @@ jobs:
           DART
           plutil -create xml1 ios/Runner/GoogleService-Info.plist
 
+      # The example integrates plugins through CocoaPods. Newer stable Flutter moves SPM-capable
+      # plugins (firebase_core) to Swift Package Manager, which leaves firebase_messaging's pod
+      # without its firebase_core dependency, so keep this build on CocoaPods.
       - name: Install dependencies
         run: |
+          flutter config --no-enable-swift-package-manager
           flutter pub get
           flutter precache --ios
           cd example && flutter pub get
