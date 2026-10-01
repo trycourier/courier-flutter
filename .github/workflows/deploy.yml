@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: write
       actions: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -51,12 +52,34 @@ jobs:
           VERSION="${{ steps.check.outputs.version }}"
           echo "" > CHANGELOG.md
 
-          LATEST_TAG=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || true)
-          if [ -n "$LATEST_TAG" ]; then
-            CURRENT_ENTRIES=$(git log "$LATEST_TAG"..HEAD --pretty=format:"- %s" --no-merges)
-          else
-            CURRENT_ENTRIES=$(git log --pretty=format:"- %s" --no-merges)
-          fi
+          # Previous release before version/tag $1, from commit $2. Starts from `git describe`,
+          # but each release tag now sits on its CHANGELOG commit, which reaches main through a
+          # PR and so isn't an ancestor of main if that PR was squashed. When the
+          # next-lower-versioned tag is such a commit, use it instead.
+          prev_tag() {
+            local described by_version
+            described=$(git describe --tags --abbrev=0 "$2" 2>/dev/null || true)
+            by_version=$(
+              { echo "$(echo "$1" | tr -cd '0-9.') ="
+                git tag | while read -r t; do echo "$(echo "$t" | tr -cd '0-9.') $t"; done
+              } | sort -s -V -k1,1 | awk '$2 == "=" { print p; exit } { p = $2 }'
+            )
+            if [ -n "$by_version" ] && ! git merge-base --is-ancestor "$by_version" "$2" \
+              && git log -1 --format=%s "$by_version" | grep -q '^Update CHANGELOG.md for ' \
+              && git merge-base --is-ancestor "$by_version^" "$2"; then
+              echo "$by_version"
+            else
+              echo "${described:-$(git rev-list --max-parents=0 HEAD)}"
+            fi
+          }
+
+          # The CHANGELOG commits themselves aren't release notes.
+          entries() {
+            git log "$1".."$2" --pretty=format:"- %s" --no-merges \
+              --invert-grep --grep='^Update CHANGELOG.md for '
+          }
+
+          CURRENT_ENTRIES=$(entries "$(prev_tag "$VERSION" HEAD)" HEAD)
           echo "## $VERSION" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           if [ -n "$CURRENT_ENTRIES" ]; then
@@ -67,8 +90,7 @@ jobs:
           echo "" >> CHANGELOG.md
 
           for TAG in $(git tag --sort=-v:refname); do
-            PREV=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || git rev-list --max-parents=0 HEAD)
-            ENTRIES=$(git log "$PREV".."$TAG" --pretty=format:"- %s" --no-merges)
+            ENTRIES=$(entries "$(prev_tag "$TAG" "$TAG^")" "$TAG")
             echo "## $TAG" >> CHANGELOG.md
             echo "" >> CHANGELOG.md
             if [ -n "$ENTRIES" ]; then
@@ -79,14 +101,22 @@ jobs:
             echo "" >> CHANGELOG.md
           done
 
+      # Committed locally, not pushed to main: main requires the iOS build check, which a
+      # direct push can't satisfy. The release tag goes on this commit (so the pub.dev package
+      # carries the new CHANGELOG), and a PR brings it to main after publishing.
       - name: Commit CHANGELOG.md
+        id: changelog
         if: steps.check.outputs.deployed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md
-          git commit -m "Update CHANGELOG.md for ${{ steps.check.outputs.version }} [skip ci]" || true
-          git push origin HEAD:main
+          if git diff --cached --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Update CHANGELOG.md for ${{ steps.check.outputs.version }}"
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create git tag
         if: steps.check.outputs.deployed == 'true'
@@ -113,6 +143,21 @@ jobs:
           VERSION="${{ steps.check.outputs.version }}"
           TAG="v$VERSION"
           gh workflow run deploy.yml --ref "$TAG" -f publish_from_tag=true
+
+      - name: Open CHANGELOG pull request
+        if: steps.check.outputs.deployed == 'true' && steps.changelog.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.check.outputs.version }}"
+          BRANCH="changelog/v$VERSION"
+          git push origin "HEAD:refs/heads/$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "Update CHANGELOG.md for $VERSION" \
+            --body "Opened by the Deploy workflow. v$VERSION is tagged on this commit and already published; merging brings CHANGELOG.md onto main. Any merge method works."
+          # PRs opened with GITHUB_TOKEN don't trigger workflows, so start CI on the branch to
+          # produce the checks main requires.
+          gh workflow run ci.yml --ref "$BRANCH"
 
   publish:
     if: github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' && inputs.publish_from_tag == 'true'
