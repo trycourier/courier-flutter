@@ -1,6 +1,13 @@
 
-## 5.0.5
+## 5.0.6
 
+- chore: bump to 5.0.6 to publish the Courier_iOS 5.9.0 and courier-android 6.1.2 pins (#55)
+- Bump Courier_iOS to 5.9.0 (#53)
+- Bump courier-android to 6.1.2 (#47)
+
+## v5.0.5
+
+- Update CHANGELOG.md for 5.0.5 [skip ci]
 - chore: bump to 5.0.5 to publish the Courier_iOS 5.8.6 pin (#52)
 - Bump Courier_iOS to 5.8.6 (#51)
 
