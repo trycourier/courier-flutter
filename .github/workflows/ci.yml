@@ -178,10 +178,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Pinned so a new Flutter release can't fail this job for non-iOS reasons: the example's
+      # google_fonts 6.2.1 doesn't compile on Flutter 3.47. Bump deliberately.
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.35.7
           cache: true
 
       # The example imports these gitignored files. Empty values compile fine; nothing runs.
@@ -210,9 +213,9 @@ jobs:
           DART
           plutil -create xml1 ios/Runner/GoogleService-Info.plist
 
-      # The example integrates plugins through CocoaPods. Newer stable Flutter moves SPM-capable
-      # plugins (firebase_core) to Swift Package Manager, which leaves firebase_messaging's pod
-      # without its firebase_core dependency, so keep this build on CocoaPods.
+      # The example integrates plugins through CocoaPods. Newer Flutter moves SPM-capable plugins
+      # (firebase_core) to Swift Package Manager, which leaves firebase_messaging's pod without its
+      # firebase_core dependency, so keep this build on CocoaPods.
       - name: Install dependencies
         run: |
           flutter config --no-enable-swift-package-manager
