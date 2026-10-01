@@ -398,6 +398,15 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
                     try await Courier.shared.clickMessage(messageId)
                     result(nil)
                     
+                case "inbox.click_message_action":
+                    guard let params = call.arguments as? [String: Any] else {
+                        throw CourierFlutterError.missingParameter(value: "params")
+                    }
+                    let messageId: String = try params.extract("messageId")
+                    let trackingId: String = try params.extract("trackingId")
+                    try await Courier.shared.client?.inbox.click(messageId: messageId, trackingId: trackingId)
+                    result(nil)
+                    
                 case "inbox.archive_message":
                     guard let params = call.arguments as? [String: Any] else {
                         throw CourierFlutterError.missingParameter(value: "params")

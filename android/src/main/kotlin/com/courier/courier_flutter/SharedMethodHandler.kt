@@ -478,6 +478,19 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
 
                 }
 
+                "inbox.click_message_action" -> {
+
+                    val params = call.arguments as? HashMap<*, *> ?: throw MissingParameter("params")
+
+                    val messageId = params.extract("messageId") as String
+                    val trackingId = params.extract("trackingId") as String
+
+                    Courier.shared.client?.inbox?.click(messageId, trackingId)
+
+                    result.success(null)
+
+                }
+
                 "inbox.archive_message" -> {
 
                     val params = call.arguments as? HashMap<*, *> ?: throw MissingParameter("params")

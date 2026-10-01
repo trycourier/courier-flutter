@@ -505,6 +505,14 @@ class Courier extends CourierChannelManager {
   }
 
   @override
+  Future clickMessageAction({required String messageId, required String trackingId}) async {
+    await CourierFlutterChannels.shared.invokeMethod('inbox.click_message_action', {
+      'messageId': messageId,
+      'trackingId': trackingId,
+    });
+  }
+
+  @override
   Future archiveMessage({required String messageId}) async {
     await CourierFlutterChannels.shared.invokeMethod('inbox.archive_message', {
       'messageId': messageId,
@@ -642,6 +650,10 @@ abstract class CourierChannelManager extends PlatformInterface {
 
   Future clickMessage({required String messageId}) async {
     throw UnimplementedError('clickMessage() has not been implemented.');
+  }
+
+  Future clickMessageAction({required String messageId, required String trackingId}) async {
+    throw UnimplementedError('clickMessageAction() has not been implemented.');
   }
 
   Future archiveMessage({required String messageId}) async {
