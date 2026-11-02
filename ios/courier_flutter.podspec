@@ -14,7 +14,7 @@ Inbox, Push Notification & Preferences for Flutter by Courier
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Courier' => 'mike@courier.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'courier_flutter/Sources/courier_flutter/**/*.swift'
   s.dependency 'Flutter'
   s.dependency 'Courier_iOS', '5.9.0'
   s.platform = :ios, '15.0'
