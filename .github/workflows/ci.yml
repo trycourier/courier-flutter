@@ -318,14 +318,14 @@ jobs:
           DART
           plutil -create xml1 ios/Runner/GoogleService-Info.plist
 
-      # Package.swift and the podspec each pin Courier_iOS. Apps get whichever one their Flutter
-      # build uses, so a bump that misses one ships two different SDK versions.
-      - name: Check Package.swift pins the same Courier_iOS as the podspec
+      # The podspec stays on 6.0.7, the last Courier_iOS on CocoaPods trunk: a newer pin can't
+      # install there. Package.swift gets every release.
+      - name: Check the Courier_iOS pins
         run: |
           PODSPEC=$(sed -nE "s/.*s\.dependency 'Courier_iOS', '([^']+)'.*/\1/p" ios/courier_flutter.podspec)
           PACKAGE=$(sed -nE 's/.*courier-ios", exact: "([^"]+)".*/\1/p' ios/courier_flutter/Package.swift)
           echo "podspec: $PODSPEC  Package.swift: $PACKAGE"
-          [ -n "$PODSPEC" ] && [ "$PODSPEC" = "$PACKAGE" ]
+          [ "$PODSPEC" = "6.0.7" ] && [ -n "$PACKAGE" ]
 
       - name: Install dependencies
         run: |
