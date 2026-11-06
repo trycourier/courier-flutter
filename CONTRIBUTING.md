@@ -4,8 +4,8 @@
 
 1. From root, run: `flutter pub get`
 2. Navigate to `example/lib`
-3. Create a `env.dart` file and create a class named `Env`
-4. Copy content from `env.sample.dart` and paste in `env.dart`
+3. Create a `env.dart` file with a class named `Env` that declares `authKey`, `clientKey`, `brandId` and `preferenceTopicId`
+4. Also declare `localEnvironments`: extra environments for the example's environment picker (see `courier_environment.dart`). Use `<CourierEnvironment>[]` if you have none
 5. Drag and drop your google-services.json file into `example/android/android/app` (Needed for Firebase FCM testing)
 6. Navigate to `example/ios`, double click on `Runner.xcworkspace`
 7. Select Runner in xcode click on `add files to "Runner"` and add `GoogleService-Info.plist`

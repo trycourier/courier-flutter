@@ -48,11 +48,13 @@ jobs:
 
           # env.dart
           env_src = (
+              "import 'courier_environment.dart';\n\n"
               'class Env {\n'
               '  static const authKey = "' + q('COURIER_AUTH_KEY') + '";\n'
               '  static const clientKey = "' + q('COURIER_CLIENT_KEY') + '";\n'
               '  static const brandId = "' + q('COURIER_BRAND_ID') + '";\n'
               '  static const preferenceTopicId = "' + q('COURIER_PREFERENCE_TOPIC_ID') + '";\n'
+              '  static const localEnvironments = <CourierEnvironment>[];\n'
               '}\n'
           )
 
@@ -193,11 +195,14 @@ jobs:
         working-directory: example
         run: |
           cat > lib/env.dart <<'DART'
+          import 'courier_environment.dart';
+
           class Env {
             static const authKey = "";
             static const clientKey = "";
             static const brandId = "";
             static const preferenceTopicId = "";
+            static const localEnvironments = <CourierEnvironment>[];
           }
           DART
           cat > lib/firebase_options.dart <<'DART'
