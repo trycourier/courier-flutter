@@ -37,3 +37,7 @@ example/ios/Runner/GoogleService-Info.plist
 example/lib/firebase_options.dart
 example/ios/firebase_app_id_file.json
 example/android/app/.cxx
+
+# Swift Package Manager
+.build/
+.swiftpm/

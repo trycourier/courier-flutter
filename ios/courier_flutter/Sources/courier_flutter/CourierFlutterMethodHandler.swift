@@ -6,6 +6,7 @@
 //
 
 import Courier_iOS
+import Foundation
 
 public class CourierFlutterMethodHandler: NSObject {
     
@@ -14,7 +15,7 @@ public class CourierFlutterMethodHandler: NSObject {
         
         // Set the flutter ios user agent
         // This ensures all the requests are tagged with this agent
-        Courier.agent = CourierAgent.flutterIOS("5.0.6")
+        Courier.agent = CourierAgent.flutterIOS("5.1.0")
         
     }
     

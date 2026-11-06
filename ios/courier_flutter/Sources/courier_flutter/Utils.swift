@@ -5,6 +5,7 @@
 //  Created by Michael Miller on 11/2/23.
 //
 
+import Flutter
 import Foundation
 import Courier_iOS
 
