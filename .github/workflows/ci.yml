@@ -297,11 +297,14 @@ jobs:
         working-directory: courier_flutter/example
         run: |
           cat > lib/env.dart <<'DART'
+          import 'courier_environment.dart';
+
           class Env {
             static const authKey = "";
             static const clientKey = "";
             static const brandId = "";
             static const preferenceTopicId = "";
+            static const localEnvironments = <CourierEnvironment>[];
           }
           DART
           cat > lib/firebase_options.dart <<'DART'
