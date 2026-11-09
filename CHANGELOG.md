@@ -1,5 +1,15 @@
 
-## 5.0.6
+## 5.0.7
+
+- chore: release 5.0.7 with Courier_iOS 6.0.7 (#64)
+- Bump Courier_iOS to 6.0.7 (#62)
+- Bump Courier_iOS to 6.0.5 (#60)
+- refactor(example): move the environment list into a class
+- chore(example): upgrade google_fonts to 8.2.1 and unpin Flutter in the iOS build (#57)
+- ci(deploy): land CHANGELOG.md through a PR instead of pushing to main (#56)
+- ci: build the example app for iOS Simulator on PRs (#54)
+
+## v5.0.6
 
 - chore: bump to 5.0.6 to publish the Courier_iOS 5.9.0 and courier-android 6.1.2 pins (#55)
 - Bump Courier_iOS to 5.9.0 (#53)
@@ -7,30 +17,25 @@
 
 ## v5.0.5
 
-- Update CHANGELOG.md for 5.0.5 [skip ci]
 - chore: bump to 5.0.5 to publish the Courier_iOS 5.8.6 pin (#52)
 - Bump Courier_iOS to 5.8.6 (#51)
 
 ## v5.0.4
 
-- Update CHANGELOG.md for 5.0.4 [skip ci]
 - feat: report inbox action clicks automatically (#50)
 
 ## v5.0.3
 
-- Update CHANGELOG.md for 5.0.3 [skip ci]
 - chore: update copyright year to 2026 and bump to 5.0.3 (#46)
 
 ## v5.0.2
 
-- Update CHANGELOG.md for 5.0.2 [skip ci]
 - chore: bump SDK version to 5.0.2 (#43)
 - Bump Courier_iOS to 5.8.3 (#42)
 - docs: slim README and delete legacy Docs/ folder (#41)
 
 ## v5.0.1
 
-- Update CHANGELOG.md for 5.0.1 [skip ci]
 - Release courier_flutter 5.0.1
 - Align ExampleService with courier-android 6.1.0 and bump example build
 - Bump courier-android to 6.1.0
@@ -52,27 +57,20 @@
 
 ## v4.3.2
 
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: use v-prefixed tags for pub.dev OIDC allowlist
 
 ## 4.3.2
 
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: trigger pub.dev publish from tag-dispatch run
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: checkout tag ref for publish so CHANGELOG is included
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Retrigger deploy for 4.3.2
 - Fix CHANGELOG generation to include current version entry
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Bump version to 4.3.2 and simplify deploy workflow
 
 ## 4.3.1
 
-- Update CHANGELOG.md for 4.3.1 [skip ci]
 - Deploy: publish from tag ref to satisfy pub.dev OIDC requirements
 - Deploy: add [skip ci] to CHANGELOG commit to prevent re-trigger loop
-- Update CHANGELOG.md for 4.3.1
 - Deploy: auto-generate CHANGELOG.md from git tags at release time
 - Add CHANGELOG.md for pub.dev publishing
 - Deploy: use official dart-lang publish workflow for OIDC auth
