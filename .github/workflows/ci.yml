@@ -3,6 +3,9 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  # Also check main after every merge
+  push:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -222,18 +225,115 @@ jobs:
         working-directory: ${{ runner.temp }}/min_app
         run: flutter build apk --debug
 
-  # Compiles the plugin's Swift (ios/Classes) against the Courier_iOS version pinned in
-  # ios/courier_flutter.podspec. Nothing else in CI builds iOS, so a Courier_iOS bump that breaks
-  # the Swift bridge would otherwise pass. Build-only: placeholder config, no secrets, no signing.
-  ios-build:
-    name: iOS build
-    runs-on: macos-15
+  # Compiles the plugin's Kotlin (android/) and the example app against the courier-android
+  # version pinned in android/build.gradle, without secrets or an emulator, so a bump that breaks
+  # the bridge fails here even when the integration tests can't run. Build-only: no signing.
+  android-build:
+    name: Android build
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     concurrency:
-      group: ios-build-${{ github.ref }}
+      group: android-build-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # The example imports these gitignored files, and the Google Services plugin needs a
+      # google-services.json for the example's application id. Placeholder values compile fine.
+      - name: Write placeholder example config
+        working-directory: example
+        run: |
+          cat > lib/env.dart <<'DART'
+          import 'courier_environment.dart';
+
+          class Env {
+            static const authKey = "";
+            static const clientKey = "";
+            static const brandId = "";
+            static const preferenceTopicId = "";
+            static const localEnvironments = <CourierEnvironment>[];
+          }
+          DART
+          cat > lib/firebase_options.dart <<'DART'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static const FirebaseOptions currentPlatform = FirebaseOptions(
+              apiKey: '',
+              appId: '',
+              messagingSenderId: '',
+              projectId: '',
+            );
+          }
+          DART
+          cat > android/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "placeholder",
+              "storage_bucket": "placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": { "package_name": "com.courier.flutter_app" }
+                },
+                "oauth_client": [],
+                "api_key": [{ "current_key": "placeholder" }],
+                "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd example && flutter pub get
+
+      - name: Build example app
+        working-directory: example
+        run: flutter build apk --debug
+
+  # Compiles the plugin's Swift (ios/Classes) against the Courier_iOS version pinned in
+  # ios/courier_flutter.podspec. Nothing else in CI builds iOS, so a Courier_iOS bump that breaks
+  # the Swift bridge would otherwise pass. Built on the current Xcode and on the oldest one
+  # courier-ios still builds on. Build-only: placeholder config, no secrets, no signing.
+  ios-build-xcode:
+    name: iOS build (Xcode ${{ matrix.xcode }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            xcode: '26.6'
+          - runner: macos-15
+            xcode: '16.4'
+    concurrency:
+      group: ios-build-${{ matrix.xcode }}-${{ github.ref }}
       cancel-in-progress: true
     env:
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
       LANG: en_US.UTF-8
     steps:
       - name: Checkout
@@ -290,9 +390,9 @@ jobs:
           path: |
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock', 'ios/courier_flutter.podspec') }}
+          key: ${{ runner.os }}-xcode-${{ matrix.xcode }}-pods-${{ hashFiles('example/ios/Podfile.lock', 'ios/courier_flutter.podspec') }}
           restore-keys: |
-            ${{ runner.os }}-pods-
+            ${{ runner.os }}-xcode-${{ matrix.xcode }}-pods-
 
       # `pod update Courier_iOS` rather than `pod install`: bump PRs change the podspec pin without
       # touching example/ios/Podfile.lock, and install would refuse the stale lock.
@@ -319,3 +419,14 @@ jobs:
             ARCHS=arm64 \
             CODE_SIGNING_ALLOWED=NO \
             -quiet
+
+  # The main branch ruleset requires a check named "iOS build". It passes only when every Xcode
+  # build passed. always() keeps it from being skipped, since a skipped check counts as passed.
+  ios-build:
+    name: iOS build
+    needs: ios-build-xcode
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the Xcode builds
+        run: '[ "${{ needs.ios-build-xcode.result }}" = "success" ]'
