@@ -153,7 +153,7 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                     val listenerId = params.extract("listenerId") as String
 
                     // Get and remove the listener
-                    val listener = authenticationListeners[listenerId] ?: throw InvalidParameter("listenerId")
+                    val listener = authenticationListeners.remove(listenerId) ?: throw InvalidParameter("listenerId")
                     listener.remove()
 
                     result.success(null)
@@ -300,12 +300,13 @@ internal class SharedMethodHandler(channel: CourierFlutterChannel, private val b
                     val listenerId = params.extract("listenerId") as String
 
                     val listener = Courier.shared.addInboxListener(
-                        onLoading = {
+                        onLoading = { isRefresh ->
                             CourierFlutterChannel.EVENTS.invokeMethod(
                                 messenger = binding.binaryMessenger,
-                                method = "auth.state_changed",
+                                method = "inbox.listener_loading",
                                 arguments = mapOf(
-                                    "id" to listenerId
+                                    "id" to listenerId,
+                                    "isRefresh" to isRefresh
                                 )
                             )
                         },
