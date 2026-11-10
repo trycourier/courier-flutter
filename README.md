@@ -4,7 +4,7 @@
 
 The Courier Flutter SDK provides prebuilt widgets and Dart APIs for adding in-app notifications, push notifications, and notification preferences to your Flutter app. It handles authentication, token management, and real-time message delivery across iOS and Android from a single codebase.
 
-Requires Flutter 3.27+ (Dart 3.6+), iOS 15.0+, Android SDK 23+, and Gradle 8.4+.
+Requires Flutter 3.29+ (Dart 3.7+), iOS 15.0+, Android SDK 23+, and Gradle 8.4+.
 
 ## Installation
 
