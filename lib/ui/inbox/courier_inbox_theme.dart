@@ -1,8 +1,14 @@
 import 'package:courier_flutter/models/courier_brand.dart';
+import 'package:courier_flutter/ui/courier_background.dart';
 import 'package:flutter/material.dart';
 
 class CourierInboxTheme {
   final String? brandId;
+
+  /// Fills the whole inbox: the tabs, the list and its items, the loading, empty and error
+  /// states, and the footer. Default text, icon and divider colors switch to white or black
+  /// so they stay readable on it. Styles you set yourself are used as they are.
+  final Color? backgroundColor;
   final Color? tabIndicatorColor;
   final CourierInboxTabStyle tabStyle;
   final CourierInboxReadingSwipeActionStyle readingSwipeActionStyle;
@@ -21,6 +27,7 @@ class CourierInboxTheme {
 
   CourierInboxTheme({
     this.brandId,
+    this.backgroundColor,
     this.tabIndicatorColor,
     this.tabStyle = const CourierInboxTabStyle(),
     this.readingSwipeActionStyle = const CourierInboxReadingSwipeActionStyle(),
@@ -33,7 +40,7 @@ class CourierInboxTheme {
     this.buttonStyle = const CourierInboxButtonStyle(),
     this.cellStyle = const CourierCellStyle(),
     this.infoViewStyle = const CourierInfoViewStyle(),
-    this.separator = const Divider(height: 1, indent: 16, endIndent: 16),
+    this.separator = _defaultSeparator,
   });
 
   Color? get _brandColor => brand?.settings?.colors?.primaryColor();
@@ -73,19 +80,19 @@ class CourierInboxTheme {
   }
 
   Color getLoadingColor(BuildContext context) {
-    return loadingIndicatorColor ?? _brandColor ?? Theme.of(context).primaryColor;
+    return loadingIndicatorColor ?? _brandColor ?? Theme.of(context).courierAccentColor;
   }
 
   Color getUnreadIndicatorColor(BuildContext context) {
-    return unreadIndicatorStyle.color ?? _brandColor ?? Theme.of(context).primaryColor;
+    return unreadIndicatorStyle.color ?? _brandColor ?? Theme.of(context).courierAccentColor;
   }
 
   Color getReadSwipeActionColor(BuildContext context) {
-    return readingSwipeActionStyle.read.color ?? _brandColor ?? Theme.of(context).primaryColor;
+    return readingSwipeActionStyle.read.color ?? _brandColor ?? Theme.of(context).courierAccentColor;
   }
 
   Color getUnreadSwipeActionColor(BuildContext context) {
-    return readingSwipeActionStyle.unread.color ?? _brandColor?.withOpacity(0.7) ?? Theme.of(context).primaryColor.withOpacity(0.7);
+    return readingSwipeActionStyle.unread.color ?? _brandColor?.withValues(alpha: 0.7) ?? Theme.of(context).courierAccentColor.withValues(alpha: 0.7);
   }
 
   Color getArchiveSwipeActionColor(BuildContext context) {
@@ -93,19 +100,19 @@ class CourierInboxTheme {
   }
 
   Color getTabIndicatorColor(BuildContext context) {
-    return tabIndicatorColor ?? _brandColor ?? Theme.of(context).primaryColor;
+    return tabIndicatorColor ?? _brandColor ?? Theme.of(context).courierAccentColor;
   }
 
   TextStyle? getSelectedTabTextStyle(BuildContext context) {
-    return tabStyle.selected.font ?? (_brandColor != null ? TextStyle(color: _brandColor) : Theme.of(context).tabBarTheme.labelStyle);
+    return mergeCourierTextStyle(_brandColor != null ? TextStyle(color: _brandColor) : Theme.of(context).tabBarTheme.labelStyle, tabStyle.selected.font);
   }
 
   TextStyle? getUnselectedTabTextStyle(BuildContext context) {
-    return tabStyle.unselected.font ?? Theme.of(context).tabBarTheme.unselectedLabelStyle;
+    return mergeCourierTextStyle(Theme.of(context).tabBarTheme.unselectedLabelStyle, tabStyle.unselected.font);
   }
 
   Color getSelectedTabIndicatorBackgroundColor(BuildContext context) {
-    return tabStyle.selected.indicator.color ?? _brandColor ?? Theme.of(context).primaryColor;
+    return tabStyle.selected.indicator.color ?? _brandColor ?? Theme.of(context).courierAccentColor;
   }
 
   Color getUnselectedTabIndicatorBackgroundColor(BuildContext context) {
@@ -113,33 +120,57 @@ class CourierInboxTheme {
   }
 
   TextStyle? getSelectedIndicatorTabTextStyle(BuildContext context) {
-    return tabStyle.selected.indicator.font ?? const TextStyle(color: Colors.white);
+    return const TextStyle(color: Colors.white).merge(tabStyle.selected.indicator.font);
   }
 
   TextStyle? getUnselectedIndicatorTabTextStyle(BuildContext context) {
-    return tabStyle.unselected.indicator.font ?? Theme.of(context).tabBarTheme.unselectedLabelStyle;
+    return mergeCourierTextStyle(Theme.of(context).tabBarTheme.unselectedLabelStyle, tabStyle.unselected.indicator.font);
   }
 
   TextStyle? getTitleStyle(BuildContext context, bool isRead) {
-    return (isRead ? titleStyle.read : titleStyle.unread) ?? Theme.of(context).textTheme.titleMedium;
+    return mergeCourierTextStyle(Theme.of(context).textTheme.titleMedium, isRead ? titleStyle.read : titleStyle.unread);
   }
 
   TextStyle? getBodyStyle(BuildContext context, bool isRead) {
-    return (isRead ? bodyStyle.read : bodyStyle.unread) ?? Theme.of(context).textTheme.bodyMedium;
+    return mergeCourierTextStyle(Theme.of(context).textTheme.bodyMedium, isRead ? bodyStyle.read : bodyStyle.unread);
   }
 
   TextStyle? getTimeStyle(BuildContext context, bool isRead) {
-    return (isRead ? timeStyle.read : timeStyle.unread) ?? Theme.of(context).textTheme.labelMedium;
+    return mergeCourierTextStyle(Theme.of(context).textTheme.labelMedium, isRead ? timeStyle.read : timeStyle.unread);
   }
 
   TextStyle? getInfoViewTitleStyle(BuildContext context) {
-    return infoViewStyle.textStyle ?? Theme.of(context).textTheme.titleMedium;
+    return mergeCourierTextStyle(Theme.of(context).textTheme.titleMedium, infoViewStyle.textStyle);
   }
 
   ButtonStyle? getInfoViewButtonStyle(BuildContext context) {
     return infoViewStyle.buttonStyle ?? _brandButtonColor(context);
   }
+
+  /// The separator between messages, with [cellStyle] applied to the default divider.
+  Widget? getSeparator() {
+    final separator = this.separator;
+    if (separator == null) return null;
+
+    final insets = cellStyle.separatorInsets?.resolve(TextDirection.ltr);
+    final isDefault = identical(separator, _defaultSeparator);
+    final divider = isDefault && insets != null
+        ? Divider(height: 1, indent: insets.left, endIndent: insets.right)
+        : separator;
+
+    if (cellStyle.separatorStyle == null && cellStyle.separatorColor == null) return divider;
+
+    return Builder(builder: (context) {
+      final style = cellStyle.separatorStyle ?? DividerTheme.of(context);
+      return DividerTheme(
+        data: style.copyWith(color: cellStyle.separatorColor ?? style.color),
+        child: divider,
+      );
+    });
+  }
 }
+
+const _defaultSeparator = Divider(height: 1, indent: 16, endIndent: 16);
 
 class CourierInboxTextStyle {
   final TextStyle? unread;

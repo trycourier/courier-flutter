@@ -1,10 +1,16 @@
 import 'package:courier_flutter/models/courier_brand.dart';
+import 'package:courier_flutter/ui/courier_background.dart';
 import 'package:flutter/material.dart';
 
 import '../inbox/courier_inbox_theme.dart';
 
 class CourierPreferencesTheme {
   final String? brandId;
+
+  /// Fills the whole preferences view and the topic sheet: the list, the loading, empty and
+  /// error states, and the footer. Default text, icon and divider colors switch to white or
+  /// black so they stay readable on it. Styles you set yourself are used as they are.
+  final Color? backgroundColor;
   final Color? loadingIndicatorColor;
   final TextStyle? sectionTitleStyle;
   final Widget? topicSeparator;
@@ -21,6 +27,7 @@ class CourierPreferencesTheme {
 
   CourierPreferencesTheme({
     this.brandId,
+    this.backgroundColor,
     this.loadingIndicatorColor,
     this.topicSeparator = const Divider(height: 1, indent: 16, endIndent: 16),
     this.sectionTitleStyle,
@@ -39,7 +46,7 @@ class CourierPreferencesTheme {
   ButtonStyle? _brandButtonColor(BuildContext context) {
     final themeStyles = Theme.of(context).elevatedButtonTheme.style;
 
-    final backgroundColor = _brandColor != null ? MaterialStateProperty.all(_brandColor) : themeStyles?.backgroundColor;
+    final backgroundColor = _brandColor != null ? WidgetStateProperty.all(_brandColor) : themeStyles?.backgroundColor;
 
     return ButtonStyle(
       textStyle: themeStyles?.textStyle,
@@ -68,15 +75,23 @@ class CourierPreferencesTheme {
   }
 
   Color getLoadingColor(BuildContext context) {
-    return loadingIndicatorColor ?? _brandColor ?? Theme.of(context).primaryColor;
+    return loadingIndicatorColor ?? _brandColor ?? Theme.of(context).courierAccentColor;
   }
 
   TextStyle? getInfoViewTitleStyle(BuildContext context) {
-    return infoViewStyle?.textStyle ?? Theme.of(context).textTheme.titleMedium;
+    return mergeCourierTextStyle(Theme.of(context).textTheme.titleMedium, infoViewStyle?.textStyle);
   }
 
   ButtonStyle? getInfoViewButtonStyle(BuildContext context) {
     return infoViewStyle?.buttonStyle ?? _brandButtonColor(context);
+  }
+
+  TextStyle? getSectionTitleStyle(BuildContext context) {
+    return mergeCourierTextStyle(Theme.of(context).textTheme.titleLarge, sectionTitleStyle);
+  }
+
+  TextStyle? getSheetTitleStyle(BuildContext context) {
+    return mergeCourierTextStyle(Theme.of(context).textTheme.titleLarge, sheetTitleStyle);
   }
 
 }
