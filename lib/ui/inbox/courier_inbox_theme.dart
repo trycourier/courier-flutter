@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 class CourierInboxTheme {
   final String? brandId;
 
-  /// Fills the whole inbox: the tabs, the list and its items, the loading, empty and error
-  /// states, and the footer. Default text, icon and divider colors switch to white or black
-  /// so they stay readable on it. Styles you set yourself are used as they are.
+  /// Fills the whole inbox: the tabs, the list and its items, and the loading, empty and
+  /// error states. Default text, icon and divider colors switch to white or black so they
+  /// stay readable on it. Styles you set yourself are used as they are.
   final Color? backgroundColor;
   final Color? tabIndicatorColor;
   final CourierInboxTabStyle tabStyle;

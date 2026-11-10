@@ -7,9 +7,9 @@ import '../inbox/courier_inbox_theme.dart';
 class CourierPreferencesTheme {
   final String? brandId;
 
-  /// Fills the whole preferences view and the topic sheet: the list, the loading, empty and
-  /// error states, and the footer. Default text, icon and divider colors switch to white or
-  /// black so they stay readable on it. Styles you set yourself are used as they are.
+  /// Fills the whole preferences view and the topic sheet: the list, and the loading, empty
+  /// and error states. Default text, icon and divider colors switch to white or black so they
+  /// stay readable on it. Styles you set yourself are used as they are.
   final Color? backgroundColor;
   final Color? loadingIndicatorColor;
   final TextStyle? sectionTitleStyle;
