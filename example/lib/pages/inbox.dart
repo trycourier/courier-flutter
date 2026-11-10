@@ -105,7 +105,6 @@ class _InboxState extends State<InboxPage> with SingleTickerProviderStateMixin {
     ),
     'Styled': CourierInbox(
       keepAlive: true,
-      showCourierFooter: false,
       lightTheme: customTheme,
       darkTheme: customTheme,
       feedScrollController: _feedScrollController,

@@ -9,9 +9,7 @@ import 'package:courier_flutter/ui/preferences/courier_preferences_list_item.dar
 import 'package:courier_flutter/ui/preferences/courier_preferences_section.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_sheet.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 extension WidgetListExtensions on List<Widget> {
 
@@ -42,13 +40,6 @@ Color hexToColor(String hexColor) {
 
   // Create a Color object from the hex value
   return Color(hexValue | 0xFF000000);
-}
-
-void launchCourierURL() async {
-  final url = Uri.parse('https://www.courier.com');
-  if (!await launchUrl(url) && kDebugMode) {
-    print('Could not launch $url');
-  }
 }
 
 extension AnimatedListStateExtensions on AnimatedListState {

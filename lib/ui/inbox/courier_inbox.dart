@@ -4,7 +4,6 @@ import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_feed.dart';
-import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_pagination_item.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_theme.dart';
@@ -18,6 +17,8 @@ class CourierInbox extends StatefulWidget {
 
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
+
+  @Deprecated('The Courier footer is no longer shown.')
   final bool showCourierFooter;
 
   // The theming for your Inbox
@@ -75,7 +76,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
   bool _isArchivedPaginating = false;
   bool _isLoading = true;
   String? _error;
-  CourierBrand? _brand;
   late TabController _tabController;
   late PageController _pageController;
   int _currentTab = 0;
@@ -111,13 +111,12 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
       });
     }
 
-    final brand = await _refreshBrand();
+    await _refreshBrand();
 
     _inboxListener = await Courier.shared.addInboxListener(
       onLoading: (isRefresh) {
         if (!mounted) return;
         setState(() {
-          _brand = brand;
           if (!isRefresh) { _isLoading = true; }
           _error = null;
         });
@@ -126,7 +125,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
         if (!mounted) return;
         final errorMessage = widget.onError?.call(error);
         setState(() {
-          _brand = brand;
           _isLoading = false;
           _error = errorMessage ?? error;
         });
@@ -397,10 +395,6 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
             children: _buildTabViews(isDarkMode, triggerPoint),
           ),
         ),
-        if (widget.showCourierFooter)
-          CourierFooter(
-            shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true,
-          ),
       ],
     );
   }

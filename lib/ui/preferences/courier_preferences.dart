@@ -3,7 +3,6 @@ import 'package:courier_flutter/courier_preference_channel.dart';
 import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
-import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_section.dart';
@@ -26,6 +25,8 @@ class CourierPreferences extends StatefulWidget {
 
   // Useful if you are placing your Inbox in a TabView or another widget that will recycle
   final bool keepAlive;
+
+  @Deprecated('The Courier footer is no longer shown.')
   final bool showCourierFooter;
 
   // The theming for your Inbox
@@ -66,7 +67,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
   String? _error;
   List<PreferenceSection> _sections = [];
 
-  CourierBrand? _brand;
 
   @override
   void initState() {
@@ -80,7 +80,7 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
 
   Future<void> _getPreferences() async {
 
-    final brand = await _refreshBrand();
+    await _refreshBrand();
 
     try {
 
@@ -123,7 +123,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       }
 
       setState(() {
-        _brand = brand;
         _sections = sections;
         _isLoading = false;
         _error = null;
@@ -137,7 +136,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
       final errorMessage = widget.onError?.call(originalError);
 
       setState(() {
-        _brand = brand;
         _sections = [];
         _isLoading = false;
         _error = errorMessage ?? originalError;
@@ -487,8 +485,6 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
             ),
           )
         ),
-        if (widget.showCourierFooter)
-          CourierFooter(shouldShow: _brand?.settings?.inapp?.showCourierFooter ?? true),
       ],
     );
   }
