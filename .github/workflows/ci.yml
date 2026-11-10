@@ -163,6 +163,65 @@ jobs:
           working-directory: example
           script: flutter test integration_test/client_tests.dart integration_test/shared_tests.dart
 
+  # Builds a new app on the oldest Flutter that pubspec.yaml allows, so the published minimum stays
+  # true. The example can't do this: it tracks current Flutter. Build-only: no secrets, no signing.
+  minimum-flutter:
+    name: Minimum Flutter (Android build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: minimum-flutter-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read the minimum Flutter version
+        id: min
+        run: |
+          VERSION=$(sed -nE 's/^  flutter: ">=([0-9.]+)".*/\1/p' pubspec.yaml)
+          echo "Minimum Flutter: $VERSION"
+          [ -n "$VERSION" ]
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.min.outputs.version }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # A fresh app from that Flutter's template, set up the way the README and docs describe:
+      # JitPack for courier-android, and Android SDK 23 or later.
+      - name: Create an app that uses the plugin
+        working-directory: ${{ runner.temp }}
+        run: |
+          flutter create --platforms android --org com.example min_app
+          cd min_app
+          flutter pub add courier_flutter --path "$GITHUB_WORKSPACE"
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle*
+          sed -i 's/mavenCentral()/mavenCentral()\n        maven { url = uri("https:\/\/jitpack.io") }/' android/build.gradle*
+          grep -n "minSdk" android/app/build.gradle*
+          grep -n "jitpack" android/build.gradle*
+          cat > lib/main.dart <<'DART'
+          import 'package:courier_flutter/courier_flutter.dart';
+          import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
+          import 'package:flutter/material.dart';
+
+          void main() {
+            runApp(MaterialApp(home: Scaffold(body: CourierInbox())));
+            Courier.shared.userId.then((id) => debugPrint('Signed in as $id'));
+          }
+          DART
+
+      - name: Build the app
+        working-directory: ${{ runner.temp }}/min_app
+        run: flutter build apk --debug
+
   # Compiles the plugin's Swift (ios/Classes) against the Courier_iOS version pinned in
   # ios/courier_flutter.podspec. Nothing else in CI builds iOS, so a Courier_iOS bump that breaks
   # the Swift bridge would otherwise pass. Build-only: placeholder config, no secrets, no signing.
