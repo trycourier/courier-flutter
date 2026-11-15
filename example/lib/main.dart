@@ -30,6 +30,9 @@ Future<void> main() async {
           // primaryColor: Colors.pink,
           // TODO: Add more theme colors here if you would like Inbox to automatically inherit styles
       ),
+      // Follow the system appearance. The default inbox and preferences pick up the dark theme too.
+      darkTheme: ThemeData(brightness: Brightness.dark),
+      themeMode: ThemeMode.system,
       home: const MyApp(),
     ),
   );
