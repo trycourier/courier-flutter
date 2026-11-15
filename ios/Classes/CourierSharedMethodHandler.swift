@@ -30,7 +30,10 @@ internal class CourierSharedMethodHandler: CourierFlutterMethodHandler, FlutterP
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
-        Task {
+        // Run on the main actor. Calls overlap, and they share the listener and client
+        // dictionaries, which aren't safe to change from two threads. Flutter also expects
+        // replies on the main thread.
+        Task { @MainActor in
             do {
                 switch call.method {
                     
