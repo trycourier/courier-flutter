@@ -4,6 +4,7 @@ import 'package:courier_flutter/courier_preference_status.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_user_preferences.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
+import 'package:courier_flutter/ui/courier_background.dart';
 import 'package:courier_flutter/ui/courier_theme.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/preferences/courier_preferences_section.dart';
@@ -498,7 +499,10 @@ class CourierPreferencesState extends State<CourierPreferences> with AutomaticKe
     super.build(context);
     return ClipRect(
       child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
-        return _buildContent(context, isDarkMode);
+        return CourierBackground(
+          color: getTheme(isDarkMode).backgroundColor,
+          child: Builder(builder: (context) => _buildContent(context, isDarkMode)),
+        );
       }),
     );
   }

@@ -93,7 +93,7 @@ class CourierPreferencesSheetState extends State<CourierPreferencesSheet> {
             padding: const EdgeInsets.only(left: CourierTheme.margin, top: CourierTheme.margin / 2, right: CourierTheme.margin, bottom: CourierTheme.margin),
             child: Text(
               widget.topic.topicName,
-              style: widget.theme.sheetTitleStyle ?? Theme.of(context).textTheme.titleLarge,
+              style: widget.theme.getSheetTitleStyle(context),
             ),
           ),
           ListView.separated(

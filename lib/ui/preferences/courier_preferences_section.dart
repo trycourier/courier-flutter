@@ -65,7 +65,7 @@ class CourierPreferencesSectionState extends State<CourierPreferencesSection> {
             label: widget.getSemanticsLabel(context),
             child: Text(
               _section.title,
-              style: widget.theme.sectionTitleStyle ?? Theme.of(context).textTheme.titleLarge,
+              style: widget.theme.getSectionTitleStyle(context),
             )
           ),
         ),

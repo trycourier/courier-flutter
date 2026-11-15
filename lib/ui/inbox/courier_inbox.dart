@@ -4,6 +4,7 @@ import 'package:courier_flutter/courier_flutter.dart';
 import 'package:courier_flutter/models/courier_brand.dart';
 import 'package:courier_flutter/models/courier_inbox_listener.dart';
 import 'package:courier_flutter/models/inbox_feed.dart';
+import 'package:courier_flutter/ui/courier_background.dart';
 import 'package:courier_flutter/ui/courier_footer.dart';
 import 'package:courier_flutter/ui/courier_theme_builder.dart';
 import 'package:courier_flutter/ui/inbox/courier_inbox_pagination_item.dart';
@@ -411,7 +412,10 @@ class CourierInboxState extends State<CourierInbox> with AutomaticKeepAliveClien
     return ClipRect(
       child: CourierThemeBuilder(builder: (context, constraints, isDarkMode) {
         final triggerPoint = constraints.maxHeight / 2;
-        return _buildContent(context, isDarkMode, triggerPoint);
+        return CourierBackground(
+          color: getTheme(isDarkMode).backgroundColor,
+          child: Builder(builder: (context) => _buildContent(context, isDarkMode, triggerPoint)),
+        );
       }),
     );
   }
@@ -651,7 +655,7 @@ class CourierMessageListState extends State<CourierMessageList> with AutomaticKe
     _listItemRefs[itemId] = GlobalKey<CourierInboxListItemState>(debugLabel: itemId);
     return Column(
       children: [
-        if (index > 0 && widget.theme.separator != null) widget.theme.separator!,
+        if (index > 0 && widget.theme.separator != null) widget.theme.getSeparator()!,
         CourierInboxListItem(
           key: _listItemRefs[itemId],
           theme: widget.theme,
