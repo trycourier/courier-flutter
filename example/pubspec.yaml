@@ -8,7 +8,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+36
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -25,13 +26,13 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  firebase_core: ^3.9.0
-  firebase_messaging: ^15.1.6
-  google_fonts: ^8.2.1
-  http: ^1.2.1
-  uuid: ^4.4.2
-  shared_preferences: ^2.5.5
+  cupertino_icons: ^2.0.0
+  firebase_core: ^5.1.0
+  firebase_messaging: ^17.0.1
+  google_fonts: ^9.0.0
+  http: ^1.6.0
+  uuid: ^4.6.0
+  shared_preferences: ^2.5.6
 
 dev_dependencies:
   integration_test:
@@ -44,13 +45,18 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
+  # The example integrates its iOS plugins with CocoaPods, as its Podfile and Podfile.lock show.
+  # Without this, Flutter 3.44+ moves Swift Package Manager capable plugins to SPM on build.
+  config:
+    enable-swift-package-manager: false
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
