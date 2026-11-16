@@ -14,9 +14,9 @@ flutter pub add courier_flutter
 
 ### iOS
 
-With Swift Package Manager on, which is the default from Flutter 3.44, Flutter gets the native iOS SDK, [Courier_iOS](https://github.com/trycourier/courier-ios), when it builds. Nothing else to set up. Apps that use CocoaPods run `cd ios && pod install`.
+Flutter sets up the native iOS SDK, [Courier_iOS](https://github.com/trycourier/courier-ios), when it builds.
 
-**Notification service extension:** if your app uses Swift Package Manager, add Courier_iOS to the extension target with it too. In Xcode, choose **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, and pick **Up to Next Major Version**. If the extension has `pod 'Courier_iOS'` in your Podfile, remove it and run `pod install`.
+**Notification service extension:** add Courier_iOS to the extension target with Swift Package Manager. In Xcode, choose **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, and pick **Up to Next Major Version**. If the extension has `pod 'Courier_iOS'` in your Podfile, remove it.
 
 ## Quick Start
 
