@@ -6,7 +6,7 @@
 - docs: add 5.1.0 and 5.0.8 to the CHANGELOG (#87)
 - Bump courier-android to 6.1.7 (#86)
 
-## v5.1.0
+## 5.1.0
 
 - chore: release 5.1.0 with Courier_iOS 6.0.10 and courier-android 6.1.6 (#84)
 - Bump Courier_iOS to 6.0.10 (#83)
@@ -21,13 +21,13 @@
 - fix(example): follow the system dark mode (#74)
 - chore: build on current Android tooling and raise the minimum Flutter to 3.29 (#72)
 
-## v5.0.8
+## 5.0.8
 
 - chore: release 5.0.8 with Courier_iOS 6.0.9 and courier-android 6.1.5 (#70)
 - Bump courier-android to 6.1.5 (#68)
 - Bump Courier_iOS to 6.0.9 (#69)
 
-## v5.0.7
+## 5.0.7
 
 - chore: release 5.0.7 with Courier_iOS 6.0.7 (#64)
 - Bump Courier_iOS to 6.0.7 (#62)
@@ -37,32 +37,32 @@
 - ci(deploy): land CHANGELOG.md through a PR instead of pushing to main (#56)
 - ci: build the example app for iOS Simulator on PRs (#54)
 
-## v5.0.6
+## 5.0.6
 
 - chore: bump to 5.0.6 to publish the Courier_iOS 5.9.0 and courier-android 6.1.2 pins (#55)
 - Bump Courier_iOS to 5.9.0 (#53)
 - Bump courier-android to 6.1.2 (#47)
 
-## v5.0.5
+## 5.0.5
 
 - chore: bump to 5.0.5 to publish the Courier_iOS 5.8.6 pin (#52)
 - Bump Courier_iOS to 5.8.6 (#51)
 
-## v5.0.4
+## 5.0.4
 
 - feat: report inbox action clicks automatically (#50)
 
-## v5.0.3
+## 5.0.3
 
 - chore: update copyright year to 2026 and bump to 5.0.3 (#46)
 
-## v5.0.2
+## 5.0.2
 
 - chore: bump SDK version to 5.0.2 (#43)
 - Bump Courier_iOS to 5.8.3 (#42)
 - docs: slim README and delete legacy Docs/ folder (#41)
 
-## v5.0.1
+## 5.0.1
 
 - Release courier_flutter 5.0.1
 - Align ExampleService with courier-android 6.1.0 and bump example build
@@ -72,7 +72,7 @@
 - Bump example app version to 1.0.0+30
 - Simplify deploy workflow
 
-## v5.0.0
+## 5.0.0
 
 - Add 5.0.0 entry to CHANGELOG.md
 - Upgrade actions/checkout from v5 to v6
@@ -83,7 +83,7 @@
 - Bump courier-android to 6.0.0 and remove bundled Firebase dependency
 - Android example: load signing files from shared flutter keystore folder.
 
-## v4.3.2
+## 4.3.2
 
 - Deploy: use v-prefixed tags for pub.dev OIDC allowlist
 
