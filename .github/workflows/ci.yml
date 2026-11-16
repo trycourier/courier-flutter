@@ -362,10 +362,11 @@ jobs:
         working-directory: example
         run: flutter build apk --debug
 
-  # Compiles the plugin's Swift (ios/Classes) against the Courier_iOS version pinned in
-  # ios/courier_flutter.podspec. Nothing else in CI builds iOS, so a Courier_iOS bump that breaks
-  # the Swift bridge would otherwise pass. Built on the current Xcode and on the oldest one
-  # courier-ios still builds on. Build-only: placeholder config, no secrets, no signing.
+  # Compiles the plugin's Swift (ios/courier_flutter/Sources) against the Courier_iOS version pinned
+  # in ios/courier_flutter.podspec, through CocoaPods. `ios-build-spm` does the same through Swift
+  # Package Manager. Without them a Courier_iOS bump that breaks the Swift bridge would pass CI.
+  # Built on the current Xcode and on the oldest one courier-ios still builds on. Build-only:
+  # placeholder config, no secrets, no signing.
   ios-build-xcode:
     name: iOS build (Xcode ${{ matrix.xcode }})
     runs-on: ${{ matrix.runner }}
