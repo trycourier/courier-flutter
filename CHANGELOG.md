@@ -1,4 +1,11 @@
 
+## 5.2.0
+
+- chore: release 5.2.0 with Swift Package Manager support (#88)
+- feat(ios): support Swift Package Manager (#58)
+- docs: add 5.1.0 and 5.0.8 to the CHANGELOG (#87)
+- Bump courier-android to 6.1.7 (#86)
+
 ## 5.1.0
 
 - chore: release 5.1.0 with Courier_iOS 6.0.10 and courier-android 6.1.6 (#84)
