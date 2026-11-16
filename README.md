@@ -12,15 +12,11 @@ Requires Flutter 3.29+ (Dart 3.7+), iOS 15.0+, Android SDK 23+, and Gradle 8.4+.
 flutter pub add courier_flutter
 ```
 
-After adding the package, run `cd ios && pod install`.
+### iOS
 
-### iOS: Swift Package Manager
+With Swift Package Manager on, which is the default from Flutter 3.44, Flutter gets the native iOS SDK, [Courier_iOS](https://github.com/trycourier/courier-ios), when it builds. Nothing else to set up. Apps that use CocoaPods run `cd ios && pod install`.
 
-Flutter apps with Swift Package Manager turned on (the default from Flutter 3.44) get the native iOS SDK, [Courier_iOS](https://github.com/trycourier/courier-ios), through Swift Package Manager. Flutter adds it when you build, and you don't need `pod install` for it. CocoaPods trunk goes read-only on December 2, 2026, and this is how the plugin keeps getting new Courier_iOS releases.
-
-Apps that still use CocoaPods install Courier_iOS 6.0.10 from trunk instead, and stay on it. To switch an app to Swift Package Manager, run `flutter config --enable-swift-package-manager`, then build.
-
-If your app has a notification service extension, add Courier_iOS to that target with Swift Package Manager as well: in Xcode, **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, choose **Exact Version** with the version this plugin pins (in `ios/courier_flutter/Package.swift` inside the plugin), and add the `Courier_iOS` library to the extension target. Don't add `pod 'Courier_iOS'` to the extension, because the app would end up with two copies of the SDK.
+**Notification service extension:** if your app uses Swift Package Manager, add Courier_iOS to the extension target with it too. In Xcode, choose **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, and pick **Up to Next Major Version**. If the extension has `pod 'Courier_iOS'` in your Podfile, remove it and run `pod install`.
 
 ## Quick Start
 
