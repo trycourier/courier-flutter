@@ -1,4 +1,25 @@
 
+## 5.1.0
+
+- chore: release 5.1.0 with Courier_iOS 6.0.10 and courier-android 6.1.6 (#84)
+- Bump Courier_iOS to 6.0.10 (#83)
+- Bump courier-android to 6.1.6 (#82)
+- fix: decode a preference topic that isn't in a section (#81)
+- build(android): support AGP 9 built-in Kotlin without raising app minimums (#80)
+- feat(ui): stop showing the "Powered by Courier" footer (#76)
+- ci: build Android, build iOS on Xcode 26 and 16.4, pin Flutter 3.47.9 (#79)
+- fix(ui): inbox and preferences background color, partial styles, dark defaults (#75)
+- fix(android): remove auth listeners from the map and send inbox loading events (#78)
+- fix(ios): handle method calls on the main actor (#77)
+- fix(example): follow the system dark mode (#74)
+- chore: build on current Android tooling and raise the minimum Flutter to 3.29 (#72)
+
+## 5.0.8
+
+- chore: release 5.0.8 with Courier_iOS 6.0.9 and courier-android 6.1.5 (#70)
+- Bump courier-android to 6.1.5 (#68)
+- Bump Courier_iOS to 6.0.9 (#69)
+
 ## 5.0.7
 
 - chore: release 5.0.7 with Courier_iOS 6.0.7 (#64)
