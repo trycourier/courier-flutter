@@ -71,8 +71,8 @@ update_kotlin_file() {
     sed -i '' "s/Courier\.agent = CourierAgent\.FlutterAndroid(version = \"[^\"]*\")/Courier.agent = CourierAgent.FlutterAndroid(version = \"$NEW_VERSION\")/" "$file"
 }
 
-update_swift_file "$ROOT_DIR/ios/Classes/CourierFlutterDelegate.swift"
-update_swift_file "$ROOT_DIR/ios/Classes/CourierFlutterMethodHandler.swift"
+update_swift_file "$ROOT_DIR/ios/courier_flutter/Sources/courier_flutter/CourierFlutterDelegate.swift"
+update_swift_file "$ROOT_DIR/ios/courier_flutter/Sources/courier_flutter/CourierFlutterMethodHandler.swift"
 
 update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierPlugin.kt"
 update_kotlin_file "$ROOT_DIR/android/src/main/kotlin/com/courier/courier_flutter/CourierFlutterFragmentActivity.kt"

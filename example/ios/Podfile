@@ -43,8 +43,3 @@ post_install do |installer|
     end
   end
 end
-
-target 'CourierService' do
-	use_frameworks!
-	pod 'Courier_iOS'
-end

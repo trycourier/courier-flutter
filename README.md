@@ -12,7 +12,11 @@ Requires Flutter 3.29+ (Dart 3.7+), iOS 15.0+, Android SDK 23+, and Gradle 8.4+.
 flutter pub add courier_flutter
 ```
 
-After adding the package, run `cd ios && pod install`.
+### iOS
+
+Flutter sets up the native iOS SDK, [Courier_iOS](https://github.com/trycourier/courier-ios), when it builds.
+
+**Notification service extension:** add Courier_iOS to the extension target with Swift Package Manager. In Xcode, choose **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, and pick **Up to Next Major Version**. If the extension has `pod 'Courier_iOS'` in your Podfile, remove it.
 
 ## Quick Start
 

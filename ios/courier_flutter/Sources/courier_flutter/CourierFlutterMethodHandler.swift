@@ -6,6 +6,7 @@
 //
 
 import Courier_iOS
+import Foundation
 
 public class CourierFlutterMethodHandler: NSObject {
     

@@ -6,6 +6,7 @@
 //
 
 @preconcurrency import Courier_iOS
+import Flutter
 import Foundation
 
 internal class CourierClientMethodHandler: CourierFlutterMethodHandler, FlutterPlugin {
