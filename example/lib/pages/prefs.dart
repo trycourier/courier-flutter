@@ -52,7 +52,6 @@ class _PrefsPageState extends State<PrefsPage> with SingleTickerProviderStateMix
     ),
     'Styled': CourierPreferences(
       keepAlive: true,
-      showCourierFooter: false,
       lightTheme: customTheme,
       darkTheme: customTheme,
       mode: ChannelsMode(channels: [CourierUserPreferencesChannel.push, CourierUserPreferencesChannel.sms, CourierUserPreferencesChannel.email]),
