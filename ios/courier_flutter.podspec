@@ -16,9 +16,9 @@ Inbox, Push Notification & Preferences for Flutter by Courier
   s.source           = { :path => '.' }
   s.source_files = 'courier_flutter/Sources/courier_flutter/**/*.swift'
   s.dependency 'Flutter'
-  # 6.0.7 is the last Courier_iOS on CocoaPods trunk (read-only from December 2, 2026). Apps on
+  # 6.0.10 is the last Courier_iOS on CocoaPods trunk (read-only from December 2, 2026). Apps on
   # Swift Package Manager get newer versions through Package.swift.
-  s.dependency 'Courier_iOS', '6.0.7'
+  s.dependency 'Courier_iOS', '6.0.10'
   s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.

@@ -8,6 +8,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Pinned so a new stable release can't break every PR at once. Bump it on purpose, with the
+# example's Gradle setup if the new release needs it.
+env:
+  FLUTTER_VERSION: "3.50.0"
+
 jobs:
   flutter-tests:
     name: Flutter tests
@@ -20,7 +25,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Generate gitignored files from secrets
         env:
@@ -166,19 +171,218 @@ jobs:
           working-directory: example
           script: flutter test integration_test/client_tests.dart integration_test/shared_tests.dart
 
-  # Compiles the plugin's Swift (ios/courier_flutter/Sources) against the Courier_iOS version pinned in
-  # ios/courier_flutter.podspec, through CocoaPods. `ios-build-spm` does the same through Swift Package
-  # Manager. Without them a Courier_iOS bump that breaks the Swift bridge would pass CI.
-  # Build-only: placeholder config, no secrets, no signing.
-  ios-build:
-    name: iOS build
-    runs-on: macos-15
+  # Builds a new app on the oldest Flutter that pubspec.yaml allows, so the published minimum stays
+  # true. The example can't do this: it tracks current Flutter. Build-only: no secrets, no signing.
+  minimum-flutter:
+    name: Minimum Flutter (Android build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: minimum-flutter-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read the minimum Flutter version
+        id: min
+        run: |
+          VERSION=$(sed -nE 's/^  flutter: ">=([0-9.]+)".*/\1/p' pubspec.yaml)
+          echo "Minimum Flutter: $VERSION"
+          [ -n "$VERSION" ]
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.min.outputs.version }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # A fresh app from that Flutter's template, set up the way the README and docs describe:
+      # JitPack for courier-android, and Android SDK 23 or later.
+      - name: Create an app that uses the plugin
+        working-directory: ${{ runner.temp }}
+        run: |
+          flutter create --platforms android --org com.example min_app
+          cd min_app
+          flutter pub add courier_flutter --path "$GITHUB_WORKSPACE"
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle*
+          sed -i 's/mavenCentral()/mavenCentral()\n        maven { url = uri("https:\/\/jitpack.io") }/' android/build.gradle*
+          grep -n "minSdk" android/app/build.gradle*
+          grep -n "jitpack" android/build.gradle*
+          cat > lib/main.dart <<'DART'
+          import 'package:courier_flutter/courier_flutter.dart';
+          import 'package:courier_flutter/ui/inbox/courier_inbox.dart';
+          import 'package:flutter/material.dart';
+
+          void main() {
+            runApp(MaterialApp(home: Scaffold(body: CourierInbox())));
+            Courier.shared.userId.then((id) => debugPrint('Signed in as $id'));
+          }
+          DART
+
+      - name: Build the app
+        working-directory: ${{ runner.temp }}/min_app
+        run: flutter build apk --debug
+
+  # Builds a new app with AGP 9's built-in Kotlin turned on. The template and the example both opt
+  # out, so without this nothing checks that the plugin skips the Kotlin plugin when it must.
+  # package_info_plus is overridden to a release that supports built-in Kotlin, since the 8.x the
+  # plugin allows doesn't; this job tests courier_flutter's own Gradle setup.
+  built-in-kotlin:
+    name: Built-in Kotlin (Android build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: built-in-kotlin-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Create an app that uses the plugin
+        working-directory: ${{ runner.temp }}
+        run: |
+          flutter create --platforms android --org com.example kotlin_app
+          cd kotlin_app
+          flutter pub add courier_flutter --path "$GITHUB_WORKSPACE"
+          printf '\ndependency_overrides:\n  package_info_plus: ^10.2.2\n' >> pubspec.yaml
+          flutter pub get
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle*
+          sed -i 's/mavenCentral()/mavenCentral()\n        maven { url = uri("https:\/\/jitpack.io") }/' android/build.gradle*
+          sed -i 's/android.builtInKotlin=false/android.builtInKotlin=true/; s/android.newDsl=false/android.newDsl=true/' android/gradle.properties
+          grep -q "android.builtInKotlin=true" android/gradle.properties
+          grep -n "builtInKotlin\|newDsl" android/gradle.properties
+
+      - name: Build the app
+        working-directory: ${{ runner.temp }}/kotlin_app
+        run: flutter build apk --debug
+
+  # Compiles the plugin's Kotlin (android/) and the example app against the courier-android
+  # version pinned in android/build.gradle, without secrets or an emulator, so a bump that breaks
+  # the bridge fails here even when the integration tests can't run. Build-only: no signing.
+  android-build:
+    name: Android build
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     concurrency:
-      group: ios-build-${{ github.ref }}
+      group: android-build-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      # The example imports these gitignored files, and the Google Services plugin needs a
+      # google-services.json for the example's application id. Placeholder values compile fine.
+      - name: Write placeholder example config
+        working-directory: example
+        run: |
+          cat > lib/env.dart <<'DART'
+          import 'courier_environment.dart';
+
+          class Env {
+            static const authKey = "";
+            static const clientKey = "";
+            static const brandId = "";
+            static const preferenceTopicId = "";
+            static const localEnvironments = <CourierEnvironment>[];
+          }
+          DART
+          cat > lib/firebase_options.dart <<'DART'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static const FirebaseOptions currentPlatform = FirebaseOptions(
+              apiKey: '',
+              appId: '',
+              messagingSenderId: '',
+              projectId: '',
+            );
+          }
+          DART
+          cat > android/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "placeholder",
+              "storage_bucket": "placeholder.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": { "package_name": "com.courier.flutter_app" }
+                },
+                "oauth_client": [],
+                "api_key": [{ "current_key": "placeholder" }],
+                "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd example && flutter pub get
+
+      - name: Build example app
+        working-directory: example
+        run: flutter build apk --debug
+
+  # Compiles the plugin's Swift (ios/Classes) against the Courier_iOS version pinned in
+  # ios/courier_flutter.podspec. Nothing else in CI builds iOS, so a Courier_iOS bump that breaks
+  # the Swift bridge would otherwise pass. Built on the current Xcode and on the oldest one
+  # courier-ios still builds on. Build-only: placeholder config, no secrets, no signing.
+  ios-build-xcode:
+    name: iOS build (Xcode ${{ matrix.xcode }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            xcode: '26.6'
+          - runner: macos-15
+            xcode: '16.4'
+    concurrency:
+      group: ios-build-${{ matrix.xcode }}-${{ github.ref }}
       cancel-in-progress: true
     env:
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
       LANG: en_US.UTF-8
     steps:
       - name: Checkout
@@ -187,7 +391,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       # The example imports these gitignored files. Empty values compile fine; nothing runs.
@@ -219,8 +423,9 @@ jobs:
           DART
           plutil -create xml1 ios/Runner/GoogleService-Info.plist
 
-      # This job covers the CocoaPods path, which apps on older Flutter or with Swift Package
-      # Manager turned off still use. `iOS build (Swift Package Manager)` covers the other path.
+      # The example integrates plugins through CocoaPods. Newer Flutter moves SPM-capable plugins
+      # (firebase_core) to Swift Package Manager, which leaves firebase_messaging's pod without its
+      # firebase_core dependency, so keep this build on CocoaPods.
       - name: Install dependencies
         run: |
           flutter config --no-enable-swift-package-manager
@@ -234,9 +439,9 @@ jobs:
           path: |
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock', 'ios/courier_flutter.podspec') }}
+          key: ${{ runner.os }}-xcode-${{ matrix.xcode }}-pods-${{ hashFiles('example/ios/Podfile.lock', 'ios/courier_flutter.podspec') }}
           restore-keys: |
-            ${{ runner.os }}-pods-
+            ${{ runner.os }}-xcode-${{ matrix.xcode }}-pods-
 
       # `pod update Courier_iOS` rather than `pod install`: bump PRs change the podspec pin without
       # touching example/ios/Podfile.lock, and install would refuse the stale lock.
@@ -264,16 +469,18 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             -quiet
 
+  # Builds the example with Swift Package Manager turned on, so courier_flutter's Package.swift has
+  # to resolve and compile, and Courier_iOS has to come from SPM rather than CocoaPods trunk.
   ios-build-spm:
     name: iOS build (Swift Package Manager)
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 45
     concurrency:
       group: ios-build-spm-${{ github.ref }}
       cancel-in-progress: true
     env:
       # The example's Firebase packages need Swift tools 6.2, which ships with Xcode 26
-      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       LANG: en_US.UTF-8
     # SwiftPM names a path dependency after its folder, and it has to match the courier_flutter
     # package, so the repo can't sit in the default courier-flutter folder
@@ -289,7 +496,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       # The example imports these gitignored files. Empty values compile fine; nothing runs.
@@ -321,14 +528,14 @@ jobs:
           DART
           plutil -create xml1 ios/Runner/GoogleService-Info.plist
 
-      # The podspec stays on 6.0.7, the last Courier_iOS on CocoaPods trunk: a newer pin can't
+      # The podspec stays on 6.0.10, the last Courier_iOS on CocoaPods trunk: a newer pin can't
       # install there. Package.swift gets every release.
       - name: Check the Courier_iOS pins
         run: |
           PODSPEC=$(sed -nE "s/.*s\.dependency 'Courier_iOS', '([^']+)'.*/\1/p" ios/courier_flutter.podspec)
           PACKAGE=$(sed -nE 's/.*courier-ios", exact: "([^"]+)".*/\1/p' ios/courier_flutter/Package.swift)
           echo "podspec: $PODSPEC  Package.swift: $PACKAGE"
-          [ "$PODSPEC" = "6.0.7" ] && [ -n "$PACKAGE" ]
+          [ "$PODSPEC" = "6.0.10" ] && [ -n "$PACKAGE" ]
 
       - name: Install dependencies
         run: |
@@ -350,3 +557,15 @@ jobs:
           PINNED=$(sed -nE 's/.*courier-ios", exact: "([^"]+)".*/\1/p' ../../ios/courier_flutter/Package.swift)
           echo "Package.swift: $PINNED  Resolved: $RESOLVED"
           [ "$PINNED" = "$RESOLVED" ]
+
+  # The main branch ruleset requires a check named "iOS build". It passes only when every Xcode
+  # build and the Swift Package Manager build passed. always() keeps it from being skipped, since
+  # a skipped check counts as passed.
+  ios-build:
+    name: iOS build
+    needs: [ios-build-xcode, ios-build-spm]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the Xcode and Swift Package Manager builds
+        run: '[ "${{ needs.ios-build-xcode.result }}" = "success" ] && [ "${{ needs.ios-build-spm.result }}" = "success" ]'

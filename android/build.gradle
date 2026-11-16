@@ -3,7 +3,7 @@ version '1.0-SNAPSHOT'
 
 buildscript {
 
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '2.3.0'
 
     repositories {
         google()
@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.android.tools.build:gradle:8.13.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -25,25 +25,32 @@ allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+// AGP 9 compiles Kotlin itself (built-in Kotlin) unless the app sets android.builtInKotlin=false.
+// Apply the Kotlin plugin only on AGP 8 or when the app opts out, so apps on every Flutter from
+// the minimum up keep building. It goes through pluginManager because Flutter warns about plugins
+// that still apply the Kotlin plugin by reading `apply plugin:` lines.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlin = agpMajor >= 9 && providers.gradleProperty('android.builtInKotlin')
+        .map { it.toBoolean() }
+        .getOrElse(true)
+if (!builtInKotlin) {
+    pluginManager.apply('org.jetbrains.kotlin.android')
+}
 
 android {
 
     namespace 'com.courier.courier_flutter'
 
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         minSdkVersion 23
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -52,11 +59,27 @@ android {
 
 }
 
+// AGP 9 drops android.kotlinOptions. Older apps can be on a Kotlin plugin that predates
+// kotlin.compilerOptions, so AGP 8 keeps kotlinOptions.
+if (agpMajor >= 9) {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
+} else {
+    android {
+        kotlinOptions {
+            jvmTarget = '17'
+        }
+    }
+}
+
 dependencies {
     implementation 'com.google.code.gson:gson:2.11.0'
 
     // Courier Core SDK
-    api 'com.github.trycourier:courier-android:6.1.2'
+    api 'com.github.trycourier:courier-android:6.1.7'
 
     // Firebase Messaging (needed to resolve RemoteMessage from Courier SDK APIs)
     compileOnly 'com.google.firebase:firebase-messaging:23.4.1'

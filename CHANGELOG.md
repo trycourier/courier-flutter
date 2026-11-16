@@ -1,5 +1,36 @@
 
-## 5.0.6
+## 5.1.0
+
+- chore: release 5.1.0 with Courier_iOS 6.0.10 and courier-android 6.1.6 (#84)
+- Bump Courier_iOS to 6.0.10 (#83)
+- Bump courier-android to 6.1.6 (#82)
+- fix: decode a preference topic that isn't in a section (#81)
+- build(android): support AGP 9 built-in Kotlin without raising app minimums (#80)
+- feat(ui): stop showing the "Powered by Courier" footer (#76)
+- ci: build Android, build iOS on Xcode 26 and 16.4, pin Flutter 3.47.9 (#79)
+- fix(ui): inbox and preferences background color, partial styles, dark defaults (#75)
+- fix(android): remove auth listeners from the map and send inbox loading events (#78)
+- fix(ios): handle method calls on the main actor (#77)
+- fix(example): follow the system dark mode (#74)
+- chore: build on current Android tooling and raise the minimum Flutter to 3.29 (#72)
+
+## 5.0.8
+
+- chore: release 5.0.8 with Courier_iOS 6.0.9 and courier-android 6.1.5 (#70)
+- Bump courier-android to 6.1.5 (#68)
+- Bump Courier_iOS to 6.0.9 (#69)
+
+## 5.0.7
+
+- chore: release 5.0.7 with Courier_iOS 6.0.7 (#64)
+- Bump Courier_iOS to 6.0.7 (#62)
+- Bump Courier_iOS to 6.0.5 (#60)
+- refactor(example): move the environment list into a class
+- chore(example): upgrade google_fonts to 8.2.1 and unpin Flutter in the iOS build (#57)
+- ci(deploy): land CHANGELOG.md through a PR instead of pushing to main (#56)
+- ci: build the example app for iOS Simulator on PRs (#54)
+
+## v5.0.6
 
 - chore: bump to 5.0.6 to publish the Courier_iOS 5.9.0 and courier-android 6.1.2 pins (#55)
 - Bump Courier_iOS to 5.9.0 (#53)
@@ -7,30 +38,25 @@
 
 ## v5.0.5
 
-- Update CHANGELOG.md for 5.0.5 [skip ci]
 - chore: bump to 5.0.5 to publish the Courier_iOS 5.8.6 pin (#52)
 - Bump Courier_iOS to 5.8.6 (#51)
 
 ## v5.0.4
 
-- Update CHANGELOG.md for 5.0.4 [skip ci]
 - feat: report inbox action clicks automatically (#50)
 
 ## v5.0.3
 
-- Update CHANGELOG.md for 5.0.3 [skip ci]
 - chore: update copyright year to 2026 and bump to 5.0.3 (#46)
 
 ## v5.0.2
 
-- Update CHANGELOG.md for 5.0.2 [skip ci]
 - chore: bump SDK version to 5.0.2 (#43)
 - Bump Courier_iOS to 5.8.3 (#42)
 - docs: slim README and delete legacy Docs/ folder (#41)
 
 ## v5.0.1
 
-- Update CHANGELOG.md for 5.0.1 [skip ci]
 - Release courier_flutter 5.0.1
 - Align ExampleService with courier-android 6.1.0 and bump example build
 - Bump courier-android to 6.1.0
@@ -52,27 +78,20 @@
 
 ## v4.3.2
 
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: use v-prefixed tags for pub.dev OIDC allowlist
 
 ## 4.3.2
 
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: trigger pub.dev publish from tag-dispatch run
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Deploy: checkout tag ref for publish so CHANGELOG is included
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Retrigger deploy for 4.3.2
 - Fix CHANGELOG generation to include current version entry
-- Update CHANGELOG.md for 4.3.2 [skip ci]
 - Bump version to 4.3.2 and simplify deploy workflow
 
 ## 4.3.1
 
-- Update CHANGELOG.md for 4.3.1 [skip ci]
 - Deploy: publish from tag ref to satisfy pub.dev OIDC requirements
 - Deploy: add [skip ci] to CHANGELOG commit to prevent re-trigger loop
-- Update CHANGELOG.md for 4.3.1
 - Deploy: auto-generate CHANGELOG.md from git tags at release time
 - Add CHANGELOG.md for pub.dev publishing
 - Deploy: use official dart-lang publish workflow for OIDC auth
