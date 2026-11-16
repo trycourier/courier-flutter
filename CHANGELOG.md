@@ -37,32 +37,32 @@
 - ci(deploy): land CHANGELOG.md through a PR instead of pushing to main (#56)
 - ci: build the example app for iOS Simulator on PRs (#54)
 
-## 5.0.6
+## v5.0.6
 
 - chore: bump to 5.0.6 to publish the Courier_iOS 5.9.0 and courier-android 6.1.2 pins (#55)
 - Bump Courier_iOS to 5.9.0 (#53)
 - Bump courier-android to 6.1.2 (#47)
 
-## 5.0.5
+## v5.0.5
 
 - chore: bump to 5.0.5 to publish the Courier_iOS 5.8.6 pin (#52)
 - Bump Courier_iOS to 5.8.6 (#51)
 
-## 5.0.4
+## v5.0.4
 
 - feat: report inbox action clicks automatically (#50)
 
-## 5.0.3
+## v5.0.3
 
 - chore: update copyright year to 2026 and bump to 5.0.3 (#46)
 
-## 5.0.2
+## v5.0.2
 
 - chore: bump SDK version to 5.0.2 (#43)
 - Bump Courier_iOS to 5.8.3 (#42)
 - docs: slim README and delete legacy Docs/ folder (#41)
 
-## 5.0.1
+## v5.0.1
 
 - Release courier_flutter 5.0.1
 - Align ExampleService with courier-android 6.1.0 and bump example build
@@ -72,7 +72,7 @@
 - Bump example app version to 1.0.0+30
 - Simplify deploy workflow
 
-## 5.0.0
+## v5.0.0
 
 - Add 5.0.0 entry to CHANGELOG.md
 - Upgrade actions/checkout from v5 to v6
@@ -83,7 +83,7 @@
 - Bump courier-android to 6.0.0 and remove bundled Firebase dependency
 - Android example: load signing files from shared flutter keystore folder.
 
-## 4.3.2
+## v4.3.2
 
 - Deploy: use v-prefixed tags for pub.dev OIDC allowlist
 
