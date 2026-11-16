@@ -8,10 +8,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Pinned so a new stable release can't break every PR at once. Flutter 3.50 requires
-# Android Gradle Plugin 9.1.1+, and the plugin and example are still on 8.x.
+# Pinned so a new stable release can't break every PR at once. Bump it on purpose, with the
+# example's Gradle setup if the new release needs it.
 env:
-  FLUTTER_VERSION: "3.47.9"
+  FLUTTER_VERSION: "3.50.0"
 
 jobs:
   flutter-tests:
@@ -228,6 +228,50 @@ jobs:
 
       - name: Build the app
         working-directory: ${{ runner.temp }}/min_app
+        run: flutter build apk --debug
+
+  # Builds a new app with AGP 9's built-in Kotlin turned on. The template and the example both opt
+  # out, so without this nothing checks that the plugin skips the Kotlin plugin when it must.
+  # package_info_plus is overridden to a release that supports built-in Kotlin, since the 8.x the
+  # plugin allows doesn't; this job tests courier_flutter's own Gradle setup.
+  built-in-kotlin:
+    name: Built-in Kotlin (Android build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: built-in-kotlin-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Create an app that uses the plugin
+        working-directory: ${{ runner.temp }}
+        run: |
+          flutter create --platforms android --org com.example kotlin_app
+          cd kotlin_app
+          flutter pub add courier_flutter --path "$GITHUB_WORKSPACE"
+          printf '\ndependency_overrides:\n  package_info_plus: ^10.2.2\n' >> pubspec.yaml
+          flutter pub get
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle*
+          sed -i 's/mavenCentral()/mavenCentral()\n        maven { url = uri("https:\/\/jitpack.io") }/' android/build.gradle*
+          sed -i 's/android.builtInKotlin=false/android.builtInKotlin=true/; s/android.newDsl=false/android.newDsl=true/' android/gradle.properties
+          grep -q "android.builtInKotlin=true" android/gradle.properties
+          grep -n "builtInKotlin\|newDsl" android/gradle.properties
+
+      - name: Build the app
+        working-directory: ${{ runner.temp }}/kotlin_app
         run: flutter build apk --debug
 
   # Compiles the plugin's Kotlin (android/) and the example app against the courier-android

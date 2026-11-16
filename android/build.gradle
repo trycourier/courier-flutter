@@ -25,7 +25,18 @@ allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+// AGP 9 compiles Kotlin itself (built-in Kotlin) unless the app sets android.builtInKotlin=false.
+// Apply the Kotlin plugin only on AGP 8 or when the app opts out, so apps on every Flutter from
+// the minimum up keep building. It goes through pluginManager because Flutter warns about plugins
+// that still apply the Kotlin plugin by reading `apply plugin:` lines.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlin = agpMajor >= 9 && providers.gradleProperty('android.builtInKotlin')
+        .map { it.toBoolean() }
+        .getOrElse(true)
+if (!builtInKotlin) {
+    pluginManager.apply('org.jetbrains.kotlin.android')
+}
 
 android {
 
@@ -42,14 +53,26 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+}
+
+// AGP 9 drops android.kotlinOptions. Older apps can be on a Kotlin plugin that predates
+// kotlin.compilerOptions, so AGP 8 keeps kotlinOptions.
+if (agpMajor >= 9) {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
+} else {
+    android {
+        kotlinOptions {
+            jvmTarget = '17'
+        }
+    }
 }
 
 dependencies {
