@@ -12,9 +12,9 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework"),
-        // Swift Package Manager gets every Courier_iOS release. The podspec stays on 6.0.7, the last
-        // version on CocoaPods trunk, so the two pins differ from here on.
-        .package(url: "https://github.com/trycourier/courier-ios", exact: "6.0.8")
+        // Swift Package Manager gets every Courier_iOS release. The podspec stays on 6.0.10, the last
+        // version on CocoaPods trunk, so the two pins differ once a newer Courier_iOS ships.
+        .package(url: "https://github.com/trycourier/courier-ios", exact: "6.0.10")
     ],
     targets: [
         .target(

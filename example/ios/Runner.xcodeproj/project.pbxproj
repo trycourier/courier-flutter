@@ -828,7 +828,7 @@
 			repositoryURL = "https://github.com/trycourier/courier-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.8;
+				minimumVersion = 6.0.10;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
