@@ -49,16 +49,19 @@ class CourierUserPreferencesTopic {
     required this.sectionId,
   });
 
+  // The single-topic read leaves out section_id and section_name when the topic isn't in a
+  // section, and the API doesn't promise the routing fields either. Missing ones fall back to
+  // empty values instead of throwing.
   factory CourierUserPreferencesTopic.fromJson(Map<String, dynamic> json) {
     return CourierUserPreferencesTopic(
       defaultStatus: CourierUserPreferencesStatus.fromJson(json['default_status'] as String),
-      hasCustomRouting: json['has_custom_routing'] as bool,
-      customRouting: (json['custom_routing'] as List<dynamic>).map((item) => CourierUserPreferencesChannel.fromJson(item)).toList(),
+      hasCustomRouting: json['has_custom_routing'] as bool? ?? false,
+      customRouting: (json['custom_routing'] as List<dynamic>? ?? []).map((item) => CourierUserPreferencesChannel.fromJson(item)).toList(),
       status: CourierUserPreferencesStatus.fromJson(json['status'] as String),
       topicId: json['topic_id'] as String,
       topicName: json['topic_name'] as String,
-      sectionName: json['section_name'] as String,
-      sectionId: json['section_id'] as String,
+      sectionName: json['section_name'] as String? ?? '',
+      sectionId: json['section_id'] as String? ?? '',
     );
   }
 
