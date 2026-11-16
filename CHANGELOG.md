@@ -1,5 +1,12 @@
 
-## 5.1.0
+## 5.2.0
+
+- chore: release 5.2.0 with Swift Package Manager support (#88)
+- feat(ios): support Swift Package Manager (#58)
+- docs: add 5.1.0 and 5.0.8 to the CHANGELOG (#87)
+- Bump courier-android to 6.1.7 (#86)
+
+## v5.1.0
 
 - chore: release 5.1.0 with Courier_iOS 6.0.10 and courier-android 6.1.6 (#84)
 - Bump Courier_iOS to 6.0.10 (#83)
@@ -14,13 +21,13 @@
 - fix(example): follow the system dark mode (#74)
 - chore: build on current Android tooling and raise the minimum Flutter to 3.29 (#72)
 
-## 5.0.8
+## v5.0.8
 
 - chore: release 5.0.8 with Courier_iOS 6.0.9 and courier-android 6.1.5 (#70)
 - Bump courier-android to 6.1.5 (#68)
 - Bump Courier_iOS to 6.0.9 (#69)
 
-## 5.0.7
+## v5.0.7
 
 - chore: release 5.0.7 with Courier_iOS 6.0.7 (#64)
 - Bump Courier_iOS to 6.0.7 (#62)
