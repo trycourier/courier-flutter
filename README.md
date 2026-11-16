@@ -16,7 +16,7 @@ flutter pub add courier_flutter
 
 Flutter sets up the native iOS SDK, [Courier_iOS](https://github.com/trycourier/courier-ios), when it builds.
 
-**Notification service extension:** add Courier_iOS to the extension target with Swift Package Manager. In Xcode, choose **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, and pick **Up to Next Major Version**. If the extension has `pod 'Courier_iOS'` in your Podfile, remove it.
+**Notification service extension:** add Courier_iOS to the extension target with Swift Package Manager. In Xcode, choose **File > Add Package Dependencies**, enter `https://github.com/trycourier/courier-ios`, and pick **Up to Next Major Version**. If the extension has `pod 'Courier_iOS'` in your Podfile, remove it. If Xcode then reports **Cycle inside Runner**, drag **Embed Foundation Extensions** above **Thin Binary** in the Runner target's **Build Phases**.
 
 ## Quick Start
 
